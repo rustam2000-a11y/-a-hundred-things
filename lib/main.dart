@@ -2,13 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'generated/codegen_loader.g.dart';
+import 'package:one_hundred_things/generated/locale_keys.g.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await FirebaseAuth.instance.signInAnonymously(); // Анонимная аутентификация
+  await EasyLocalization.ensureInitialized();
 
-  runApp(const MyApp());
+  await FirebaseAuth.instance.signInAnonymously();
+
+  runApp(
+    EasyLocalization(
+      supportedLocales: [Locale('en'), Locale('ru')],
+      path: 'assets/translations', // Путь к файлам перевода
+      fallbackLocale: Locale('en'), // Язык по умолчанию
+      assetLoader: CodegenLoader(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -17,6 +30,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       title: 'Firestore Demo',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: const MyHomePage(),
@@ -43,9 +59,9 @@ class _MyHomePageState extends State<MyHomePage> {
           'userId': FirebaseAuth.instance.currentUser?.uid,
           'timestamp': Timestamp.now(),
         });
-        _controller.clear(); // Очистка поля после добавления
+        _controller.clear();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Текст добавлен в Firestore")),
+          SnackBar(content: Text(LocaleKeys.text_added_to_firestore.tr())), // Используем локализованный текст
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -58,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Добавить текст в Firestore")),
+      appBar: AppBar(title: Text(LocaleKeys.add_text_to_firestore.tr())), // Используем ключ для перевода
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -66,15 +82,27 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             TextField(
               controller: _controller,
-              decoration: const InputDecoration(
-                labelText: "Введите текст",
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: LocaleKeys.enter_text.tr(), // Используем ключ для перевода
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _addToFirestore,
-              child: const Text("Добавить в Firestore"),
+              child: Text(LocaleKeys.add_text_to_firestore.tr()), // Используем ключ для перевода
+            ),
+            ElevatedButton(
+              onPressed: () {
+                context.setLocale(Locale('ru')); // Устанавливаем локаль на русский
+              },
+              child: Text(LocaleKeys.switch_language.tr()), // Используем ключ для перевода
+            ),
+            ElevatedButton(
+              onPressed: () {
+                context.setLocale(Locale('en')); // Устанавливаем локаль на английский
+              },
+              child: Text("Switch to English".tr()), // Используем локализованный текст
             ),
           ],
         ),
