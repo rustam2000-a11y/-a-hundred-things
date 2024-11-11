@@ -89,7 +89,7 @@ class AppColors {
   ];
 
   static const Color whiteColor = Colors.white; // HexColor('#F2EFF8');
-  static const Color silverColor = Color(0xFFBABABA); // HexColor('#F2EFF8');
+  static const Color silverColor = Color(0xFF7984FF); // HexColor('#F2EFF8');
   static const Color royalBlue = Color(0xFF2868E8); // HexColor('#F2EFF8');
   static const Color silverSand = Color(0xFFC7C8C9); // HexColor('#F2EFF8');
   static const Color silverColor3 = Color(0xFFC5C5C5); // HexColor('#F2EFF8');
