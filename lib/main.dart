@@ -106,20 +106,24 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _birthdayController = TextEditingController();
   final TextEditingController _loginEmailController = TextEditingController();
-  final TextEditingController _loginPasswordController = TextEditingController();
+  final TextEditingController _loginPasswordController =
+      TextEditingController();
   int _currentIndex = 0;
-
 
   Future<void> _login(BuildContext context) async {
     try {
       UserCredential userCredential =
           await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
+        email: _loginEmailController.text.trim(),
+        password: _loginPasswordController.text.trim(),
       );
 
-      // Add user to Firestore
-      await _addUserToFirestore(userCredential.user);
+      // Действия после успешного входа
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (_) => MyHomePage(toggleTheme: widget.toggleTheme)),
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error: $e")),
@@ -378,6 +382,10 @@ class _LoginPageState extends State<LoginPage> {
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black,
                     side: BorderSide(color: Colors.grey),
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(10), // Added border radius
+                    ),
                   ),
                 ),
                 SizedBox(height: 20),
@@ -405,6 +413,10 @@ class _LoginPageState extends State<LoginPage> {
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black,
                     side: BorderSide(color: Colors.grey),
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(10), // Added border radius
+                    ),
                   ),
                 ),
                 SizedBox(height: 16),
@@ -467,7 +479,11 @@ class _LoginPageState extends State<LoginPage> {
               controller: _emailController,
               decoration: InputDecoration(
                 labelText: "Email",
-                border: const OutlineInputBorder(),
+                border: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(10),
+                  ),
+                ),
               ),
             ),
             SizedBox(height: 16),
@@ -480,9 +496,16 @@ class _LoginPageState extends State<LoginPage> {
               controller: _passwordController,
               decoration: InputDecoration(
                 labelText: "Пароль",
-                border: const OutlineInputBorder(),
+                border: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(10),
+                  ),
+                ),
               ),
               obscureText: true,
+            ),
+            SizedBox(
+              height: 16,
             ),
             Align(
               alignment: Alignment.bottomLeft,
@@ -493,7 +516,11 @@ class _LoginPageState extends State<LoginPage> {
               controller: _birthdayController,
               decoration: InputDecoration(
                 labelText: "Дата рождения",
-                border: const OutlineInputBorder(),
+                border: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(10),
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 16),
@@ -561,9 +588,13 @@ class _LoginPageState extends State<LoginPage> {
                 backgroundColor: Colors.white,
                 foregroundColor: Colors.black,
                 side: BorderSide(color: Colors.grey),
+                shape: RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.circular(10), // Added border radius
+                ),
               ),
             ),
-            SizedBox(height: 8),
+            SizedBox(height: 15),
             ElevatedButton.icon(
               onPressed: () async {
                 User? user = await signInWithApple();
@@ -588,6 +619,10 @@ class _LoginPageState extends State<LoginPage> {
                 backgroundColor: Colors.white,
                 foregroundColor: Colors.black,
                 side: BorderSide(color: Colors.grey),
+                shape: RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.circular(10), // Added border radius
+                ),
               ),
             ),
           ],
@@ -747,8 +782,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -839,7 +872,6 @@ class _MyHomePageState extends State<MyHomePage> {
                             },
                           ),
                         ),
-
                       ],
                     ),
                   ],
@@ -881,7 +913,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             children: [
                               Container(
                                 decoration: BoxDecoration(
-                                  color: Colors.red,
+                                  color: AppColors.royalBlue,
                                 ),
                                 child: Text(
                                   '$itemCount%',
@@ -1019,16 +1051,16 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (context, selectedItems, child) {
           return selectedItems.isNotEmpty
               ? FloatingActionButton.extended(
-            onPressed: _deleteSelectedItems,
-            label: Text('Удалить выбранные'),
-            icon: Icon(Icons.delete),
-            backgroundColor: Colors.redAccent,
-          )
+                  onPressed: _deleteSelectedItems,
+                  label: Text('Удалить выбранные'),
+                  icon: Icon(Icons.delete),
+                  backgroundColor: Colors.redAccent,
+                )
               : FloatingActionButton(
-            onPressed: _showAddItemBottomSheet,
-            child: Icon(Icons.add),
-            backgroundColor: Colors.blueAccent,
-          );
+                  onPressed: _showAddItemBottomSheet,
+                  child: Icon(Icons.add),
+                  backgroundColor: Colors.blueAccent,
+                );
         },
       ),
     );
@@ -1052,7 +1084,7 @@ class _MyHomePageState extends State<MyHomePage> {
           decoration: BoxDecoration(
             color: _selectedCategoryType == type
                 ? Colors.blueAccent
-                : Colors.grey[400],
+                : AppColors.silverColor,
             borderRadius: BorderRadius.circular(20),
           ),
           child: Center(
@@ -1081,314 +1113,312 @@ class _MyHomePageState extends State<MyHomePage> {
         bool isSelected = selectedItems.contains(itemId);
 
         return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4.0),
-        child: GestureDetector(
-        onTap: () {
-        showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        builder: (context) {
-        final screenHeight = MediaQuery.of(context).size.height;
-        final screenWidth = MediaQuery.of(context).size.width;
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          child: GestureDetector(
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                builder: (context) {
+                  final screenHeight = MediaQuery.of(context).size.height;
+                  final screenWidth = MediaQuery.of(context).size.width;
 
-        return SafeArea(
-        child: SingleChildScrollView(
-        child: Container(
-        height: screenHeight,
-        child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-        Container(
-        height: screenHeight * 0.6,
-        width: double.infinity,
-        color: Colors.deepPurpleAccent[200],
-        ),
-        Positioned(
-        top: screenHeight * 0.05,
-        left: 0,
-        right: 0,
-        child: Center(
-        child: Text(
-        'Тип: $type',
-        textAlign: TextAlign.center,
-        style: TextStyle(
-        color: Colors.white,
-        fontSize: screenWidth * 0.05,
-        fontWeight: FontWeight.bold,
-        ),
-        ),
-        ),
-        ),
-        Positioned(
-        top: screenHeight * 0.55,
-        left: 0,
-        right: 0,
-        child: Container(
-        height: screenHeight * 0.50,
-        padding: EdgeInsets.all(screenWidth * 0.05),
-        decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-        BoxShadow(
-        color: Colors.black.withOpacity(0.1),
-        spreadRadius: 3,
-        blurRadius: 5,
-        offset: Offset(0, 3),
-        ),
-        ],
-        ),
-        child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-        Text(
-        'Название:',
-        style: TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        ),
-        ),
-        SizedBox(height: 8),
-        Text(
-        title,
-        style: TextStyle(fontSize: 16),
-        ),
-        SizedBox(height: screenHeight * 0.02),
-        Text(
-        'Описание:',
-        style: TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        ),
-        ),
-        SizedBox(height: 8),
-        Text(
-        description,
-        style: TextStyle(fontSize: 16),
-        ),
-        ],
-        ),
-        ),
-        ),
-        Align(
-        alignment: Alignment.bottomCenter,
-        child: Container(
-        decoration: BoxDecoration(
-        color: Colors.blueAccent,
-        borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(20),
-        topRight: Radius.circular(20),
-        ),
-        ),
-        padding: EdgeInsets.symmetric(
-        vertical: screenHeight * 0.02),
-        child: Row(
-        mainAxisAlignment:
-        MainAxisAlignment.spaceEvenly,
-        children: [
-        ElevatedButton(
-        onPressed: () {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(
-        SnackBar(content: Text('Добавлено')),
-        );
-        },
-        child: Text(
-        "Добавить",
-        style: TextStyle(
-        fontSize: screenWidth * 0.04),
-        ),
-        ),
-        ElevatedButton(
-        onPressed: () async {
-        try {
-        await FirebaseFirestore.instance
-            .collection('item')
-            .doc(itemId)
-            .delete();
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context)
-            .showSnackBar(
-        SnackBar(
-        content: Text(
-        'Item deleted successfully')),
-        );
-        } catch (e) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-        );
-        }
-        },
-        style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.red,
-        ),
-        child: Text(
-        "Удалить",
-        style: TextStyle(
-        fontSize: screenWidth * 0.04),
-        ),
-        ),
-        ],
-        ),
-        ),
-        ),
-        ],
-        ),
-        ),
-        ),
-        );
-        },
-        );
-        },
-        onLongPress: () {
-        if (isSelected) {
-        _selectedItemsNotifier.value =
-        List.from(_selectedItemsNotifier.value)..remove(itemId);
-        } else {
-        _selectedItemsNotifier.value =
-        List.from(_selectedItemsNotifier.value)..add(itemId);
-        }
-        },
-        child: Container(
-        decoration: BoxDecoration(
-        color: Colors.grey[400],
-        borderRadius: BorderRadius.circular(20),
-        border: isSelected
-        ? Border.all(color: Colors.blueAccent, width: 2)
-            : null,
-        ),
-        child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-        Container(
-        width: 100,
-        height: 100,
-        decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.grey[300],
-        ),
-        child: Center(
-        child: Icon(Icons.image,
-        size: 40, color: Colors.grey[600]),
-        ),
-        ),
-        SizedBox(width: 16),
-        Expanded(
-        child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-        Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-        Expanded(
-        child: Text(
-        title,
-        style: TextStyle(
-        color: Colors.black,
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        ),
-        ),
-        ),
-        Row(
-        children: [
-        if (isSelected)
-        Container(
-        width: 24,
-        height: 24,
-        decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(4),
-        ),
-        child: Icon(
-        Icons.check,
-        color: Colors.white,
-        size: 18,
-        ),
-        ),
-        if (!isSelected)
-        Row(
-        children: [
-        IconButton(
-        icon: Icon(Icons.edit,
-        color: Colors.black),
-        onPressed: () {
-        _showEditItemBottomSheet(
-        context,
-        itemId: itemId,
-        initialTitle: title,
-        initialDescription: description,
-        initialType: type,
-        );
-        },
-        ),
-        IconButton(
-        icon: Icon(Icons.close,
-        color: Colors.black),
-        onPressed: () async {
-        try {
-        await FirebaseFirestore.instance
-            .collection('item')
-            .doc(itemId)
-            .delete();
-        ScaffoldMessenger.of(context)
-            .showSnackBar(
-        SnackBar(
-        content: Text(
-        'Item deleted successfully')),
-        );
-        } catch (e) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(
-        SnackBar(
-        content: Text('Error: $e')),
-        );
-        }
-        },
-        ),
-        ],
-        ),
-        ],
-        ),
-        ],
-        ),
-        Text(
-        description.length > 20
-        ? '${description.substring(0, 20)}...'
-            : description,
-        style: TextStyle(color: Colors.black),
-        ),
-        SizedBox(height: 8),
-        Text(
-        type,
-        style: TextStyle(
-        color: Colors.black,
-        fontSize: 14,
-        fontWeight: FontWeight.bold,
-        ),
-        ),
-        ],
-        ),
-        ),
-        ],
-        ),
-        ),
-        ),
-        ),
+                  return SafeArea(
+                    child: SingleChildScrollView(
+                      child: Container(
+                        height: screenHeight,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Container(
+                              height: screenHeight * 0.6,
+                              width: double.infinity,
+                              color: Colors.deepPurpleAccent[200],
+                            ),
+                            Positioned(
+                              top: screenHeight * 0.05,
+                              left: 0,
+                              right: 0,
+                              child: Center(
+                                child: Text(
+                                  'Тип: $type',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: screenWidth * 0.05,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: screenHeight * 0.55,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                height: screenHeight * 0.50,
+                                padding: EdgeInsets.all(screenWidth * 0.05),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      spreadRadius: 3,
+                                      blurRadius: 5,
+                                      offset: Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Название:',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      title,
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                    SizedBox(height: screenHeight * 0.02),
+                                    Text(
+                                      'Описание:',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      description,
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.blueAccent,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(20),
+                                    topRight: Radius.circular(20),
+                                  ),
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                    vertical: screenHeight * 0.02),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(content: Text('Добавлено')),
+                                        );
+                                      },
+                                      child: Text(
+                                        "Добавить",
+                                        style: TextStyle(
+                                            fontSize: screenWidth * 0.04),
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () async {
+                                        try {
+                                          await FirebaseFirestore.instance
+                                              .collection('item')
+                                              .doc(itemId)
+                                              .delete();
+                                          Navigator.pop(context);
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                                content: Text(
+                                                    'Item deleted successfully')),
+                                          );
+                                        } catch (e) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                                content: Text('Error: $e')),
+                                          );
+                                        }
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.red,
+                                      ),
+                                      child: Text(
+                                        "Удалить",
+                                        style: TextStyle(
+                                            fontSize: screenWidth * 0.04),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+            onLongPress: () {
+              if (isSelected) {
+                _selectedItemsNotifier.value =
+                    List.from(_selectedItemsNotifier.value)..remove(itemId);
+              } else {
+                _selectedItemsNotifier.value =
+                    List.from(_selectedItemsNotifier.value)..add(itemId);
+              }
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.silverColor,
+                borderRadius: BorderRadius.circular(20),
+                border: isSelected
+                    ? Border.all(color: Colors.blueAccent, width: 2)
+                    : null,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.grey[300],
+                      ),
+                      child: Center(
+                        child: Icon(Icons.image,
+                            size: 40, color: Colors.grey[600]),
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  title,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  if (isSelected)
+                                    Container(
+                                      width: 24,
+                                      height: 24,
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withOpacity(0.5),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Icon(
+                                        Icons.check,
+                                        color: Colors.white,
+                                        size: 18,
+                                      ),
+                                    ),
+                                  if (!isSelected)
+                                    Row(
+                                      children: [
+                                        IconButton(
+                                          icon: Icon(Icons.edit,
+                                              color: Colors.black),
+                                          onPressed: () {
+                                            _showEditItemBottomSheet(
+                                              context,
+                                              itemId: itemId,
+                                              initialTitle: title,
+                                              initialDescription: description,
+                                              initialType: type,
+                                            );
+                                          },
+                                        ),
+                                        IconButton(
+                                          icon: Icon(Icons.close,
+                                              color: Colors.black),
+                                          onPressed: () async {
+                                            try {
+                                              await FirebaseFirestore.instance
+                                                  .collection('item')
+                                                  .doc(itemId)
+                                                  .delete();
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                    content: Text(
+                                                        'Item deleted successfully')),
+                                              );
+                                            } catch (e) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                    content: Text('Error: $e')),
+                                              );
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Text(
+                            description.length > 20
+                                ? '${description.substring(0, 20)}...'
+                                : description,
+                            style: TextStyle(color: Colors.black),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            type,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         );
       },
     );
   }
 
-
-
-
   void _showSearchBottomSheet() {
     final StreamController<String> _searchStreamController =
-    StreamController<String>();
+        StreamController<String>();
 
     _searchController.addListener(() {
       _searchStreamController.add(_searchController.text.toLowerCase());
@@ -1435,8 +1465,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         stream: FirebaseFirestore.instance
                             .collection('item')
                             .where('userId',
-                            isEqualTo:
-                            FirebaseAuth.instance.currentUser?.uid)
+                                isEqualTo:
+                                    FirebaseAuth.instance.currentUser?.uid)
                             .snapshots(),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
@@ -1489,8 +1519,6 @@ class _MyHomePageState extends State<MyHomePage> {
           .close(); // Close the stream when the bottom sheet is dismissed
     });
   }
-
-
 
   // Функция для отображения bottom sheet при нажатии на кнопку "Добавить"
   void _showAddItemBottomSheet() {
@@ -1877,8 +1905,6 @@ void _showEditItemBottomSheet(
   );
 }
 
-
-
 class UserProfileScreen extends StatefulWidget {
   @override
   _UserProfileScreenState createState() => _UserProfileScreenState();
@@ -1890,7 +1916,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double spacing = screenHeight * 0.01; // Отступы между элементами
-    final double horizontalPadding = MediaQuery.of(context).size.width * 0.06; // Горизонтальные отступы
+    final double horizontalPadding =
+        MediaQuery.of(context).size.width * 0.06; // Горизонтальные отступы
 
     // Получение текущего аутентифицированного пользователя
     User? currentUser = FirebaseAuth.instance.currentUser;
@@ -1910,7 +1937,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             width: double.infinity,
             color: AppColors.silverColor,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 40.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 40.0),
               child: Column(
                 children: [
                   Row(
@@ -1918,7 +1946,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     children: [
                       IconButton(
                         onPressed: () {
-                          Navigator.pop(context); // Действие при нажатии — возвращение назад
+                          Navigator.pop(
+                              context); // Действие при нажатии — возвращение назад
                         },
                         icon: Icon(Icons.arrow_back), // Иконка "назад"
                         color: Colors.white,
@@ -1926,8 +1955,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     ],
                   ),
 
-
-                 // Опускаем содержимое на несколько пикселей вниз
+                  // Опускаем содержимое на несколько пикселей вниз
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -1935,7 +1963,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       Container(
                         width: 50,
                         height: 50,
-                        color: Colors.white, // Замените на нужный цвет или виджет
+                        color:
+                            Colors.white, // Замените на нужный цвет или виджет
                       ),
                       // Иконка настроек с другой стороны
                       IconButton(
@@ -1967,7 +1996,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             ),
           ),
           Positioned(
-            top: screenHeight * 0.15, // Слегка наслаивается на верхний контейнер
+            top: screenHeight * 0.15,
+            // Слегка наслаивается на верхний контейнер
             left: 0,
             right: 0,
             child: Container(
@@ -1991,13 +2021,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           // Аватарка
                           CircleAvatar(
                             radius: 30,
-                            backgroundImage: AssetImage('assets/avatar.png'), // Замените на изображение пользователя
+                            backgroundImage: AssetImage(
+                                'assets/avatar.png'), // Замените на изображение пользователя
                           ),
                           SizedBox(width: 16),
                           // Почта пользователя
                           Expanded(
                             child: Text(
-                              userEmail, // Отображение почты аутентифицированного пользователя
+                              userEmail,
+                              // Отображение почты аутентифицированного пользователя
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -2028,9 +2060,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         title: Text('Редактировать профиль'),
                         trailing: Icon(Icons.arrow_forward_ios),
                         onTap: () {
-                          Navigator.push(context,
-                            MaterialPageRoute(builder: (context) =>Account()
-                            ),
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Account()),
                           );
                         },
                       ),
@@ -2052,7 +2084,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         contentPadding: EdgeInsets.zero,
                         title: Text('Push-уведомления'),
                         trailing: Switch(
-                          value: true, // Замените на переменную, чтобы управлять состоянием
+                          value: true,
+                          // Замените на переменную, чтобы управлять состоянием
                           onChanged: (bool value) {
                             // Действие при переключении
                           },
@@ -2068,7 +2101,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         contentPadding: EdgeInsets.zero,
                         title: Text('Тема'),
                         trailing: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 8.0, vertical: 4.0),
                           decoration: BoxDecoration(
                             color: Colors.grey[200],
                             borderRadius: BorderRadius.circular(20),
@@ -2076,7 +2110,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           child: DropdownButton<String>(
                             value: _selectedTheme,
                             icon: Icon(Icons.arrow_drop_down),
-                            underline: SizedBox(), // Убираем стандартную линию под DropdownButton
+                            underline: SizedBox(),
+                            // Убираем стандартную линию под DropdownButton
                             onChanged: (String? newValue) {
                               setState(() {
                                 _selectedTheme = newValue!;
@@ -2154,7 +2189,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 }
 
-
 class Account extends StatefulWidget {
   const Account({super.key});
 
@@ -2178,7 +2212,8 @@ class _AccountState extends State<Account> {
               height: screenHeight * 0.25,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
-                color: Colors.grey, // Замените на AppColors.silverColor при необходимости
+                color: Colors
+                    .grey, // Замените на AppColors.silverColor при необходимости
               ),
               child: Stack(
                 clipBehavior: Clip.none,
@@ -2188,7 +2223,8 @@ class _AccountState extends State<Account> {
                     bottom: -screenHeight * 0.07,
                     child: CircleAvatar(
                       radius: screenHeight * 0.08,
-                      backgroundImage: AssetImage('assets/avatar.png'), // Проверьте путь к изображению
+                      backgroundImage: AssetImage('assets/avatar.png'),
+                      // Проверьте путь к изображению
                       backgroundColor: Colors.grey[300],
                     ),
                   ),
@@ -2253,8 +2289,7 @@ class _AccountState extends State<Account> {
                   TextField(
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8)
-                      ),
+                          borderRadius: BorderRadius.circular(8)),
                       hintText: 'Введите имя',
                     ),
                   ),
@@ -2272,8 +2307,7 @@ class _AccountState extends State<Account> {
                   TextField(
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8)
-                      ),
+                          borderRadius: BorderRadius.circular(8)),
                       hintText: 'Введите имеил',
                     ),
                   ),
@@ -2291,8 +2325,7 @@ class _AccountState extends State<Account> {
                   TextField(
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8)
-                      ),
+                          borderRadius: BorderRadius.circular(8)),
                       hintText: 'Введите номер',
                     ),
                   ),
@@ -2310,22 +2343,25 @@ class _AccountState extends State<Account> {
                   TextField(
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8)
-                      ),
+                          borderRadius: BorderRadius.circular(8)),
                       hintText: 'Введите пароль',
                     ),
                   ),
-                  SizedBox(height: screenHeight*0.08,),
+                  SizedBox(
+                    height: screenHeight * 0.08,
+                  ),
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
                         // Действие при нажатии кнопки
                       },
-                      child: Text("Обновить",
+                      child: Text(
+                        "Обновить",
                         style: TextStyle(color: Colors.white),
                       ),
                       style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.3, vertical: 15.0),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth * 0.3, vertical: 15.0),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         ),
@@ -2341,5 +2377,3 @@ class _AccountState extends State<Account> {
     );
   }
 }
-
-
