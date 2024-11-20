@@ -119,9 +119,9 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       // Действия после успешного входа
-      Navigator.pushReplacement(
+      await Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
+        MaterialPageRoute<dynamic>(
             builder: (_) => MyHomePage(toggleTheme: widget.toggleTheme)),
       );
     } catch (e) {
@@ -321,7 +321,7 @@ class _LoginPageState extends State<LoginPage> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
+                          MaterialPageRoute<dynamic>(
                               builder: (context) => ForgotPassword()),
                         );
                       },
@@ -363,9 +363,9 @@ class _LoginPageState extends State<LoginPage> {
                     User? user = await signInWithGoogle();
                     if (user != null) {
                       await _addUserToFirestore(user);
-                      Navigator.pushReplacement(
+                      await Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(
+                        MaterialPageRoute<dynamic>(
                             builder: (_) =>
                                 MyHomePage(toggleTheme: widget.toggleTheme)),
                       );
@@ -394,9 +394,9 @@ class _LoginPageState extends State<LoginPage> {
                     User? user = await signInWithApple();
                     if (user != null) {
                       await _addUserToFirestore(user);
-                      Navigator.pushReplacement(
+                      await Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(
+                        MaterialPageRoute<dynamic>(
                             builder: (_) =>
                                 MyHomePage(toggleTheme: widget.toggleTheme)),
                       );
@@ -527,15 +527,15 @@ class _LoginPageState extends State<LoginPage> {
             ElevatedButton(
               onPressed: () async {
                 try {
-                  UserCredential userCredential = await FirebaseAuth.instance
+                  final UserCredential userCredential = await FirebaseAuth.instance
                       .createUserWithEmailAndPassword(
                     email: _emailController.text.trim(),
                     password: _passwordController.text.trim(),
                   );
                   await _addUserToFirestore(userCredential.user);
-                  Navigator.pushReplacement(
+                  await Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(
+                    MaterialPageRoute<dynamic>(
                         builder: (_) =>
                             MyHomePage(toggleTheme: widget.toggleTheme)),
                   );
@@ -569,9 +569,9 @@ class _LoginPageState extends State<LoginPage> {
                 User? user = await signInWithGoogle();
                 if (user != null) {
                   await _addUserToFirestore(user);
-                  Navigator.pushReplacement(
+                  await Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(
+                    MaterialPageRoute<dynamic>(
                         builder: (_) =>
                             MyHomePage(toggleTheme: widget.toggleTheme)),
                   );
@@ -600,9 +600,9 @@ class _LoginPageState extends State<LoginPage> {
                 User? user = await signInWithApple();
                 if (user != null) {
                   await _addUserToFirestore(user);
-                  Navigator.pushReplacement(
+                  await Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(
+                    MaterialPageRoute<dynamic>(
                         builder: (_) =>
                             MyHomePage(toggleTheme: widget.toggleTheme)),
                   );
@@ -865,7 +865,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
+                                MaterialPageRoute<dynamic>(
                                   builder: (context) => UserProfileScreen(),
                                 ),
                               );
@@ -1973,9 +1973,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         onPressed: () async {
                           try {
                             await FirebaseAuth.instance.signOut();
-                            Navigator.push(
+                            await Navigator.push(
                               context,
-                              MaterialPageRoute(
+                              MaterialPageRoute<dynamic>(
                                 builder: (context) => LoginPage(
                                   toggleTheme: () {
                                     // Логика переключения темы
@@ -2062,7 +2062,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => Account()),
+                            MaterialPageRoute<dynamic>(builder: (context) => Account()),
                           );
                         },
                       ),
