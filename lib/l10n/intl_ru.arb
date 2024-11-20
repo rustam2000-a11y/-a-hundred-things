@@ -1,0 +1,10 @@
+{
+  "@@locale": "ru",
+  "title": "Flutter Example App",
+  "@title": {
+    "type": "text",
+    "placeholders": {}
+  },
+
+  "or": "или"
+}
