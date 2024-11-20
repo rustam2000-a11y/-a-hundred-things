@@ -1,13 +1,12 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:one_hundred_things/presentation/colors.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'dart:async';
-
 import 'generated/l10n.dart';
+import 'presentation/colors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,7 +48,7 @@ class _MyAppState extends State<MyApp> {
               ElevatedButton.styleFrom(backgroundColor: AppColors.silverColor),
         ),
       ),
-      localizationsDelegates: [S.delegate],
+      localizationsDelegates: [S.delegate,],
       supportedLocales: S.delegate.supportedLocales,
       darkTheme: ThemeData.dark(),
       themeMode: _themeMode,
@@ -940,7 +939,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Padding(
             padding: const EdgeInsets.only(left: 16.0),
             child: Text(
-              "Категории",
+              S.of(context).or,
               style: TextStyle(fontSize: 24),
             ),
           ),
@@ -1248,7 +1247,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         backgroundColor: Colors.red,
                                       ),
                                       child: Text(
-                                        "Удалить",
+                                        S.of(context).delete,
                                         style: TextStyle(
                                             fontSize: screenWidth * 0.04),
                                       ),

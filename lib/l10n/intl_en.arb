@@ -6,5 +6,6 @@
     "placeholders": {}
   },
 
-  "or": "or"
+  "or": "or",
+  "delete": "Удалить"
 }
