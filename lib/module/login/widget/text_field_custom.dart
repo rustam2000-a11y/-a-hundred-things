@@ -4,12 +4,7 @@ import '../../../generated/l10n.dart';
 import '../../../presentation/colors.dart';
 import '../../utils/base_text_field.dart';
 
-
-enum TextFieldType {
-  password,
-  email,
-  none
-}
+enum TextFieldType { password, email, none }
 
 abstract class TextFieldCustom extends StatefulWidget {
   const TextFieldCustom({
@@ -60,7 +55,6 @@ abstract class TextFieldCustom extends StatefulWidget {
 class _TextWidget extends State<TextFieldCustom> {
   late bool isObscureText;
 
-
   bool hasFocus = false;
 
   Color get getLabelColor {
@@ -79,7 +73,6 @@ class _TextWidget extends State<TextFieldCustom> {
 
   @override
   Widget build(BuildContext context) {
-   
     return Focus(
       onFocusChange: (hasFocus) {
         setState(() {
@@ -113,13 +106,11 @@ class _TextWidget extends State<TextFieldCustom> {
         decoration: InputDecoration(
           errorText: widget.errorText,
           border: const OutlineInputBorder(),
-          focusColor:Colors.grey,
+          focusColor: Colors.grey,
           labelText: getLabelText,
           errorMaxLines: 2,
-          contentPadding: const EdgeInsets.fromLTRB(14,
-              12, 14,16),
-          labelStyle:
-            TextStyle(fontSize: 14, color: getLabelColor),
+          contentPadding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
+          labelStyle: TextStyle(fontSize: 14, color: getLabelColor),
           errorStyle: const TextStyle(
             fontSize: 11,
             color: Colors.red,
@@ -132,8 +123,10 @@ class _TextWidget extends State<TextFieldCustom> {
                     });
                   },
                   icon: Icon(
-                    isObscureText ? Icons.remove_red_eye_sharp : Icons.hide_source,
-                    size:17,
+                    isObscureText
+                        ? Icons.remove_red_eye_sharp
+                        : Icons.hide_source,
+                    size: 17,
                   ))
               : null,
           suffixIconColor: Colors.grey,
@@ -150,7 +143,7 @@ class _TextWidget extends State<TextFieldCustom> {
           ),
           errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color:  Colors.red)),
+              borderSide: const BorderSide(color: Colors.red)),
           focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: Colors.red)),
@@ -164,15 +157,13 @@ class _TextWidget extends State<TextFieldCustom> {
   String get getLabelText {
     if (widget.label != null) return widget.label!;
 
-    
     if (widget.fieldType == TextFieldType.email) {
       return S.of(context).email;
     }
-    
+
     if (widget.fieldType == TextFieldType.password) {
       return S.of(context).password;
     }
-    
 
     return '';
   }
@@ -200,30 +191,30 @@ class TextFieldPasswordWidget extends TextFieldCustom {
           textCapitalization: TextCapitalization.none,
           onChanged: onChanged,
           scrollPadding: scrollPadding,
+
         );
 }
 
-
-
 class TextFieldEmailWidget extends TextFieldCustom {
-  const TextFieldEmailWidget(
-      {super.key,
-      required String? errorText,
-      required void Function(String)? onChanged,
-      required Color primaryColor,
-      void Function()? onTapComplete})
-      : super(
-            isPasswordTextfield: false,
-            fieldType: TextFieldType.email,
-            autocorrect: false,
-            keyBoardType: TextInputType.emailAddress,
-            autoFillHints: const [AutofillHints.email],
-            isDeleteWhiteSpace: true,
-            errorText: errorText,
-            onChanged: onChanged,
-            primaryColor: primaryColor,
-            textCapitalization: TextCapitalization.none,
-            onTapComplete: onTapComplete);
+  const TextFieldEmailWidget({
+    super.key,
+    required String? errorText,
+    required void Function(String)? onChanged,
+    required Color primaryColor,
+    void Function()? onTapComplete,
+    TextEditingController? controller,
+  }) : super(
+          isPasswordTextfield: false,
+          fieldType: TextFieldType.email,
+          autocorrect: false,
+          keyBoardType: TextInputType.emailAddress,
+          autoFillHints: const [AutofillHints.email],
+          isDeleteWhiteSpace: true,
+          errorText: errorText,
+          onChanged: onChanged,
+          primaryColor: primaryColor,
+          textCapitalization: TextCapitalization.none,
+          onTapComplete: onTapComplete,
+          controller: controller,
+        );
 }
-
-

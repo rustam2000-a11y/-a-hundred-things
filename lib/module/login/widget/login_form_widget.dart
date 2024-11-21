@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -17,12 +16,13 @@ class LoginFormWidget extends StatefulWidget {
 }
 
 class _LoginFormWidgetState extends State<LoginFormWidget> {
-
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _birthdayController = TextEditingController();
   final TextEditingController _loginEmailController = TextEditingController();
-  final TextEditingController _loginPasswordController = TextEditingController();
+  final TextEditingController _loginPasswordController =
+      TextEditingController();
+
   Future<void> addUserToFirestore(User? user) async {
     if (user != null) {
       await FirebaseFirestore.instance.collection('user').doc(user.uid).set({
@@ -33,10 +33,11 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
       });
     }
   }
+
   Future<void> _login(BuildContext context) async {
     try {
       UserCredential userCredential =
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _loginEmailController.text.trim(),
         password: _loginPasswordController.text.trim(),
       );
@@ -45,7 +46,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
       await Navigator.pushReplacement(
         context,
         MaterialPageRoute<dynamic>(
-            builder: (_) => MyHomePage(toggleTheme:(){})),
+            builder: (_) => MyHomePage(toggleTheme: () {})),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -71,11 +72,18 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                 SizedBox(height: 25),
                 Text("Почта", style: TextStyle(fontSize: 16)),
                 SizedBox(height: 5),
-                TextFieldEmailWidget(errorText: '', onChanged: (text ) {  }, primaryColor:AppColors.silverColor),
+                TextFieldEmailWidget(
+                    controller: _loginEmailController,
+                    errorText: '',
+                    onChanged: (text) {},
+                    primaryColor: AppColors.silverColor),
                 SizedBox(height: 16),
                 Text("Пароль", style: TextStyle(fontSize: 16)),
                 SizedBox(height: 5),
-                TextFieldPasswordWidget(onChanged: (text ) {  }, primaryColor: AppColors.silverColor),
+                TextFieldPasswordWidget(
+                    controller: _loginPasswordController,
+                    onChanged: (text) {},
+                    primaryColor: AppColors.silverColor),
                 SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -115,7 +123,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                 SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
-                     _login(context);
+                    _login(context);
                   },
                   child: Text("Войти"),
                   style: ElevatedButton.styleFrom(
@@ -144,8 +152,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                       await Navigator.pushReplacement(
                         context,
                         MaterialPageRoute<dynamic>(
-                            builder: (_) =>
-                                MyHomePage(toggleTheme: (){})),
+                            builder: (_) => MyHomePage(toggleTheme: () {})),
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -162,7 +169,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                     side: BorderSide(color: Colors.grey),
                     shape: RoundedRectangleBorder(
                       borderRadius:
-                      BorderRadius.circular(10), // Added border radius
+                          BorderRadius.circular(10), // Added border radius
                     ),
                   ),
                 ),
@@ -175,8 +182,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                       await Navigator.pushReplacement(
                         context,
                         MaterialPageRoute<dynamic>(
-                            builder: (_) =>
-                                MyHomePage(toggleTheme:(){})),
+                            builder: (_) => MyHomePage(toggleTheme: () {})),
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -193,7 +199,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                     side: BorderSide(color: Colors.grey),
                     shape: RoundedRectangleBorder(
                       borderRadius:
-                      BorderRadius.circular(10), // Added border radius
+                          BorderRadius.circular(10), // Added border radius
                     ),
                   ),
                 ),
@@ -207,21 +213,19 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
   }
 }
 
-
 Future<User?> signInWithGoogle() async {
   final GoogleSignIn googleSignIn = GoogleSignIn();
   final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
   if (googleUser == null) {
     return null;
   }
-  final GoogleSignInAuthentication googleAuth =
-  await googleUser.authentication;
+  final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
   final OAuthCredential credential = GoogleAuthProvider.credential(
     accessToken: googleAuth.accessToken,
     idToken: googleAuth.idToken,
   );
   final UserCredential userCredential =
-  await FirebaseAuth.instance.signInWithCredential(credential);
+      await FirebaseAuth.instance.signInWithCredential(credential);
   return userCredential.user;
 }
 
@@ -237,6 +241,6 @@ Future<User?> signInWithApple() async {
     accessToken: appleCredential.authorizationCode,
   );
   final userCredential =
-  await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+      await FirebaseAuth.instance.signInWithCredential(oauthCredential);
   return userCredential.user;
 }
