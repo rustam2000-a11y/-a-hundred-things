@@ -6,6 +6,8 @@
     "placeholders": {}
   },
 
-  "or": "или",
-  "delete": "Удалить"
+  "or": "or",
+  "delete": "delete",
+  "email": "Email",
+  "password": "Password"
 }

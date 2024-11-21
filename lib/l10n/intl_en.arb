@@ -7,5 +7,7 @@
   },
 
   "or": "or",
-  "delete": "Удалить"
+  "delete": "delete",
+  "email": "Email",
+  "password": "Password"
 }
