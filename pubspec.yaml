@@ -44,6 +44,11 @@ dependencies:
   static_analyze_av: ^0.3.0
   flutter_localization: ^0.2.2
   intl_utils: ^2.8.7
+  shared_preferences: ^2.3.3
+  firebase_storage: ^12.3.6
+  image_picker: ^1.1.2
+  photo_manager: ^3.6.3
+
 
 
 dev_dependencies:
