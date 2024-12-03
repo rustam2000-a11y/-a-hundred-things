@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:one_hundred_things/module/login/widget/login_form_widget.dart';
 import '../../presentation/colors.dart';
 import 'widget/registration_form_widget.dart';
-
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key, required this.toggleTheme});
 

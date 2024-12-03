@@ -1,18 +1,32 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 import 'package:one_hundred_things/module/home/WdgetHome/show_modal_buttom_sheet.dart';
 import '../../../generated/l10n.dart';
 import '../../../presentation/colors.dart';
 import 'edit_item_bottom_sheet.dart';
 import 'home_widget.dart';
+import 'show_add_item_bottom_sheet.dart'; // Импорт функции showAddItemBottomSheet
+import 'package:one_hundred_things/module/home/WdgetHome/home_widget.dart' as home;
+import 'package:one_hundred_things/module/home/WdgetHome/show_add_item_bottom_sheet.dart' as add_item;
 
 List<String> selectedItems = [];
 final ValueNotifier<List<String>> selectedItemsNotifier = ValueNotifier([]);
 String? selectedCategoryType;
 bool isSelectionMode = false; // Переменная для режима выбора
 
+/// Глобальный словарь для сохранения цветов по типу
+final Map<String, String> typeColors = {}; // Словарь для хранения цветов по типу
+
+/// Функция для получения цвета для типа из глобального словаря
+Color getColorForType(String type) {
+  if (!typeColorsCache.containsKey(type)) {
+    typeColorsCache[type] = home.getRandomColor(); // Используем функцию из home_widget.dart
+  }
+  return home.getColorFromHex(typeColorsCache[type]) ?? Colors.grey; // Используем функцию из home_widget.dart
+}
+
+/// Виджет карточки элемента
 Widget buildCardItem({
   required BuildContext context,
   required String itemId,
@@ -32,7 +46,7 @@ Widget buildCardItem({
           ? (isSelected
           ? AppColors.darkBlueGradient.colors.first
           : AppColors.blackSand)
-          : getColorFromHex(color) ?? AppColors.silverColor;
+          : getColorForType(type); // Используем глобальный цвет для типа
 
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -105,6 +119,7 @@ Widget buildCardItem({
   );
 }
 
+/// Функция для отображения изображения элемента
 Widget _buildImage(String? imageUrl, bool isDarkTheme) {
   return Container(
     width: 100,
@@ -129,6 +144,7 @@ Widget _buildImage(String? imageUrl, bool isDarkTheme) {
   );
 }
 
+/// Функция для отображения деталей элемента
 Widget _buildItemDetails({
   required BuildContext context,
   required String title,
@@ -186,6 +202,7 @@ Widget _buildItemDetails({
   );
 }
 
+/// Иконки действий для элемента
 Widget _buildActionIcons({
   required BuildContext context,
   required bool isDarkTheme,
@@ -235,10 +252,7 @@ Widget _buildActionIcons({
         ),
         onPressed: () async {
           try {
-            await FirebaseFirestore.instance
-                .collection('item')
-                .doc(itemId)
-                .delete();
+            await FirebaseFirestore.instance.collection('item').doc(itemId).delete();
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Item deleted successfully')),
             );
@@ -253,6 +267,7 @@ Widget _buildActionIcons({
   );
 }
 
+/// Функция переключения выделения элемента
 void _toggleSelection(String itemId) {
   final currentItems = List<String>.from(selectedItemsNotifier.value);
   if (currentItems.contains(itemId)) {
