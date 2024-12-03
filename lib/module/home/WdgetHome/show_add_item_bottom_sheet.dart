@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +8,25 @@ import 'dart:io';
 
 import '../../../presentation/colors.dart';
 import 'bottom_container_button.dart';
-import 'home_widget.dart';
+
+// Глобальный словарь для хранения цветов по типу
+final Map<String, String> typeColorsCache = {};
+
+// Функция для генерации случайного цвета в формате HEX
+String getRandomColor() {
+  final random = Random();
+  return '#${random.nextInt(0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
+}
+
+// Функция для получения цвета из HEX
+Color? getColorFromHex(String? hexColor) {
+  if (hexColor == null || !hexColor.startsWith('#')) return null;
+  try {
+    return Color(int.parse(hexColor.replaceFirst('#', '0xff')));
+  } catch (e) {
+    return null; // Возвращаем null в случае ошибки
+  }
+}
 
 void showAddItemBottomSheet(BuildContext context) {
   final TextEditingController _titleController = TextEditingController();
@@ -62,7 +81,6 @@ void showAddItemBottomSheet(BuildContext context) {
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
-
                     GestureDetector(
                       onTap: () => _pickImage(context, setState),
                       child: Container(
@@ -90,15 +108,15 @@ void showAddItemBottomSheet(BuildContext context) {
                             ),
                             child: Icon(
                               Icons.add,
-                              color: isDarkMode ? Colors.white : Colors.white,
+                              color: isDarkMode
+                                  ? Colors.white
+                                  : Colors.white,
                               size: screenWidth * 0.15,
                             ),
                           ),
                         ),
                       ),
                     ),
-
-
                     Positioned(
                       top: screenHeight * 0.05,
                       left: 0,
@@ -107,20 +125,18 @@ void showAddItemBottomSheet(BuildContext context) {
                         child: TextField(
                           controller: _typeController,
                           textAlign: TextAlign.center,
-                          decoration: InputDecoration(
-                            hintText: "Тип",
+                          decoration: const InputDecoration(
+                            hintText: 'Тип',
                             border: InputBorder.none,
                           ),
                           style: TextStyle(
-                            color: Colors.white,
+                            color: isDarkMode ? Colors.white : Colors.black,
                             fontSize: screenWidth * 0.05,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ),
-
-
                     Positioned(
                       top: screenHeight * 0.55,
                       left: 0,
@@ -149,16 +165,16 @@ void showAddItemBottomSheet(BuildContext context) {
                           children: [
                             TextField(
                               controller: _titleController,
-                              decoration: InputDecoration(
-                                labelText: "Название предмета",
+                              decoration: const InputDecoration(
+                                labelText: 'Название предмета',
                                 border: InputBorder.none,
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.02),
                             TextField(
                               controller: _descriptionController,
-                              decoration: InputDecoration(
-                                labelText: "Описание предмета",
+                              decoration: const InputDecoration(
+                                labelText: 'Описание предмета',
                                 border: InputBorder.none,
                               ),
                               style: TextStyle(fontSize: screenWidth * 0.045),
@@ -169,8 +185,6 @@ void showAddItemBottomSheet(BuildContext context) {
                         ),
                       ),
                     ),
-
-
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: Container(
@@ -178,12 +192,12 @@ void showAddItemBottomSheet(BuildContext context) {
                           color: isDarkMode
                               ? AppColors.blackSand
                               : AppColors.whiteColor,
-                          borderRadius: BorderRadius.only(
+                          borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(12),
                             topRight: Radius.circular(12),
                           ),
                         ),
-                        padding: EdgeInsets.symmetric(vertical: 26),
+                        padding: const EdgeInsets.symmetric(vertical: 26),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -193,26 +207,33 @@ void showAddItemBottomSheet(BuildContext context) {
                                     _descriptionController.text.isNotEmpty &&
                                     _typeController.text.isNotEmpty) {
                                   try {
+                                    // Если изображение выбрано, загрузим его
                                     if (_selectedImage != null) {
                                       _imageUrl =
                                       await _uploadImage(_selectedImage!);
                                     }
 
-                                    final randomColor = getRandomColor();
-                                    await FirebaseFirestore.instance
-                                        .collection('item')
-                                        .add({
+                                    // Проверка на наличие цвета для типа
+                                    final type = _typeController.text.trim();
+                                    if (!typeColorsCache.containsKey(type)) {
+                                      typeColorsCache[type] =
+                                          getRandomColor(); // Генерация нового цвета
+                                    }
+                                    final randomColor =
+                                    typeColorsCache[type]!;
+
+                                    // Добавление элемента в Firestore
+                                    await FirebaseFirestore.instance.collection('item').add({
                                       'title': _titleController.text,
-                                      'description':
-                                      _descriptionController.text,
-                                      'type': _typeController.text,
-                                      'userId': FirebaseAuth
-                                          .instance.currentUser?.uid,
-                                      'color': randomColor,
-                                      'typeColor': randomColor,
+                                      'description': _descriptionController.text,
+                                      'type': type,
+                                      'userId': FirebaseAuth.instance.currentUser?.uid,
+                                      'color': randomColor, // Основной цвет
+                                      'typeColor': randomColor, // Цвет для типа
                                       'timestamp': Timestamp.now(),
                                       'imageUrl': _imageUrl,
                                     });
+
                                     Navigator.pop(context);
                                   } catch (e) {
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -228,7 +249,7 @@ void showAddItemBottomSheet(BuildContext context) {
                                 }
                               },
                             ),
-                            SizedBox(width: 10),
+                            const SizedBox(width: 10),
                             CancelButton(
                               onPressed: () {
                                 Navigator.pop(context);
@@ -248,5 +269,3 @@ void showAddItemBottomSheet(BuildContext context) {
     },
   );
 }
-
-
