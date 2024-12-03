@@ -64,149 +64,143 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Expanded(
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 30.0),
-        color: isDarkMode
-            ? AppColors.blackSand // Цвет для тёмной темы
-            : Colors.white, // Цвет для светлой темы
-        child: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                SizedBox(height: 25),
-                Text("Почта", style: TextStyle(fontSize: 16)),
-                SizedBox(height: 5),
-                CustomTextField(
-                  controller: _loginEmailController,
-                  labelText: "Email", // Замените на подходящий текст
-                ),
-                SizedBox(height: 16),
-                Text("Пароль", style: TextStyle(fontSize: 16)),
-                SizedBox(height: 5),
-                CustomTextField(
-                  controller: _loginPasswordController,
-                  labelText: "Пароль",
-                  isPasswordField: true, // Включение функционала скрытия/отображения пароля
-                ),
-                SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: false,
-                          onChanged: (value) {
-                            // setState(() {
-                            //   _rememberMe = value!;
-                            // });
-                          },
-                        ),
-                        Text("Запомнить", style: TextStyle(fontSize: 14)),
-                      ],
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute<dynamic>(
-                              builder: (context) => ForgotPassword()),
-                        );
-                      },
-                      child: Text(
-                        "Забыл пароль?",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.blue,
-                          decoration: TextDecoration.underline,
-                        ),
+      child: SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(height: 25),
+              Text("Почта", style: TextStyle(fontSize: 16)),
+              SizedBox(height: 5),
+              CustomTextField(
+                controller: _loginEmailController,
+                labelText: "Email", // Замените на подходящий текст
+              ),
+              SizedBox(height: 16),
+              Text("Пароль", style: TextStyle(fontSize: 16)),
+              SizedBox(height: 5),
+              CustomTextField(
+                controller: _loginPasswordController,
+                labelText: "Пароль",
+                isPasswordField: true, // Включение функционала скрытия/отображения пароля
+              ),
+              SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: false,
+                        onChanged: (value) {
+                          // setState(() {
+                          //   _rememberMe = value!;
+                          // });
+                        },
+                      ),
+                      Text("Запомнить", style: TextStyle(fontSize: 14)),
+                    ],
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute<dynamic>(
+                            builder: (context) => ForgotPassword()),
+                      );
+                    },
+                    child: Text(
+                      "Забыл пароль?",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline,
                       ),
                     ),
-                  ],
-                ),
-                SizedBox(height: 16),
-                ReusableButton(
-                  text: 'Войти',
-                  onPressed: () => _login(context),
-                ),
-                SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(child: Divider(thickness: 1, color: Colors.grey)),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Text("или", style: TextStyle(color: Colors.grey)),
-                    ),
-                    Expanded(child: Divider(thickness: 1, color: Colors.grey)),
-                  ],
-                ),
-                SizedBox(height: 30),
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    User? user = await signInWithGoogle();
-                    if (user != null) {
-                      await addUserToFirestore(user);
-                      await Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute<dynamic>(
-                            builder: (_) => MyHomePage(toggleTheme: () {})),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Ошибка входа через Google")),
-                      );
-                    }
-                  },
-                  icon: Icon(Icons.login, color: Colors.red),
-                  label: Text("Продолжить с Google"),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50),
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                    side: BorderSide(color: Colors.grey),
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                      BorderRadius.circular(10), // Added border radius
-                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16),
+              ReusableButton(
+                text: 'Войти',
+                onPressed: () => _login(context),
+              ),
+              SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(child: Divider(thickness: 1, color: Colors.grey)),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Text("или", style: TextStyle(color: Colors.grey)),
+                  ),
+                  Expanded(child: Divider(thickness: 1, color: Colors.grey)),
+                ],
+              ),
+              SizedBox(height: 30),
+              ElevatedButton.icon(
+                onPressed: () async {
+                  User? user = await signInWithGoogle();
+                  if (user != null) {
+                    await addUserToFirestore(user);
+                    await Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute<dynamic>(
+                          builder: (_) => MyHomePage(toggleTheme: () {})),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Ошибка входа через Google")),
+                    );
+                  }
+                },
+                icon: Icon(Icons.login, color: Colors.red),
+                label: Text("Продолжить с Google"),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size(double.infinity, 50),
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  side: BorderSide(color: Colors.grey),
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                    BorderRadius.circular(10), // Added border radius
                   ),
                 ),
-                SizedBox(height: 20),
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    User? user = await signInWithApple();
-                    if (user != null) {
-                      await addUserToFirestore(user);
-                      await Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute<dynamic>(
-                            builder: (_) => MyHomePage(toggleTheme: () {})),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Ошибка входа через Apple")),
-                      );
-                    }
-                  },
-                  icon: Icon(Icons.apple, color: Colors.black),
-                  label: Text("Продолжить с Apple"),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50),
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                    side: BorderSide(color: Colors.grey),
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                      BorderRadius.circular(10), // Added border radius
-                    ),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: () async {
+                  User? user = await signInWithApple();
+                  if (user != null) {
+                    await addUserToFirestore(user);
+                    await Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute<dynamic>(
+                          builder: (_) => MyHomePage(toggleTheme: () {})),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Ошибка входа через Apple")),
+                    );
+                  }
+                },
+                icon: Icon(Icons.apple, color: Colors.black),
+                label: Text("Продолжить с Apple"),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size(double.infinity, 50),
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  side: BorderSide(color: Colors.grey),
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                    BorderRadius.circular(10), // Added border radius
                   ),
                 ),
-                SizedBox(height: 16),
-              ],
-            ),
+              ),
+              SizedBox(height: 16),
+            ],
           ),
         ),
       ),

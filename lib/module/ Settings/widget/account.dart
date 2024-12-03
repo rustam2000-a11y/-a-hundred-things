@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import '../../../presentation/colors.dart';
 import '../../login/widget/text_filed.dart';
-import 'account_text_field.dart';
+
 
 class Account extends StatefulWidget {
   const Account({super.key});

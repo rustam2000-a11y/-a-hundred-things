@@ -92,7 +92,7 @@ import 'build_card_item.dart';
                             iconColor: Colors.black, // Оставляем цвет иконки
                             borderRadius: 10,
                           ),
-                          SizedBox(width: 10),
+                          SizedBox(width: 4),
                           // Кнопка крестика появляется, если есть выбранные элементы
 
                           SizedBox(width: 10),
@@ -243,7 +243,7 @@ import 'build_card_item.dart';
             Expanded(
               child: Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.02,
+                  horizontal: screenWidth * 0.01,
                   vertical: screenHeight * 0.02,
                 ),
                 child: StreamBuilder<QuerySnapshot>(
@@ -276,6 +276,7 @@ import 'build_card_item.dart';
 
 
                     return ListView.builder(
+                      padding: EdgeInsets.zero,
                       itemCount: items.length,
                       itemBuilder: (context, index) {
                         final item = items[index];

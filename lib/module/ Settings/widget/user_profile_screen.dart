@@ -16,12 +16,12 @@ class UserProfileScreen extends StatefulWidget {
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
-  String _selectedTheme = 'Light'; // Начальное значение для выбора темы
+  String _selectedTheme = 'Light';
 
   @override
   void initState() {
     super.initState();
-    _loadThemePreference(); // Загрузка сохраненной темы при инициализации
+    _loadThemePreference();
   }
 
   Future<void> saveThemePreference(String theme) async {
@@ -55,8 +55,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double spacing = screenHeight * 0.01; // Отступы между элементами
-    final double horizontalPadding =
-        MediaQuery.of(context).size.width * 0.06; // Горизонтальные отступы
+    final double horizontalPadding = MediaQuery.of(context).size.width * 0.06; // Горизонтальные отступы
 
     // Проверяем текущую тему
     final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
@@ -114,7 +113,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       // Иконка настроек с другой стороны
                       IconButton(
                         icon: Icon(Icons.settings,
-                            color: isDarkTheme ? Colors.white : Colors.black),
+                            color: isDarkTheme ? Colors.white : Colors.white),
                         iconSize: 38,
                         onPressed: () async {
                           try {
@@ -141,16 +140,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             ),
           ),
           Positioned(
-            top: screenHeight * 0.15,
+            top: screenHeight * 0.18,
             left: 0,
             right: 0,
             child: Container(
               width: double.infinity,
-              height: screenHeight * 0.9,
+              height: screenHeight * 0.82,
               decoration: BoxDecoration(
                 gradient: isDarkTheme ? AppColors.darkBlueGradient : null,
                 color: !isDarkTheme ? Colors.white : null,
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
                 ),
@@ -163,13 +162,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       padding: EdgeInsets.symmetric(vertical: spacing),
                       child: Row(
                         children: [
-                          // Аватарка
                           CircleAvatar(
                             radius: 30,
                             backgroundImage: AssetImage('assets/avatar.png'),
                           ),
                           SizedBox(width: 16),
-                          // Почта пользователя
                           Expanded(
                             child: Text(
                               userEmail,
@@ -267,8 +264,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           ),
                         ),
                         trailing: Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 8.0, vertical: 4.0),
+                          padding:
+                          EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                           decoration: BoxDecoration(
                             color: Colors.grey[200],
                             borderRadius: BorderRadius.circular(20),
@@ -304,17 +301,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       padding: EdgeInsets.symmetric(vertical: spacing),
                       child: Divider(
                         color: isDarkTheme ? Colors.blue : Colors.black,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: spacing),
-                      child: Text(
-                        'Настройки учетной записи',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: isDarkTheme ? Colors.white : Colors.black,
-                        ),
                       ),
                     ),
                     Padding(
@@ -372,7 +358,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ),
               ),
             ),
-          ),
+          )
+
         ],
       ),
     );
