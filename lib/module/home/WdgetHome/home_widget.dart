@@ -72,7 +72,7 @@ class MyHomePageState extends State<MyHomePage> {
                         ReusableIconButton(
                           icon: Icons.search_rounded,
                           onPressed: () {
-                            showSearchBottomSheet(context, buildCardItem);
+                            showSearchBottomSheet(context);
                           },
                           screenWidth: screenWidth,
                           // Оставляем цвет иконки

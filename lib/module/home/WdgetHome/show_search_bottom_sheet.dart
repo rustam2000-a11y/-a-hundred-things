@@ -3,14 +3,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../../presentation/colors.dart';
-import 'home_widget.dart';
+import 'build_card_item.dart';
 
-void showSearchBottomSheet(BuildContext context, Function buildCardItem) {
+void showSearchBottomSheet(BuildContext context) {
   final StreamController<String> _searchStreamController =
       StreamController<String>();
-  final TextEditingController controller = TextEditingController();
   final TextEditingController searchController = TextEditingController();
-  String _searchQuery = '';
 
   searchController.addListener(() {
     _searchStreamController.add(searchController.text.toLowerCase());
@@ -90,9 +88,7 @@ void showSearchBottomSheet(BuildContext context, Function buildCardItem) {
                                 color: isDarkMode
                                     ? Colors.grey[400]
                                     : Colors.grey[700]),
-                            onPressed: () {
-                              searchController.clear(); // Очистка текста
-                            },
+                            onPressed: searchController.clear,
                           ),
                           filled: true,
                           fillColor: isDarkMode
@@ -108,7 +104,7 @@ void showSearchBottomSheet(BuildContext context, Function buildCardItem) {
                   ],
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Expanded(
                 child: StreamBuilder<String>(
                   stream: _searchStreamController.stream,
@@ -124,14 +120,15 @@ void showSearchBottomSheet(BuildContext context, Function buildCardItem) {
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
+                          return const Center(
+                              child: CircularProgressIndicator());
                         }
                         if (snapshot.hasError) {
                           return Center(
                               child: Text('Error: ${snapshot.error}'));
                         }
                         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                          return Center(child: Text('No items found.'));
+                          return const Center(child: Text('No items found.'));
                         }
 
                         final items = snapshot.data!.docs.where((item) {
@@ -140,17 +137,18 @@ void showSearchBottomSheet(BuildContext context, Function buildCardItem) {
                         }).toList();
 
                         if (items.isEmpty) {
-                          return Center(
+                          return const Center(
                               child: Text('No items match your search.'));
                         }
 
                         return ListView.builder(
-                          padding: EdgeInsets.symmetric(horizontal: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
                           itemCount: items.length,
                           itemBuilder: (context, index) {
                             final item = items[index];
                             final color = item['color'] as String? ?? '';
                             final imageUrl = item['imageUrl'] as String?;
+
                             return buildCardItem(
                                 itemId: item.id,
                                 title: item['title'],
@@ -158,7 +156,8 @@ void showSearchBottomSheet(BuildContext context, Function buildCardItem) {
                                 type: item['type'],
                                 color: color,
                                 context: context,
-                                imageUrl: imageUrl);
+                                imageUrl: imageUrl,
+                                onStateUpdate: () {});
                           },
                         );
                       },
@@ -171,7 +170,5 @@ void showSearchBottomSheet(BuildContext context, Function buildCardItem) {
         ),
       );
     },
-  ).whenComplete(() {
-    _searchStreamController.close(); // Закрываем поток при закрытии BottomSheet
-  });
+  ).whenComplete(_searchStreamController.close);
 }
