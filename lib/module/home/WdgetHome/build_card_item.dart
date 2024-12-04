@@ -1,32 +1,32 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:one_hundred_things/module/home/WdgetHome/show_modal_buttom_sheet.dart';
-import '../../../generated/l10n.dart';
+
 import '../../../presentation/colors.dart';
 import 'edit_item_bottom_sheet.dart';
-import 'home_widget.dart';
+import 'home_widget.dart' as home;
 import 'show_add_item_bottom_sheet.dart'; // Импорт функции showAddItemBottomSheet
-import 'package:one_hundred_things/module/home/WdgetHome/home_widget.dart' as home;
-import 'package:one_hundred_things/module/home/WdgetHome/show_add_item_bottom_sheet.dart' as add_item;
+import 'show_modal_buttom_sheet.dart';
 
 List<String> selectedItems = [];
 final ValueNotifier<List<String>> selectedItemsNotifier = ValueNotifier([]);
-String? selectedCategoryType;
 bool isSelectionMode = false; // Переменная для режима выбора
 
+final Map<String, int> itemCounts = {};
+
 /// Глобальный словарь для сохранения цветов по типу
-final Map<String, String> typeColors = {}; // Словарь для хранения цветов по типу
+final Map<String, String> typeColors =
+    {}; // Словарь для хранения цветов по типу
 
 /// Функция для получения цвета для типа из глобального словаря
 Color getColorForType(String type) {
   if (!typeColorsCache.containsKey(type)) {
-    typeColorsCache[type] = home.getRandomColor(); // Используем функцию из home_widget.dart
+    typeColorsCache[type] =
+        home.getRandomColor(); // Используем функцию из home_widget.dart
   }
-  return home.getColorFromHex(typeColorsCache[type]) ?? Colors.grey; // Используем функцию из home_widget.dart
+  return home.getColorFromHex(typeColorsCache[type]) ??
+      Colors.grey; // Используем функцию из home_widget.dart
 }
 
-/// Виджет карточки элемента
 Widget buildCardItem({
   required BuildContext context,
   required String itemId,
@@ -34,7 +34,9 @@ Widget buildCardItem({
   required String description,
   required String type,
   required String color,
-  String? imageUrl, // Поле для URL изображения
+  required VoidCallback onStateUpdate,
+  String? imageUrl,
+  String? selectedCategoryType,
 }) {
   return ValueListenableBuilder<List<String>>(
     valueListenable: selectedItemsNotifier,
@@ -43,10 +45,8 @@ Widget buildCardItem({
       final isSelected = selectedItems.contains(itemId);
 
       final backgroundColor = isDarkTheme
-          ? (isSelected
-          ? AppColors.darkBlueGradient.colors.first
-          : AppColors.blackSand)
-          : getColorForType(type); // Используем глобальный цвет для типа
+          ? (isSelected ? Colors.blueGrey : Colors.black54)
+          : getColorForType(type);
 
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -80,35 +80,42 @@ Widget buildCardItem({
                 color: isSelected ? Colors.blueAccent : Colors.transparent,
                 width: isSelected ? 2 : 0,
               ),
-              boxShadow: isDarkTheme
-                  ? [
-                const BoxShadow(
-                  color: Colors.grey,
-                  offset: Offset(0, 1),
-                  blurRadius: 0,
-                  spreadRadius: 0,
-                ),
-              ]
-                  : [],
             ),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Stack(
                 children: [
-                  _buildImage(imageUrl, isDarkTheme),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildItemDetails(
-                      context: context,
-                      title: title,
-                      description: description,
-                      type: type,
-                      isDarkTheme: isDarkTheme,
-                      isSelected: isSelected,
-                      itemId: itemId,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildImage(imageUrl, isDarkTheme),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: _buildItemDetails(
+                              context: context,
+                              title: title,
+                              description: description,
+                              type: type,
+                              isDarkTheme: isDarkTheme,
+                              isSelected: isSelected,
+                              itemId: itemId,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
+                  if (selectedCategoryType != null ||
+                      selectedCategoryType == type)
+                    Positioned(
+                      right: 8,
+                      bottom: 8,
+                      child: _buildCounterControls(context, itemId, type,
+                          onStateUpdate, selectedCategoryType),
+                    ),
                 ],
               ),
             ),
@@ -119,7 +126,6 @@ Widget buildCardItem({
   );
 }
 
-/// Функция для отображения изображения элемента
 Widget _buildImage(String? imageUrl, bool isDarkTheme) {
   return Container(
     width: 100,
@@ -131,20 +137,19 @@ Widget _buildImage(String? imageUrl, bool isDarkTheme) {
           : null,
       image: imageUrl != null
           ? DecorationImage(
-        image: NetworkImage(imageUrl),
-        fit: BoxFit.cover,
-      )
+              image: NetworkImage(imageUrl),
+              fit: BoxFit.cover,
+            )
           : null,
     ),
     child: imageUrl == null
         ? Center(
-      child: Icon(Icons.image, size: 40, color: Colors.grey[600]),
-    )
+            child: Icon(Icons.image, size: 40, color: Colors.grey[600]),
+          )
         : null,
   );
 }
 
-/// Функция для отображения деталей элемента
 Widget _buildItemDetails({
   required BuildContext context,
   required String title,
@@ -202,7 +207,6 @@ Widget _buildItemDetails({
   );
 }
 
-/// Иконки действий для элемента
 Widget _buildActionIcons({
   required BuildContext context,
   required bool isDarkTheme,
@@ -252,7 +256,10 @@ Widget _buildActionIcons({
         ),
         onPressed: () async {
           try {
-            await FirebaseFirestore.instance.collection('item').doc(itemId).delete();
+            await FirebaseFirestore.instance
+                .collection('item')
+                .doc(itemId)
+                .delete();
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Item deleted successfully')),
             );
@@ -267,7 +274,6 @@ Widget _buildActionIcons({
   );
 }
 
-/// Функция переключения выделения элемента
 void _toggleSelection(String itemId) {
   final currentItems = List<String>.from(selectedItemsNotifier.value);
   if (currentItems.contains(itemId)) {
@@ -277,8 +283,49 @@ void _toggleSelection(String itemId) {
   }
   selectedItemsNotifier.value = currentItems;
 
-  // Если список выбранных элементов пуст, отключаем режим выбора
   if (currentItems.isEmpty) {
     isSelectionMode = false;
+  }
+}
+
+Widget _buildCounterControls(BuildContext context, String itemId,
+    String itemType, VoidCallback onStateUpdate, String? selectedCategoryType) {
+  return Row(
+    children: [
+      IconButton(
+        icon: const Icon(Icons.remove, color: Colors.red),
+        onPressed: () {
+          _decrementItem(itemId, itemType, onStateUpdate, selectedCategoryType);
+        },
+      ),
+      Text(
+        '${itemCounts[itemId] ?? 0}',
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      ),
+      IconButton(
+        icon: const Icon(Icons.add, color: Colors.green),
+        onPressed: () {
+          _incrementItem(itemId, itemType, onStateUpdate, selectedCategoryType);
+        },
+      ),
+    ],
+  );
+}
+
+void _incrementItem(String itemId, String itemType, VoidCallback onStateUpdate,
+    String? selectedCategoryType) {
+  if (selectedCategoryType == null || selectedCategoryType == itemType) {
+    itemCounts[itemId] = (itemCounts[itemId] ?? 0) + 1;
+    onStateUpdate();
+  }
+}
+
+void _decrementItem(String itemId, String itemType, VoidCallback onStateUpdate,
+    String? selectedCategoryType) {
+  if (selectedCategoryType == null || selectedCategoryType == itemType) {
+    if (itemCounts[itemId] != null && itemCounts[itemId]! > 0) {
+      itemCounts[itemId] = itemCounts[itemId]! - 1;
+      onStateUpdate();
+    }
   }
 }
