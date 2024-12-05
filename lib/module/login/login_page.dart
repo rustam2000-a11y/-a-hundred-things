@@ -32,42 +32,53 @@ class _LoginPageState extends State<LoginPage> {
           child: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.brightness_6),
-                onPressed: widget.toggleTheme,
-              ),
-            ],
-            flexibleSpace: const Padding(
+            flexibleSpace:  Padding(
               padding: EdgeInsets.only(left: 16.0, bottom: 16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Logo",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Две картинки вместо текста "Logo"
+                    Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10), // Закругленные углы для первой картинки
+                          child: Image.asset(
+                            'assets/images/IMG_4650(1).png', // Путь к первой картинке
+                            width: 32, // Ширина картинки
+                            height: 31, // Высота картинки
+                            fit: BoxFit.cover, // Масштабируем изображение под размеры
+                          ),
+                        ),
+                         SizedBox(width: 4), // Отступ между картинками
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10), // Закругленные углы для второй картинки
+                          child: Image.asset(
+                            'assets/images/100 Things(3).png', // Путь ко второй картинке
+                            width: 106, // Ширина картинки
+                            height: 20, // Высота картинки
+                            fit: BoxFit.cover, // Масштабируем изображение под размеры
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    "Начните сейчас",
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                    SizedBox(height: 10),
+                    Text(
+                      "Начните сейчас",
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 5),
-                  Text(
-                    "Зарегистрируйтесь или войдите в систему, чтобы узнать больше о нашем приложении.",
-                    style: TextStyle(fontSize: 12, color: Colors.white),
-                  ),
-                ],
-              ),
+                    const SizedBox(height: 5),
+                    Text(
+                      "Зарегистрируйтесь или войдите в систему, чтобы узнать больше о нашем приложении.",
+                      style: TextStyle(fontSize: 12, color: Colors.white),
+                    ),
+                  ],
+                )
+
             ),
           ),
         ),

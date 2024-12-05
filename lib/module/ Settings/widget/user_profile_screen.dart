@@ -102,14 +102,28 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   // Опускаем содержимое на несколько пикселей вниз
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Контейнер 50x50 с одной стороны
-                      Container(
-                        width: 50,
-                        height: 50,
-                        color:
-                        Colors.white, // Замените на нужный цвет или виджет
-                      ),
+                    children: [Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10), // Закругленные углы для первой картинки
+                          child: Image.asset(
+                            'assets/images/IMG_4650(1).png', // Путь к первой картинке
+                            width: 32, // Ширина картинки
+                            height: 32, // Высота картинки
+                            fit: BoxFit.cover, // Масштабируем изображение под размеры
+                          ),
+                        ),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10), // Закругленные углы для второй картинки
+                          child: Image.asset(
+                            'assets/images/100 Things(3).png', // Путь ко второй картинке
+                            width: 106, // Ширина картинки
+                            height: 20, // Высота картинки
+                            fit: BoxFit.cover, // Масштабируем изображение под размеры
+                          ),
+                        ),
+                      ],
+                    ),
                       // Иконка настроек с другой стороны
                       IconButton(
                         icon: Icon(Icons.settings,

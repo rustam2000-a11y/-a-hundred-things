@@ -75,11 +75,19 @@ Widget buildCardItem({
             duration: const Duration(milliseconds: 300),
             decoration: BoxDecoration(
               color: backgroundColor,
-              borderRadius: BorderRadius.circular(25),
+              borderRadius: BorderRadius.circular(30),
               border: Border.all(
                 color: isSelected ? Colors.blueAccent : Colors.transparent,
                 width: isSelected ? 2 : 0,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.5), // Цвет тени с прозрачностью
+                  offset: const Offset(0, 1), // Смещение по X и Y
+                  blurRadius: 5, // Радиус размытия
+                  spreadRadius: 1, // Радиус распространения
+                ),
+              ],
             ),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -108,18 +116,23 @@ Widget buildCardItem({
                       ),
                     ],
                   ),
-                  if (selectedCategoryType != null ||
-                      selectedCategoryType == type)
+                  if (selectedCategoryType != null || selectedCategoryType == type)
                     Positioned(
                       right: 8,
                       bottom: 8,
-                      child: _buildCounterControls(context, itemId, type,
-                          onStateUpdate, selectedCategoryType),
+                      child: _buildCounterControls(
+                        context,
+                        itemId,
+                        type,
+                        onStateUpdate,
+                        selectedCategoryType,
+                      ),
                     ),
                 ],
               ),
             ),
           ),
+
         ),
       );
     },
@@ -293,17 +306,17 @@ Widget _buildCounterControls(BuildContext context, String itemId,
   return Row(
     children: [
       IconButton(
-        icon: const Icon(Icons.remove, color: Colors.red),
+        icon: const Icon(Icons.remove, color: Colors.white),
         onPressed: () {
           _decrementItem(itemId, itemType, onStateUpdate, selectedCategoryType);
         },
       ),
       Text(
-        '${itemCounts[itemId] ?? 0}',
+        '${itemCounts[itemId] ?? 1}',
         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       ),
       IconButton(
-        icon: const Icon(Icons.add, color: Colors.green),
+        icon: const Icon(Icons.add, color: Colors.white),
         onPressed: () {
           _incrementItem(itemId, itemType, onStateUpdate, selectedCategoryType);
         },

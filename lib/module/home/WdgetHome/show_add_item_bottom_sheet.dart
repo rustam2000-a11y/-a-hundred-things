@@ -88,7 +88,12 @@ void showAddItemBottomSheet(BuildContext context) {
                         width: double.infinity,
                         color: isDarkMode
                             ? AppColors.blackSand
-                            : AppColors.greySand,
+                            : null, // Цвета для светлой темы не задаем, так как используется градиент
+                        decoration: isDarkMode
+                            ? null // Градиент не используется в темной теме
+                            : BoxDecoration(
+                          gradient: AppColors.greyWhite, // Устанавливаем градиент для светлой темы
+                        ),
                         child: Center(
                           child: _selectedImage != null
                               ? Image.file(
@@ -193,8 +198,8 @@ void showAddItemBottomSheet(BuildContext context) {
                               ? AppColors.blackSand
                               : AppColors.whiteColor,
                           borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(12),
-                            topRight: Radius.circular(12),
+                            topLeft: Radius.circular(50),
+                            topRight: Radius.circular(50),
                           ),
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 26),
@@ -249,7 +254,7 @@ void showAddItemBottomSheet(BuildContext context) {
                                 }
                               },
                             ),
-                            const SizedBox(width: 10),
+                            const SizedBox(width: 20),
                             CancelButton(
                               onPressed: () {
                                 Navigator.pop(context);

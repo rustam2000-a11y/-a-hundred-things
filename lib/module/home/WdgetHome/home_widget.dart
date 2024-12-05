@@ -56,16 +56,33 @@ class MyHomePageState extends State<MyHomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween, // Расстояние между группами
                   children: [
-                    Container(
-                      width: screenWidth * 0.10,
-                      height: screenWidth * 0.08,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.grey[300],
-                      ),
+                    // Левая группа: две картинки
+                    Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10), // Закругленные углы
+                          child: Image.asset(
+                            'assets/images/IMG_4650(1).png',
+                            width: screenWidth * 0.07, // Задаем ширину
+                            height: screenWidth * 0.07, // Задаем высоту
+                            fit: BoxFit.cover, // Масштабируем изображение, чтобы заполнить размеры
+                          ),
+                        ),
+                        const SizedBox(width: 2), // Отступ между картинками
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10), // Закругленные углы
+                          child: Image.asset(
+                            'assets/images/100 Things(3).png',
+                            width: screenWidth * 0.22, // Задаем ширину
+                            height: screenWidth * 0.04, // Задаем высоту
+                            fit: BoxFit.cover, // Масштабируем изображение, чтобы заполнить размеры
+                          ),
+                        ),
+                      ],
                     ),
+                    // Правая группа: иконки
                     Row(
                       children: [
                         const SizedBox(width: 10),
@@ -75,12 +92,9 @@ class MyHomePageState extends State<MyHomePage> {
                             showSearchBottomSheet(context);
                           },
                           screenWidth: screenWidth,
-                          // Оставляем цвет иконки
-                          borderRadius: 10,
+                          borderRadius: 10, // Закругленные углы
                         ),
                         const SizedBox(width: 4),
-                        // Кнопка крестика появляется, если есть выбранные элементы
-
                         const SizedBox(width: 10),
                         ReusableIconButton(
                           icon: Icons.more_vert,
@@ -90,22 +104,21 @@ class MyHomePageState extends State<MyHomePage> {
                               MaterialPageRoute<dynamic>(
                                 builder: (context) => UserProfileScreen(
                                   toggleTheme: () {
-                                    final state = context
-                                        .findAncestorStateOfType<MyAppState>();
+                                    final state = context.findAncestorStateOfType<MyAppState>();
                                     state?.toggleTheme();
                                   },
                                 ),
                               ),
                             );
                           },
-                          screenWidth: MediaQuery.of(context).size.width,
-                          // Цвет иконки
-                          borderRadius: 10, // Закруглённые углы
+                          screenWidth: screenWidth,
+                          borderRadius: 10, // Закругленные углы
                         ),
                       ],
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 60),
                 StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
@@ -270,29 +283,35 @@ class MyHomePageState extends State<MyHomePage> {
                   }
 
                   return ListView.builder(
-                    padding: EdgeInsets.zero,
+                    padding: const EdgeInsets.symmetric(horizontal: 6), // Отступы по бокам
                     itemCount: items.length,
                     itemBuilder: (context, index) {
                       final item = items[index];
                       final color = item['color'] as String? ?? '';
-                      final imageUrl = item['imageUrl']
-                          as String?; // Получаем URL изображения
+                      final imageUrl = item['imageUrl'] as String?; // Получаем URL изображения
 
-                      return buildCardItem(
-                        itemId: item.id,
-                        title: item['title'],
-                        description: item['description'],
-                        type: item['type'],
-                        color: color,
-                        context: context,
-                        imageUrl: imageUrl,
-                        selectedCategoryType: _selectedCategoryType,
-                        onStateUpdate: () {
-                          setState(() {});
-                        }, // Передаем URL изображения
+                      return Column(
+                        children: [
+                          buildCardItem(
+                            itemId: item.id,
+                            title: item['title'],
+                            description: item['description'],
+                            type: item['type'],
+                            color: color,
+                            context: context,
+                            imageUrl: imageUrl,
+                            selectedCategoryType: _selectedCategoryType,
+                            onStateUpdate: () {
+                              setState(() {});
+                            }, // Передаем URL изображения
+                          ),
+                          if (index < items.length - 1) // Отступ только между контейнерами
+                            const SizedBox(height: 12),
+                        ],
                       );
                     },
                   );
+
                 },
               ),
             ),
