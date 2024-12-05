@@ -15,6 +15,9 @@
   void main() async {
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp();
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp();
+    await loadTypeColorsFromFirestore(); // Загружаем цвета типов
     runApp(
       const MyApp(),
     );
@@ -50,6 +53,8 @@
     }
 
     Future<void> _loadThemePreference() async {
+
+      runApp(MyApp());
       final prefs = await SharedPreferences.getInstance();
       final savedTheme = prefs.getString('themeMode') ?? 'Light';
       setState(() {

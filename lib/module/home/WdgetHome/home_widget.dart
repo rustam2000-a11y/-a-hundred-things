@@ -419,3 +419,15 @@ Future<void> deleteSelectedItems(BuildContext context) async {
     );
   }
 }
+Future<void> loadTypeColorsFromFirestore() async {
+  final querySnapshot = await FirebaseFirestore.instance.collection('item').get();
+
+  for (var doc in querySnapshot.docs) {
+    final type = doc['type'];
+    final color = doc['typeColor'];
+
+    if (type != null && color != null) {
+      typeColorsCache[type] = color;
+    }
+  }
+}
