@@ -37,6 +37,7 @@ Widget buildCardItem({
   required VoidCallback onStateUpdate,
   String? imageUrl,
   String? selectedCategoryType,
+  required int quantity,
 }) {
   return ValueListenableBuilder<List<String>>(
     valueListenable: selectedItemsNotifier,
@@ -303,42 +304,96 @@ void _toggleSelection(String itemId) {
 
 Widget _buildCounterControls(BuildContext context, String itemId,
     String itemType, VoidCallback onStateUpdate, String? selectedCategoryType) {
-  return Row(
-    children: [
-      IconButton(
-        icon: const Icon(Icons.remove, color: Colors.white),
-        onPressed: () {
-          _decrementItem(itemId, itemType, onStateUpdate, selectedCategoryType);
-        },
-      ),
-      Text(
-        '${itemCounts[itemId] ?? 1}',
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-      ),
-      IconButton(
-        icon: const Icon(Icons.add, color: Colors.white),
-        onPressed: () {
-          _incrementItem(itemId, itemType, onStateUpdate, selectedCategoryType);
-        },
-      ),
-    ],
+  return StreamBuilder<DocumentSnapshot>(
+    stream: FirebaseFirestore.instance.collection('item').doc(itemId).snapshots(),
+    builder: (context, snapshot) {
+      if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
+        return const SizedBox.shrink(); // Возвращаем пустой виджет, пока данные загружаются
+      }
+
+      // Приводим данные к Map<String, dynamic>
+      final data = snapshot.data!.data() as Map<String, dynamic>;
+      final quantity = data['quantity'] ?? 1;
+
+      return Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.remove, color: Colors.white),
+            onPressed: () {
+              _decrementItem(itemId, itemType, onStateUpdate, selectedCategoryType);
+            },
+          ),
+          Text(
+            '$quantity',
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          IconButton(
+            icon: const Icon(Icons.add, color: Colors.white),
+            onPressed: () {
+              _incrementItem(itemId, itemType, onStateUpdate, selectedCategoryType);
+            },
+          ),
+        ],
+      );
+    },
   );
 }
 
-void _incrementItem(String itemId, String itemType, VoidCallback onStateUpdate,
-    String? selectedCategoryType) {
+
+
+Future<void> _incrementItem(String itemId, String itemType, VoidCallback onStateUpdate,
+    String? selectedCategoryType) async {
   if (selectedCategoryType == null || selectedCategoryType == itemType) {
-    itemCounts[itemId] = (itemCounts[itemId] ?? 0) + 1;
+    // Увеличиваем локальный счетчик
+    itemCounts[itemId] = (itemCounts[itemId] ?? 1) + 1;
     onStateUpdate();
+
+    // Обновляем количество в Firebase
+    final itemRef = FirebaseFirestore.instance.collection('item').doc(itemId);
+
+    await FirebaseFirestore.instance.runTransaction((transaction) async {
+      final snapshot = await transaction.get(itemRef);
+
+      if (snapshot.exists) {
+        final currentQuantity = snapshot.data()?['quantity'] ?? 1;
+        transaction.update(itemRef, {'quantity': currentQuantity + 1});
+      }
+    });
   }
 }
 
-void _decrementItem(String itemId, String itemType, VoidCallback onStateUpdate,
-    String? selectedCategoryType) {
+
+
+Future<void> _decrementItem(String itemId, String itemType, VoidCallback onStateUpdate,
+    String? selectedCategoryType) async {
   if (selectedCategoryType == null || selectedCategoryType == itemType) {
-    if (itemCounts[itemId] != null && itemCounts[itemId]! > 0) {
-      itemCounts[itemId] = itemCounts[itemId]! - 1;
+    // Получаем текущий счетчик из локального хранилища
+    final currentCount = itemCounts[itemId] ?? 1;
+
+    if (currentCount > 1) {
+      // Уменьшаем локальный счетчик
+      itemCounts[itemId] = currentCount - 1;
       onStateUpdate();
+
+      // Обновляем количество в Firebase
+      final itemRef = FirebaseFirestore.instance.collection('item').doc(itemId);
+
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        final snapshot = await transaction.get(itemRef);
+
+        if (snapshot.exists) {
+          final currentQuantity = snapshot.data()?['quantity'] as int? ?? 1;
+          if (currentQuantity > 1) {
+            transaction.update(itemRef, {'quantity': currentQuantity - 1});
+          } else {
+            // Если количество становится 1, удаляем элемент из базы данных
+            transaction.delete(itemRef);
+          }
+        }
+      });
     }
   }
 }
+
+
+

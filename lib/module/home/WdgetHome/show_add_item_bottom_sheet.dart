@@ -221,12 +221,13 @@ void showAddItemBottomSheet(BuildContext context) {
                                     // Проверка на наличие цвета для типа
                                     final type = _typeController.text.trim();
                                     if (!typeColorsCache.containsKey(type)) {
-                                      typeColorsCache[type] =
-                                          getRandomColor(); // Генерация нового цвета
+                                      typeColorsCache[type] = getRandomColor(); // Генерация нового цвета
                                     }
-                                    final randomColor =
-                                    typeColorsCache[type]!;
-
+                                    final randomColor = typeColorsCache[type]!;
+                                    final items = await FirebaseFirestore.instance.collection('item').get();
+                                    for (var item in items.docs) {
+                                      await item.reference.update({'quantity': 1});
+                                    }
                                     // Добавление элемента в Firestore
                                     await FirebaseFirestore.instance.collection('item').add({
                                       'title': _titleController.text,
@@ -237,6 +238,8 @@ void showAddItemBottomSheet(BuildContext context) {
                                       'typeColor': randomColor, // Цвет для типа
                                       'timestamp': Timestamp.now(),
                                       'imageUrl': _imageUrl,
+                                      'quantity': 1, // Инициализируем с количеством 1
+
                                     });
 
                                     Navigator.pop(context);
@@ -247,13 +250,12 @@ void showAddItemBottomSheet(BuildContext context) {
                                   }
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content:
-                                        Text('Please fill all fields')),
+                                    SnackBar(content: Text('Please fill all fields')),
                                   );
                                 }
                               },
                             ),
+
                             const SizedBox(width: 20),
                             CancelButton(
                               onPressed: () {
