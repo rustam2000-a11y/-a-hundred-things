@@ -146,8 +146,12 @@ void showSearchBottomSheet(BuildContext context) {
                           itemCount: items.length,
                           itemBuilder: (context, index) {
                             final item = items[index];
+                            final data = item.data() as Map<String, dynamic>;
+                            final quantity = data['quantity'] ?? 1;
+
                             final color = item['color'] as String? ?? '';
                             final imageUrl = item['imageUrl'] as String?;
+
 
                             return buildCardItem(
                                 itemId: item.id,
@@ -157,7 +161,7 @@ void showSearchBottomSheet(BuildContext context) {
                                 color: color,
                                 context: context,
                                 imageUrl: imageUrl,
-                                onStateUpdate: () {});
+                                onStateUpdate: () {}, quantity: quantity);
                           },
                         );
                       },

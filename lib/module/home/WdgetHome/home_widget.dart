@@ -124,15 +124,25 @@ class MyHomePageState extends State<MyHomePage> {
                   stream: FirebaseFirestore.instance
                       .collection('item')
                       .where('userId',
-                          isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+                      isEqualTo: FirebaseAuth.instance.currentUser?.uid)
                       .snapshots(),
                   builder: (context, snapshot) {
-                    if (!snapshot.hasData) return const SizedBox();
+                    // Default values for when there are no data or documents
+                    int totalQuantity = 0;
 
-                    final itemCount = snapshot.data!.docs.length;
-                    final progress = (itemCount / 100).clamp(0.0, 1.0);
-                    final isDarkTheme =
-                        Theme.of(context).brightness == Brightness.dark;
+                    // Check if data exists and calculate total quantity
+                    if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                      totalQuantity = snapshot.data!.docs.fold<int>(
+                        0,
+                            (accumulator, doc) {
+                          final quantity = doc['quantity'] as int? ?? 1; // Default quantity is 1
+                          return accumulator + quantity;
+                        },
+                      );
+                    }
+
+                    final progress = (totalQuantity / 100).clamp(0.0, 1.0); // Progress capped between 0 and 1
+                    final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
 
                     return Stack(
                       clipBehavior: Clip.none,
@@ -145,16 +155,14 @@ class MyHomePageState extends State<MyHomePage> {
                               value: progress,
                               backgroundColor: Colors.grey[300],
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                isDarkTheme
-                                    ? AppColors.blueSand
-                                    : Colors.blue, // Цвет линии в тёмной теме
+                                isDarkTheme ? AppColors.blueSand : Colors.blue, // Progress bar color
                               ),
                             ),
                           ),
                         ),
                         Positioned(
                           left: progress *
-                                  (MediaQuery.of(context).size.width * 0.85) -
+                              (MediaQuery.of(context).size.width * 0.85) -
                               10,
                           top: -25,
                           child: Column(
@@ -162,16 +170,14 @@ class MyHomePageState extends State<MyHomePage> {
                               Container(
                                 decoration: BoxDecoration(
                                   color: isDarkTheme
-                                      ? AppColors
-                                          .blueSand // Цвет контейнера в тёмной теме
-                                      : AppColors.violetSand,
-                                  // Цвет в светлой теме
+                                      ? AppColors.blueSand // Dark theme container color
+                                      : AppColors.violetSand, // Light theme container color
                                   borderRadius: BorderRadius.circular(4),
                                 ),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 6, vertical: 2),
+                                padding:
+                                const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                 child: Text(
-                                  '$itemCount%',
+                                  '${(progress * 100).toInt()}%', // Show progress percentage
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -183,13 +189,10 @@ class MyHomePageState extends State<MyHomePage> {
                                 height: 23,
                                 decoration: BoxDecoration(
                                   color: isDarkTheme
-                                      ? AppColors
-                                          .blueSand // Цвет точки в тёмной теме
-                                      : Colors.blue,
-                                  // Цвет точки в светлой теме
+                                      ? AppColors.blueSand // Dark theme point color
+                                      : Colors.blue, // Light theme point color
                                   shape: BoxShape.circle,
-                                  border:
-                                      Border.all(color: Colors.white, width: 2),
+                                  border: Border.all(color: Colors.white, width: 2),
                                 ),
                               ),
                             ],
@@ -199,6 +202,8 @@ class MyHomePageState extends State<MyHomePage> {
                     );
                   },
                 )
+
+
               ],
             ),
           ),
@@ -254,68 +259,71 @@ class MyHomePageState extends State<MyHomePage> {
                 horizontal: screenWidth * 0.01,
                 vertical: screenHeight * 0.02,
               ),
-              child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('item')
-                    .where('userId',
-                        isEqualTo: FirebaseAuth.instance.currentUser?.uid)
-                    .orderBy('timestamp', descending: true)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  }
-                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return const Center(child: Text('No items found.'));
-                  }
+              child: Column(
+                children: [
+                  Expanded(
+                    child: StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('item')
+                          .where('userId',
+                          isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+                          .orderBy('timestamp', descending: true)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        if (snapshot.hasError) {
+                          return Center(child: Text('Error: ${snapshot.error}'));
+                        }
+                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                          return const Center(child: Text('No items found.'));
+                        }
 
-                  final items = snapshot.data!.docs.where((item) {
-                    if (_selectedCategoryType == null) return true;
-                    return item['type'] == _selectedCategoryType;
-                  }).toList();
+                        final items = snapshot.data!.docs.where((item) {
+                          if (_selectedCategoryType == null) return true;
+                          return item['type'] == _selectedCategoryType;
+                        }).toList();
 
-                  if (items.isEmpty) {
-                    return const Center(
-                        child: Text('No items found for selected category.'));
-                  }
+                        if (items.isEmpty) {
+                          return const Center(
+                              child: Text('No items found for selected category.'));
+                        }
 
-                  return ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 6), // Отступы по бокам
-                    itemCount: items.length,
-                    itemBuilder: (context, index) {
-                      final item = items[index];
-                      final color = item['color'] as String? ?? '';
-                      final imageUrl = item['imageUrl'] as String?; // Получаем URL изображения
+    return ListView.builder(
+    itemCount: items.length,
+    itemBuilder: (context, index) {
+    final item = items[index];
+    final data = item.data() as Map<String, dynamic>;
+    final quantity = data['quantity'] ?? 1;
 
-                      return Column(
-                        children: [
-                          buildCardItem(
-                            itemId: item.id,
-                            title: item['title'],
-                            description: item['description'],
-                            type: item['type'],
-                            color: color,
-                            context: context,
-                            imageUrl: imageUrl,
-                            selectedCategoryType: _selectedCategoryType,
-                            onStateUpdate: () {
-                              setState(() {});
-                            }, // Передаем URL изображения
-                          ),
-                          if (index < items.length - 1) // Отступ только между контейнерами
-                            const SizedBox(height: 12),
-                        ],
-                      );
-                    },
-                  );
+    return buildCardItem(
+    context: context,
+    itemId: item.id,
+    title: data['title'] ?? 'Unknown Title',
+    description: data['description'] ?? 'No Description',
+    type: data['type'] ?? 'Unknown Type',
+    color: data['color'] ?? '#FFFFFF',
+    imageUrl: data['imageUrl'],
+    selectedCategoryType: _selectedCategoryType,
+    onStateUpdate: () {
+    setState(() {});
+    },
+    quantity: quantity,
+    );
+    },
+    );
 
-                },
+    },
+                      ),
+                    ),
+
+
+                ],
               ),
             ),
           ),
+
         ],
       ),
       floatingActionButton: ValueListenableBuilder<List<String>>(
@@ -450,3 +458,6 @@ Future<void> loadTypeColorsFromFirestore() async {
     }
   }
 }
+
+
+
