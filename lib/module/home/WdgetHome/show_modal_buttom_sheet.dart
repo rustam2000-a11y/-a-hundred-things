@@ -138,8 +138,8 @@ Future<void> showItemDetailsBottomSheet({
                           ? AppColors.blackSand
                           : AppColors.whiteColor,
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20),
+                        topLeft: Radius.circular(50),
+                        topRight: Radius.circular(50),
                       ),
                     ),
                     padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02),

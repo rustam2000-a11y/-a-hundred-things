@@ -63,4 +63,14 @@ class AppColors {
   begin: Alignment.topLeft, // Начало градиента
   end: Alignment.bottomRight, // Конец градиента
   );
+
+  static const LinearGradient greyWhite = LinearGradient(
+    colors: [
+      // Тёмный серо-синий
+      Color(0xFFF1F1F1), Color(0xFF8B8B8B)
+    ],
+    begin: Alignment.topLeft, // Начало градиента
+    end: Alignment.bottomRight, // Конец градиента
+  );
 }
+

@@ -60,7 +60,12 @@ void showEditItemBottomSheet(
                         width: double.infinity,
                         color: isDarkMode
                             ? AppColors.blackSand
-                            : AppColors.greySand,
+                            : null, // Цвета для светлой темы не задаем, так как используется градиент
+                        decoration: isDarkMode
+                            ? null // Градиент не используется в темной теме
+                            : BoxDecoration(
+                          gradient: AppColors.greyWhite, // Устанавливаем градиент для светлой темы
+                        ),
                         child: Center(
                           child: _selectedImage != null
                               ? Image.file(
@@ -88,8 +93,7 @@ void showEditItemBottomSheet(
                             child: Icon(
                               Icons.edit,
                               color: isDarkMode
-                                  ? Colors.white
-                                  : Colors.black,
+                                  ? Colors.white : Colors.black,
                               size: screenWidth * 0.15,
                             ),
                           )),
@@ -191,8 +195,8 @@ void showEditItemBottomSheet(
                               ? AppColors.blackSand
                               : AppColors.whiteColor,
                           borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(12),
-                            topRight: Radius.circular(12),
+                            topLeft: Radius.circular(50),
+                            topRight: Radius.circular(50),
                           ),
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 26),
