@@ -15,8 +15,6 @@
   void main() async {
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp();
-    WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp();
     await loadTypeColorsFromFirestore(); // Загружаем цвета типов
     runApp(
       const MyApp(),
