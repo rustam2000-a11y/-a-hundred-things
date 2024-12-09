@@ -439,10 +439,15 @@ class MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               const SizedBox(width: 8), // Отступ между текстом и крестиком
-              const Icon(
-                Icons.close,
-                color: Colors.white, // Белый крестик
-                size: 18, // Размер крестика
+              GestureDetector(
+                onTap: () async {
+                  await _deleteItemsByType(type);
+                },
+                child: const Icon(
+                  Icons.close,
+                  color: Colors.white, // Белый крестик
+                  size: 18, // Размер крестика
+                ),
               ),
             ],
           ),
@@ -450,6 +455,36 @@ class MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+
+  /// Функция для удаления всех элементов определённого типа
+  Future<void> _deleteItemsByType(String type) async {
+    try {
+
+      final items = await FirebaseFirestore.instance
+          .collection('item')
+          .where('type', isEqualTo: type)
+          .get();
+
+      for (final doc in items.docs) {
+        await doc.reference.delete();
+      }
+
+
+      setState(() {
+        _selectedCategoryType = null;
+            typeColorsCache.remove(type);
+          });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Категория "$type" удалена.')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ошибка при удалении категории: $e')),
+      );
+    }
+  }
+
 
 }
 
