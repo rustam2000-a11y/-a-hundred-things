@@ -86,7 +86,7 @@ Future<void> showItemDetailsBottomSheet({
                           color: Colors.black.withOpacity(0.1),
                           spreadRadius: 3,
                           blurRadius: 5,
-                          offset: Offset(0, 3),
+                          offset: const Offset(0, 3),
                         ),
                       ],
                     ),
@@ -101,7 +101,7 @@ Future<void> showItemDetailsBottomSheet({
                             color: isDarkMode ? Colors.white : Colors.black,
                           ),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Text(
                           title,
                           style: TextStyle(
@@ -109,7 +109,7 @@ Future<void> showItemDetailsBottomSheet({
                             color: isDarkMode ? Colors.white : Colors.black,
                           ),
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         Text(
                           'Описание:',
                           style: TextStyle(
@@ -118,7 +118,7 @@ Future<void> showItemDetailsBottomSheet({
                             color: isDarkMode ? Colors.white : Colors.black,
                           ),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Text(
                           description,
                           style: TextStyle(
@@ -137,7 +137,7 @@ Future<void> showItemDetailsBottomSheet({
                       color: isDarkMode
                           ? AppColors.blackSand
                           : AppColors.whiteColor,
-                      borderRadius: BorderRadius.only(
+                      borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(50),
                         topRight: Radius.circular(50),
                       ),
@@ -149,7 +149,7 @@ Future<void> showItemDetailsBottomSheet({
                         ElevatedButton(
                           onPressed: () {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Добавлено')),
+                              const SnackBar(content: Text('Добавлено')),
                             );
                           },
                           style: ElevatedButton.styleFrom(
@@ -173,7 +173,7 @@ Future<void> showItemDetailsBottomSheet({
                                   .delete();
                               Navigator.pop(context);
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Элемент удалён')),
+                                const SnackBar(content: Text('Элемент удалён')),
                               );
                             } catch (e) {
                               ScaffoldMessenger.of(context).showSnackBar(

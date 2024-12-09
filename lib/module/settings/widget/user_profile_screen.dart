@@ -61,8 +61,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
 
     // Получение текущего аутентифицированного пользователя
-    User? currentUser = FirebaseAuth.instance.currentUser;
-    String userEmail = currentUser?.email ?? 'Неизвестный пользователь';
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+    final String userEmail = currentUser?.email ?? 'Неизвестный пользователь';
 
     return Scaffold(
       body: Stack(
@@ -94,7 +94,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           Navigator.pop(
                               context); // Действие при нажатии — возвращение назад
                         },
-                        icon: Icon(Icons.arrow_back), // Иконка "назад"
+                        icon: const Icon(Icons.arrow_back), // Иконка "назад"
                         color: isDarkTheme ? Colors.white : Colors.black, // Цвет иконки
                       ),
                     ],
@@ -176,11 +176,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       padding: EdgeInsets.symmetric(vertical: spacing),
                       child: Row(
                         children: [
-                          CircleAvatar(
+                          const CircleAvatar(
                             radius: 30,
                             backgroundImage: AssetImage('assets/avatar.png'),
                           ),
-                          SizedBox(width: 16),
+                          const SizedBox(width: 16),
                           Expanded(
                             child: Text(
                               userEmail,
@@ -227,7 +227,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute<dynamic>(
-                                builder: (context) => Account()),
+                                builder: (context) => const Account()),
                           );
                         },
                       ),
@@ -279,7 +279,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         ),
                         trailing: Container(
                           padding:
-                          EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                          const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                           decoration: BoxDecoration(
                             color: Colors.grey[200],
                             borderRadius: BorderRadius.circular(20),
@@ -288,7 +288,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             value: _selectedTheme,
                             icon: Icon(Icons.arrow_drop_down,
                                 color: isDarkTheme ? Colors.white : Colors.black),
-                            underline: SizedBox(),
+                            underline: const SizedBox(),
                             onChanged: (String? newValue) {
                               if (newValue != null) {
                                 _changeTheme(newValue);

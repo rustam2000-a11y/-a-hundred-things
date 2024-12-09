@@ -8,7 +8,7 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../../main.dart';
 import '../../../presentation/colors.dart';
-import '../../home/WdgetHome/home_widget.dart';
+import '../../home/widget/home_widget.dart';
 import 'button_basic.dart';
 import 'forgot_widget.dart';
 

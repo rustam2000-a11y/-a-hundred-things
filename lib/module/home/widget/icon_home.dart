@@ -32,7 +32,7 @@ class ReusableIconButton extends StatelessWidget {
         color: backgroundColor ??
             (isDarkTheme
                 ? AppColors.blueSand // Цвет для темной темы
-                : Colors.white.withOpacity(0.6)),
+                : Colors.white.withOpacity(0.2)),
         borderRadius: BorderRadius.circular(borderRadius),
       ),
       child: IconButton(

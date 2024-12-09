@@ -52,11 +52,11 @@ class _AccountState extends State<Account> {
         'password': passwordController.text,
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Данные успешно обновлены')),
+        const SnackBar(content: Text('Данные успешно обновлены')),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Не удалось обновить данные')),
+        const SnackBar(content: Text('Не удалось обновить данные')),
       );
     }
   }
@@ -90,24 +90,27 @@ class _AccountState extends State<Account> {
                     bottom: -screenHeight * 0.07,
                     child: CircleAvatar(
                       radius: screenHeight * 0.08,
-                      backgroundImage: AssetImage('assets/avatar.png'),
+                      backgroundImage: const AssetImage('assets/avatar.png'),
                       backgroundColor: Colors.grey[300],
                     ),
                   ),
                   Positioned.fill(
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                      child: Stack(
+                        alignment: Alignment.center, // Центрируем содержимое
                         children: [
-                          IconButton(
-                            icon: Icon(Icons.arrow_back),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
+                          Align(
+                            alignment: Alignment.centerLeft, // Кнопка "назад" всегда слева
+                            child: IconButton(
+                              icon: const Icon(Icons.arrow_back_ios_new,color: Colors.white,),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
                           ),
-                          SizedBox(width: 45),
-                          Expanded(
+                          const Center(
+                            // Текст всегда по центру
                             child: Text(
                               'Редактировать Профиль',
                               style: TextStyle(
@@ -122,11 +125,12 @@ class _AccountState extends State<Account> {
                       ),
                     ),
                   ),
+
                 ],
               ),
             ),
             SizedBox(height: screenHeight * 0.08),
-            Center(
+            const Center(
               child: Text(
                 "Изменить",
                 style: TextStyle(
@@ -142,78 +146,88 @@ class _AccountState extends State<Account> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Имя',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
+                        color: AppColors.grey
                     ),
                   ),
                   SizedBox(height: screenHeight * 0.01),
                   CustomTextField(
                     controller: nameController,
                     labelText: 'Введите имя',
+                    height: 40,
                   ),
                   SizedBox(height: screenHeight * 0.02),
-                  Text(
+                  const Text(
                     'Емеил',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
+                        color: AppColors.grey
                     ),
                   ),
                   SizedBox(height: screenHeight * 0.01),
                   CustomTextField(
                     controller: emailController,
                     labelText: 'Введите имеил',
+                    height: 40,
                   ),
                   SizedBox(height: screenHeight * 0.02),
-                  Text(
+                  const Text(
                     'Номер',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
+                        color: AppColors.grey
                     ),
                   ),
                   SizedBox(height: screenHeight * 0.01),
                   CustomTextField(
                     controller: phoneController,
                     labelText: 'Введите номер',
+                    height: 40,
                   ),
                   SizedBox(height: screenHeight * 0.02),
-                  Text(
+                  const Text(
                     'Пароль',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
+                      color: AppColors.grey
                     ),
                   ),
                   SizedBox(height: screenHeight * 0.01),
                   CustomTextField(
                     controller: passwordController,
                     labelText: 'Введите пароль',
+                    height: 40,
                   ),
                   SizedBox(
-                    height: screenHeight * 0.08,
+                    height: screenHeight * 0.02,
                   ),
                   Center(
-                    child: ElevatedButton(
-                      onPressed: _updateUserData,
-                      child: Text(
-                        "Обновить",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: screenWidth * 0.3,
-                          vertical: 15.0,
+                    child: SafeArea(
+                      child: ElevatedButton(
+                        onPressed: _updateUserData,
+                        child: const Text(
+                          "Обновить",
+                          style: TextStyle(color: Colors.white),
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth * 0.3,
+                            vertical: 15.0,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          backgroundColor: isDarkTheme
+                              ? AppColors.blueGradient.colors.first // Используем первый цвет из градиента
+                              : AppColors.silverColor, // Цвет для светлой темы
                         ),
-                        backgroundColor: isDarkTheme
-                            ? AppColors.blueGradient.colors.first // Используем первый цвет из градиента
-                            : AppColors.silverColor, // Цвет для светлой темы
                       ),
                     ),
                   ),

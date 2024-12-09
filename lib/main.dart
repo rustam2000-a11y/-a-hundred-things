@@ -6,7 +6,7 @@
   import 'package:flutter_localization/flutter_localization.dart';
   import 'package:one_hundred_things/presentation/colors.dart';
   import 'generated/l10n.dart';
-  import 'module/home/WdgetHome/home_widget.dart';
+  import 'module/home/widget/home_widget.dart';
   import 'module/login/login_page.dart';
   import 'package:shared_preferences/shared_preferences.dart';
   import 'package:firebase_storage/firebase_storage.dart';

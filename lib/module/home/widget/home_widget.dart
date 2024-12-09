@@ -4,10 +4,11 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../../ Settings/widget/user_profile_screen.dart';
+
 import '../../../generated/l10n.dart';
 import '../../../main.dart';
 import '../../../presentation/colors.dart';
+import '../../settings/widget/user_profile_screen.dart';
 import 'build_card_item.dart';
 import 'icon_home.dart';
 import 'show_add_item_bottom_sheet.dart';
@@ -44,7 +45,7 @@ class MyHomePageState extends State<MyHomePage> {
               top: screenHeight * 0.07,
               left: screenWidth * 0.05,
               right: screenWidth * 0.05,
-              bottom: screenHeight * 0.05,
+              bottom: screenHeight * 0.03,
             ),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
@@ -56,28 +57,33 @@ class MyHomePageState extends State<MyHomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween, // Расстояние между группами
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  // Расстояние между группами
                   children: [
                     // Левая группа: две картинки
                     Row(
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(10), // Закругленные углы
+                          borderRadius: BorderRadius.circular(10),
+                          // Закругленные углы
                           child: Image.asset(
                             'assets/images/IMG_4650(1).png',
-                            width: screenWidth * 0.07, // Задаем ширину
-                            height: screenWidth * 0.07, // Задаем высоту
-                            fit: BoxFit.cover, // Масштабируем изображение, чтобы заполнить размеры
+                            width: screenWidth * 0.09, // Задаем ширину
+                            height: screenWidth * 0.09, // Задаем высоту
+                            fit: BoxFit
+                                .cover, // Масштабируем изображение, чтобы заполнить размеры
                           ),
                         ),
                         const SizedBox(width: 2), // Отступ между картинками
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(10), // Закругленные углы
+                          borderRadius: BorderRadius.circular(10),
+                          // Закругленные углы
                           child: Image.asset(
                             'assets/images/100 Things(3).png',
                             width: screenWidth * 0.22, // Задаем ширину
                             height: screenWidth * 0.04, // Задаем высоту
-                            fit: BoxFit.cover, // Масштабируем изображение, чтобы заполнить размеры
+                            fit: BoxFit
+                                .cover, // Масштабируем изображение, чтобы заполнить размеры
                           ),
                         ),
                       ],
@@ -104,7 +110,8 @@ class MyHomePageState extends State<MyHomePage> {
                               MaterialPageRoute<dynamic>(
                                 builder: (context) => UserProfileScreen(
                                   toggleTheme: () {
-                                    final state = context.findAncestorStateOfType<MyAppState>();
+                                    final state = context
+                                        .findAncestorStateOfType<MyAppState>();
                                     state?.toggleTheme();
                                   },
                                 ),
@@ -118,13 +125,12 @@ class MyHomePageState extends State<MyHomePage> {
                     ),
                   ],
                 ),
-
-                const SizedBox(height: 60),
+                const SizedBox(height: 40),
                 StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
                       .collection('item')
                       .where('userId',
-                      isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+                          isEqualTo: FirebaseAuth.instance.currentUser?.uid)
                       .snapshots(),
                   builder: (context, snapshot) {
                     // Default values for when there are no data or documents
@@ -134,50 +140,59 @@ class MyHomePageState extends State<MyHomePage> {
                     if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
                       totalQuantity = snapshot.data!.docs.fold<int>(
                         0,
-                            (accumulator, doc) {
-                          final quantity = doc['quantity'] as int? ?? 1; // Default quantity is 1
+                        (accumulator, doc) {
+                          final quantity = doc['quantity'] as int? ??
+                              1; // Default quantity is 1
                           return accumulator + quantity;
                         },
                       );
                     }
 
-                    final progress = (totalQuantity / 100).clamp(0.0, 1.0); // Progress capped between 0 and 1
-                    final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+                    final progress = (totalQuantity / 100)
+                        .clamp(0.0, 1.0); // Progress capped between 0 and 1
+                    final isDarkTheme =
+                        Theme.of(context).brightness == Brightness.dark;
 
                     return Stack(
                       clipBehavior: Clip.none,
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(10),
                           child: SizedBox(
-                            height: 15,
+                            height: 10,
                             child: LinearProgressIndicator(
                               value: progress,
-                              backgroundColor: Colors.grey[300],
+                              backgroundColor: AppColors.lightviolet,
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                isDarkTheme ? AppColors.blueSand : Colors.blue, // Progress bar color
+                                isDarkTheme
+                                    ? AppColors.blueSand
+                                    : AppColors
+                                        .violetSand, // Progress bar color
                               ),
                             ),
                           ),
                         ),
                         Positioned(
                           left: progress *
-                              (MediaQuery.of(context).size.width * 0.85) -
+                                  (MediaQuery.of(context).size.width * 0.85) -
                               10,
-                          top: -25,
+                          top: -30,
                           child: Column(
                             children: [
                               Container(
                                 decoration: BoxDecoration(
                                   color: isDarkTheme
-                                      ? AppColors.blueSand // Dark theme container color
-                                      : AppColors.violetSand, // Light theme container color
+                                      ? AppColors
+                                          .blueSand // Dark theme container color
+                                      : AppColors.violetSand,
+                                  // Light theme container color
                                   borderRadius: BorderRadius.circular(4),
                                 ),
-                                padding:
-                                const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
                                 child: Text(
-                                  '${(progress * 100).toInt()}%', // Show progress percentage
+                                  '${(progress * 100).toInt()}%',
+                                  // Show progress percentage
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -185,14 +200,16 @@ class MyHomePageState extends State<MyHomePage> {
                                 ),
                               ),
                               Container(
-                                width: 23,
+                                width: 24,
                                 height: 23,
                                 decoration: BoxDecoration(
                                   color: isDarkTheme
-                                      ? AppColors.blueSand // Dark theme point color
-                                      : Colors.blue, // Light theme point color
+                                      ? AppColors
+                                          .blueSand // Dark theme point color
+                                      : Colors.white,
                                   shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.white, width: 2),
+                                  border: Border.all(
+                                      color: AppColors.violetSand, width: 4),
                                 ),
                               ),
                             ],
@@ -202,8 +219,6 @@ class MyHomePageState extends State<MyHomePage> {
                     );
                   },
                 )
-
-
               ],
             ),
           ),
@@ -245,9 +260,14 @@ class MyHomePageState extends State<MyHomePage> {
 
                 return ListView(
                   scrollDirection: Axis.horizontal,
+                  padding: EdgeInsets.only(left: screenWidth * 0.02),
+                  // Отступ слева: 2% от ширины экрана
                   children: typesWithColors.entries.map((entry) {
                     return _buildCategoryButton(
-                        entry.key, entry.value, isDarkMode);
+                      entry.key,
+                      entry.value,
+                      isDarkMode,
+                    );
                   }).toList(),
                 );
               },
@@ -255,9 +275,12 @@ class MyHomePageState extends State<MyHomePage> {
           ),
           Expanded(
             child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: screenWidth * 0.01,
-                vertical: screenHeight * 0.02,
+              padding: EdgeInsets.only(
+                top: screenHeight * 0.02, // Отступ сверху: 2% от высоты экрана
+              ).add(
+                EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.02, // Отступ по горизонтали
+                ),
               ),
               child: Column(
                 children: [
@@ -266,15 +289,18 @@ class MyHomePageState extends State<MyHomePage> {
                       stream: FirebaseFirestore.instance
                           .collection('item')
                           .where('userId',
-                          isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+                              isEqualTo: FirebaseAuth.instance.currentUser?.uid)
                           .orderBy('timestamp', descending: true)
                           .snapshots(),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
                         }
                         if (snapshot.hasError) {
-                          return Center(child: Text('Error: ${snapshot.error}'));
+                          return Center(
+                              child: Text('Error: ${snapshot.error}'));
                         }
                         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                           return const Center(child: Text('No items found.'));
@@ -285,93 +311,97 @@ class MyHomePageState extends State<MyHomePage> {
                           return item['type'] == _selectedCategoryType;
                         }).toList();
 
-                        if (items.isEmpty) {
-                          return const Center(
-                              child: Text('No items found for selected category.'));
-                        }
+                        return ListView.builder(
+                          padding: EdgeInsets.zero,
+                          itemCount: items.length,
+                          itemBuilder: (context, index) {
+                            final item = items[index];
+                            final data = item.data() as Map<String, dynamic>;
+                            final quantity = data['quantity'] ?? 1;
 
-    return ListView.builder(
-    itemCount: items.length,
-    itemBuilder: (context, index) {
-    final item = items[index];
-    final data = item.data() as Map<String, dynamic>;
-    final quantity = data['quantity'] ?? 1;
-
-    return buildCardItem(
-    context: context,
-    itemId: item.id,
-    title: data['title'] ?? 'Unknown Title',
-    description: data['description'] ?? 'No Description',
-    type: data['type'] ?? 'Unknown Type',
-    color: data['color'] ?? '#FFFFFF',
-    imageUrl: data['imageUrl'],
-    selectedCategoryType: _selectedCategoryType,
-    onStateUpdate: () {
-    setState(() {});
-    },
-    quantity: quantity,
-    );
-    },
-    );
-
-    },
-                      ),
+                            return Padding(
+                              padding:
+                                  EdgeInsets.only(bottom: screenHeight * 0.01),
+                              // Отступ между элементами (2% от высоты экрана)
+                              child: buildCardItem(
+                                context: context,
+                                itemId: item.id,
+                                title: data['title'] ?? 'Unknown Title',
+                                description:
+                                    data['description'] ?? 'No Description',
+                                type: data['type'] ?? 'Unknown Type',
+                                color: data['color'] ?? '#FFFFFF',
+                                imageUrl: data['imageUrl'],
+                                selectedCategoryType: _selectedCategoryType,
+                                onStateUpdate: () {
+                                  setState(() {});
+                                },
+                                quantity: quantity,
+                              ),
+                            );
+                          },
+                        );
+                      },
                     ),
-
-
+                  ),
                 ],
               ),
             ),
           ),
-
         ],
       ),
-      floatingActionButton: ValueListenableBuilder<List<String>>(
-        valueListenable: selectedItemsNotifier,
-        builder: (context, selectedItems, child) {
-          final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
-
-          return selectedItems.isNotEmpty
-              ? FloatingActionButton(
-                  onPressed: () {
-                    deleteSelectedItems(
-                        context); // Удаление выделенных элементов
-                  },
-                  backgroundColor: Colors.redAccent, // Красный фон для удаления
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(16), // Прямоугольная форма
-                  ),
-                  child: const Icon(Icons.delete),
-                )
-              : Container(
-                  width: 60, // Фиксированная ширина
-                  height: 60, // Фиксированная высота
-                  decoration: isDarkTheme
-                      ? BoxDecoration(
-                          gradient: AppColors
-                              .blueGradient, // Градиент для темной темы
-                          borderRadius:
-                              BorderRadius.circular(16), // Закругленные углы
-                        )
-                      : null,
-                  child: FloatingActionButton(
+      floatingActionButton: SafeArea(
+        child: ValueListenableBuilder<List<String>>(
+          valueListenable: selectedItemsNotifier,
+          builder: (context, selectedItems, child) {
+            final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+        
+            return selectedItems.isNotEmpty
+                ? FloatingActionButton(
                     onPressed: () {
-                      showAddItemBottomSheet(context); // Добавление элемента
+                      deleteSelectedItems(
+                          context); // Удаление выделенных элементов
                     },
-                    backgroundColor: isDarkTheme
-                        ? Colors.transparent // Прозрачный фон для градиента
-                        : Colors.blueAccent,
-                    // Синий цвет для светлой темы
+                    backgroundColor: Colors.redAccent, // Красный фон для удаления
                     shape: RoundedRectangleBorder(
                       borderRadius:
-                          BorderRadius.circular(16), // Прямоугольная форма
+                          BorderRadius.circular(10), // Прямоугольная форма
                     ),
-                    elevation: 0,
-                    child: const Icon(Icons.add), // Убираем тень для градиента
-                  ),
-                );
-        },
+                    child: const Icon(Icons.delete),
+                  )
+                : Container(
+                    width: 60, // Фиксированная ширина
+                    height: 60, // Фиксированная высота
+                    decoration: isDarkTheme
+                        ? BoxDecoration(
+                            gradient: AppColors
+                                .blueGradient, // Градиент для темной темы
+                            borderRadius:
+                                BorderRadius.circular(10), // Закругленные углы
+                          )
+                        : null,
+                    child: FloatingActionButton(
+                      onPressed: () {
+                        showAddItemBottomSheet(context); // Добавление элемента
+                      },
+                      backgroundColor: isDarkTheme
+                          ? Colors.transparent // Прозрачный фон для градиента
+                          : AppColors.orangeSand,
+                      // Оранжевый цвет для светлой темы
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(10), // Прямоугольная форма
+                      ),
+                      elevation: 0,
+                      // Убираем тень
+                      child: const Icon(
+                        Icons.add,
+                        color: Colors.white, // Белая иконка +
+                      ),
+                    ),
+                  );
+          },
+        ),
       ),
     );
   }
@@ -396,21 +426,31 @@ class MyHomePageState extends State<MyHomePage> {
           decoration: BoxDecoration(
             gradient: isDarkMode ? AppColors.whiteToBlackGradient : null,
             color: !isDarkMode ? backgroundColor : null,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(10),
           ),
-          child: Center(
-            child: Text(
-              type,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
+          child: Row(
+            mainAxisSize: MainAxisSize.min, // Контейнер подстраивается под содержимое
+            children: [
+              Text(
+                type,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
               ),
-            ),
+              const SizedBox(width: 8), // Отступ между текстом и крестиком
+              const Icon(
+                Icons.close,
+                color: Colors.white, // Белый крестик
+                size: 18, // Размер крестика
+              ),
+            ],
           ),
         ),
       ),
     );
   }
+
 }
 
 String getRandomColor() {
@@ -446,8 +486,10 @@ Future<void> deleteSelectedItems(BuildContext context) async {
     );
   }
 }
+
 Future<void> loadTypeColorsFromFirestore() async {
-  final querySnapshot = await FirebaseFirestore.instance.collection('item').get();
+  final querySnapshot =
+      await FirebaseFirestore.instance.collection('item').get();
 
   for (var doc in querySnapshot.docs) {
     final type = doc['type'];
@@ -458,6 +500,3 @@ Future<void> loadTypeColorsFromFirestore() async {
     }
   }
 }
-
-
-

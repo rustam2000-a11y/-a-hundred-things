@@ -6,7 +6,7 @@ import 'package:one_hundred_things/module/login/widget/text_filed.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../../main.dart';
 import '../../../presentation/colors.dart';
-import '../../home/WdgetHome/home_widget.dart';
+import '../../home/widget/home_widget.dart';
 import 'button_basic.dart';
 
 class RegistrationFormWidget extends StatefulWidget {

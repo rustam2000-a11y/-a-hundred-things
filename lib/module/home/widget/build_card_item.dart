@@ -76,7 +76,7 @@ Widget buildCardItem({
             duration: const Duration(milliseconds: 300),
             decoration: BoxDecoration(
               color: backgroundColor,
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(25),
               border: Border.all(
                 color: isSelected ? Colors.blueAccent : Colors.transparent,
                 width: isSelected ? 2 : 0,
@@ -143,7 +143,7 @@ Widget buildCardItem({
 Widget _buildImage(String? imageUrl, bool isDarkTheme) {
   return Container(
     width: 100,
-    height: 100,
+    height: 90,
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(10),
       color: imageUrl == null
@@ -209,14 +209,15 @@ Widget _buildItemDetails({
         ),
       ),
       const SizedBox(height: 8),
-      Text(
-        type,
-        style: TextStyle(
-          color: isDarkTheme ? Colors.white : Colors.black,
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      // Удаляем отображение типа
+      // Text(
+      //   type,
+      //   style: TextStyle(
+      //     color: isDarkTheme ? Colors.white : Colors.black,
+      //     fontSize: 14,
+      //     fontWeight: FontWeight.bold,
+      //   ),
+      // ),
     ],
   );
 }
