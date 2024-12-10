@@ -216,8 +216,8 @@ void showAddItemBottomSheet(BuildContext context) {
                       Align(
                         alignment: Alignment.bottomCenter,
                         child: Container(
-                          padding: const EdgeInsets.all(16),
-                          height: MediaQuery.of(context).size.height * 0.15, // 10% от высоты экрана
+                          // padding: const EdgeInsets.all(16),
+                          height: MediaQuery.of(context).size.height * 0.13, // 10% от высоты экрана
                           decoration: BoxDecoration(
                             color: isDarkMode
                                 ? AppColors.blackSand

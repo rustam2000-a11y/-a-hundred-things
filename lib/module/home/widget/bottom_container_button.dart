@@ -15,19 +15,24 @@ abstract class AbstractButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        //minimumSize: const Size(180, 46), // Размер кнопки
+        minimumSize: Size(screenWidth * 0.45 , 46), // 30% ширины экрана
         backgroundColor: color, // Цвет кнопки
+        elevation: 6,
+        shadowColor: Colors.black,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8), // Закругленные углы
+          borderRadius: BorderRadius.circular(10), // Закругленные углы
         ),
       ),
       child: Text(
         textAlign: TextAlign.center,
         text,
-        style: const TextStyle(fontSize: 18),
+        style: const TextStyle(fontSize: 18,color: Colors.white),
+
       ),
     );
   }

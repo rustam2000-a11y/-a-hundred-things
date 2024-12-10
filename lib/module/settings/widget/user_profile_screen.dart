@@ -155,7 +155,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             ),
           ),
           Positioned(
-            top: screenHeight * 0.18,
+            top: screenHeight * 0.19,
             left: 0,
             right: 0,
             child: Container(
