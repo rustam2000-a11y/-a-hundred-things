@@ -9,5 +9,6 @@
   "or": "or",
   "delete": "delete",
   "email": "Email",
-  "password": "Password"
+  "password": "Password",
+  "accountSettings": "Настройки учетной записи"
 }

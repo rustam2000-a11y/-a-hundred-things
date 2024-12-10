@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../generated/l10n.dart';
 import '../../../main.dart';
 import '../../../presentation/colors.dart';
 import '../../login/login_page.dart';
@@ -203,7 +204,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: spacing),
                       child: Text(
-                        'Настройки учетной записи',
+                        S.of(context).accountSettings,
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,

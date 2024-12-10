@@ -22,6 +22,8 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+        "accountSettings":
+            MessageLookupByLibrary.simpleMessage("Настройки учетной записи"),
         "delete": MessageLookupByLibrary.simpleMessage("delete"),
         "email": MessageLookupByLibrary.simpleMessage("Email"),
         "or": MessageLookupByLibrary.simpleMessage("or"),

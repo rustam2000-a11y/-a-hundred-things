@@ -69,7 +69,7 @@
           primarySwatch: Colors.blue,
           primaryColor: AppColors.silverColor,
           scaffoldBackgroundColor: AppColors.silverColor,
-          appBarTheme: AppBarTheme(color: AppColors.royalBlue),
+          appBarTheme: const AppBarTheme(color: AppColors.royalBlue),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style:
             ElevatedButton.styleFrom(backgroundColor: AppColors.silverColor),
@@ -77,9 +77,9 @@
         ),
         darkTheme: ThemeData.dark(),
         themeMode: themeMode,
+        locale: const Locale('en'),
         supportedLocales: S.delegate.supportedLocales,
-        localizationsDelegates: [
-          ...localization.localizationsDelegates,
+        localizationsDelegates: const [
           S.delegate,
         ],
         home: AuthCheck(toggleTheme: toggleTheme),
