@@ -12,7 +12,7 @@ void showEditItemBottomSheet(
       required String initialTitle,
       required String initialDescription,
       required String initialType,
-      String? initialImageUrl,
+      required String? imageUrl, // URL текущего изображения
     }) {
   final TextEditingController _titleController =
   TextEditingController(text: initialTitle);
@@ -21,7 +21,7 @@ void showEditItemBottomSheet(
   final TextEditingController _typeController =
   TextEditingController(text: initialType);
 
-  File? _selectedImage;
+  File? _selectedImage; // Для хранения нового изображения
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -50,36 +50,33 @@ void showEditItemBottomSheet(
                   child: Stack(
                     clipBehavior: Clip.none,
                     children: [
-        
                       GestureDetector(
                         onTap: () async {
                           await _pickImage();
-                          setState(() {});
+                          setState(() {}); // Обновляем состояние после выбора изображения
                         },
                         child: Container(
                           height: screenHeight * 0.6,
                           width: double.infinity,
-                          color: isDarkMode
-                              ? AppColors.blackSand
-                              : null, // Цвета для светлой темы не задаем, так как используется градиент
+                          color: isDarkMode ? AppColors.blackSand : null,
                           decoration: isDarkMode
-                              ? null // Градиент не используется в темной теме
+                              ? null
                               : BoxDecoration(
-                            gradient: AppColors.greyWhite, // Устанавливаем градиент для светлой темы
+                            gradient: AppColors.greyWhite,
                           ),
                           child: Center(
                             child: _selectedImage != null
                                 ? Image.file(
                               _selectedImage!,
                               fit: BoxFit.cover,
-                              width: screenWidth,
+                              width: double.infinity,
                               height: screenHeight * 0.6,
                             )
-                                : (initialImageUrl != null
+                                : ((imageUrl ?? '').isNotEmpty
                                 ? Image.network(
-                              initialImageUrl,
+                              imageUrl!, // Текущее изображение
                               fit: BoxFit.cover,
-                              width: screenWidth,
+                              width: double.infinity,
                               height: screenHeight * 0.6,
                             )
                                 : Container(
@@ -89,20 +86,20 @@ void showEditItemBottomSheet(
                                 color: isDarkMode
                                     ? AppColors.greySand
                                     : Colors.grey[300],
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius:
+                                BorderRadius.circular(20),
                               ),
                               child: Icon(
                                 Icons.edit,
                                 color: isDarkMode
-                                    ? Colors.white : Colors.black,
+                                    ? Colors.white
+                                    : Colors.black,
                                 size: screenWidth * 0.15,
                               ),
                             )),
                           ),
                         ),
                       ),
-        
-        
                       Positioned(
                         top: screenHeight * 0.05,
                         left: 0,
@@ -111,6 +108,7 @@ void showEditItemBottomSheet(
                           child: TextField(
                             controller: _typeController,
                             textAlign: TextAlign.center,
+                            readOnly: true, // Запрещаем редактирование
                             decoration: const InputDecoration(
                               hintText: "Тип",
                               border: InputBorder.none,
@@ -123,8 +121,6 @@ void showEditItemBottomSheet(
                           ),
                         ),
                       ),
-        
-        
                       Positioned(
                         top: screenHeight * 0.55,
                         left: 0,
@@ -136,9 +132,7 @@ void showEditItemBottomSheet(
                             gradient: isDarkMode
                                 ? AppColors.darkBlueGradient
                                 : null,
-                            color: isDarkMode
-                                ? null
-                                : AppColors.silverColor,
+                            color: isDarkMode ? null : AppColors.silverColor,
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
@@ -186,8 +180,6 @@ void showEditItemBottomSheet(
                           ),
                         ),
                       ),
-        
-        
                       Align(
                         alignment: Alignment.bottomCenter,
                         child: Container(
@@ -211,9 +203,8 @@ void showEditItemBottomSheet(
                                         _descriptionController.text.isNotEmpty &&
                                         _typeController.text.isNotEmpty) {
                                       try {
-                                        String? newImageUrl = initialImageUrl;
-        
-        
+                                        String? newImageUrl = imageUrl;
+
                                         if (_selectedImage != null) {
                                           final storageRef = FirebaseStorage
                                               .instance
@@ -222,11 +213,10 @@ void showEditItemBottomSheet(
                                               'images/${itemId}_${DateTime.now().millisecondsSinceEpoch}');
                                           await storageRef.putFile(
                                               _selectedImage!);
-                                          newImageUrl =
-                                          await storageRef.getDownloadURL();
+                                          newImageUrl = await storageRef
+                                              .getDownloadURL(); // Получаем URL нового изображения
                                         }
-        
-                                        // Обновляем документ Firestore
+
                                         await FirebaseFirestore.instance
                                             .collection('item')
                                             .doc(itemId)
@@ -235,25 +225,29 @@ void showEditItemBottomSheet(
                                           'description':
                                           _descriptionController.text,
                                           'type': _typeController.text,
-                                          'imageUrl': newImageUrl,
+                                          'imageUrl': newImageUrl, // Сохраняем новое или текущее изображение
                                           'timestamp': Timestamp.now(),
                                         });
-        
+
                                         Navigator.pop(context);
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
                                           const SnackBar(
                                               content: Text(
                                                   'Item updated successfully')),
                                         );
                                       } catch (e) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
                                           SnackBar(content: Text('Error: $e')),
                                         );
                                       }
                                     } else {
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
                                         const SnackBar(
-                                            content: Text('Please fill all fields')),
+                                            content: Text(
+                                                'Please fill all fields')),
                                       );
                                     }
                                   },
@@ -280,4 +274,3 @@ void showEditItemBottomSheet(
     },
   );
 }
-

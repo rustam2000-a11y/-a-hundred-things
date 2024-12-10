@@ -15,16 +15,15 @@ final Map<String, int> itemCounts = {};
 
 /// Глобальный словарь для сохранения цветов по типу
 final Map<String, String> typeColors =
-    {}; // Словарь для хранения цветов по типу
+{}; // Словарь для хранения цветов по типу
 
 /// Функция для получения цвета для типа из глобального словаря
 Color getColorForType(String type) {
   if (!typeColorsCache.containsKey(type)) {
-    typeColorsCache[type] =
-        home.getRandomColor(); // Используем функцию из home_widget.dart
+    // Если типа нет в кэше, генерируем цвет и сохраняем
+    typeColorsCache[type] = getRandomColor();
   }
-  return home.getColorFromHex(typeColorsCache[type]) ??
-      Colors.grey; // Используем функцию из home_widget.dart
+  return getColorFromHex(typeColorsCache[type]) ?? Colors.grey;
 }
 
 Widget buildCardItem({
@@ -111,6 +110,7 @@ Widget buildCardItem({
                               isDarkTheme: isDarkTheme,
                               isSelected: isSelected,
                               itemId: itemId,
+                              imageUrl: imageUrl,
                             ),
                           ),
                         ],
@@ -151,15 +151,15 @@ Widget _buildImage(String? imageUrl, bool isDarkTheme) {
           : null,
       image: imageUrl != null
           ? DecorationImage(
-              image: NetworkImage(imageUrl),
-              fit: BoxFit.cover,
-            )
+        image: NetworkImage(imageUrl),
+        fit: BoxFit.cover,
+      )
           : null,
     ),
     child: imageUrl == null
         ? Center(
-            child: Icon(Icons.image, size: 40, color: Colors.grey[600]),
-          )
+      child: Icon(Icons.image, size: 40, color: Colors.grey[600]),
+    )
         : null,
   );
 }
@@ -172,6 +172,7 @@ Widget _buildItemDetails({
   required bool isDarkTheme,
   required bool isSelected,
   required String itemId,
+  String? imageUrl,
 }) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -197,6 +198,7 @@ Widget _buildItemDetails({
             title: title,
             description: description,
             type: type,
+            imageUrl: imageUrl,
           ),
         ],
       ),
@@ -230,6 +232,7 @@ Widget _buildActionIcons({
   required String title,
   required String description,
   required String type,
+  String? imageUrl,
 }) {
   if (isSelected) {
     return Container(
@@ -255,12 +258,14 @@ Widget _buildActionIcons({
           color: isDarkTheme ? Colors.white : Colors.white,
         ),
         onPressed: () {
+
+
           showEditItemBottomSheet(
             context,
             itemId: itemId,
             initialTitle: title,
             initialDescription: description,
-            initialType: type,
+            initialType: type, imageUrl: imageUrl ,
           );
         },
       ),
@@ -395,6 +400,3 @@ Future<void> _decrementItem(String itemId, String itemType, VoidCallback onState
     }
   }
 }
-
-
-

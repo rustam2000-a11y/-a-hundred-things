@@ -331,7 +331,7 @@ class MyHomePageState extends State<MyHomePage> {
                                     data['description'] ?? 'No Description',
                                 type: data['type'] ?? 'Unknown Type',
                                 color: data['color'] ?? '#FFFFFF',
-                                imageUrl: data['imageUrl'],
+                                imageUrl: data['imageUrl'] as String?,
                                 selectedCategoryType: _selectedCategoryType,
                                 onStateUpdate: () {
                                   setState(() {});
