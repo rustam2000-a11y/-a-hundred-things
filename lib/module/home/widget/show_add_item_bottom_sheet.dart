@@ -83,7 +83,9 @@ void showAddItemBottomSheet(BuildContext context) {
                     clipBehavior: Clip.none,
                     children: [
                       GestureDetector(
-                        onTap: () => _pickImage(context, setState),
+                        onTap: () async {
+                          await _pickImage(context, setState);
+                        },
                         child: Container(
                           height: screenHeight * 0.6,
                           width: double.infinity,
@@ -214,7 +216,8 @@ void showAddItemBottomSheet(BuildContext context) {
                       Align(
                         alignment: Alignment.bottomCenter,
                         child: Container(
-                          height: MediaQuery.of(context).size.height * 0.10, // 10% от высоты экрана
+                          padding: const EdgeInsets.all(16),
+                          height: MediaQuery.of(context).size.height * 0.15, // 10% от высоты экрана
                           decoration: BoxDecoration(
                             color: isDarkMode
                                 ? AppColors.blackSand
@@ -224,65 +227,63 @@ void showAddItemBottomSheet(BuildContext context) {
                               topRight: Radius.circular(50),
                             ),
                           ),
-                          child: Center( // Центрируем содержимое
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center, // Центрируем кнопки по горизонтали
-                              children: [
-                                AddButton(
-                                  onPressed: () async {
-                                    if (_titleController.text.isNotEmpty &&
-                                        _descriptionController.text.isNotEmpty &&
-                                        _typeController.text.isNotEmpty) {
-                                      try {
-                                        // Если изображение выбрано, загрузим его
-                                        if (_selectedImage != null) {
-                                          _imageUrl = await _uploadImage(_selectedImage!);
-                                        }
-
-                                        // Проверка на наличие цвета для типа
-                                        final type = _typeController.text.trim();
-                                        if (!typeColorsCache.containsKey(type)) {
-                                          typeColorsCache[type] = getRandomColor(); // Генерация нового цвета
-                                        }
-                                        final randomColor = typeColorsCache[type]!;
-                                        final items = await FirebaseFirestore.instance.collection('item').get();
-                                        for (var item in items.docs) {
-                                          await item.reference.update({'quantity': 1});
-                                        }
-                                        // Добавление элемента в Firestore
-                                        await FirebaseFirestore.instance.collection('item').add({
-                                          'title': _titleController.text,
-                                          'description': _descriptionController.text,
-                                          'type': type,
-                                          'userId': FirebaseAuth.instance.currentUser?.uid,
-                                          'color': randomColor, // Основной цвет
-                                          'typeColor': randomColor, // Цвет для типа
-                                          'timestamp': Timestamp.now(),
-                                          'imageUrl': _imageUrl,
-                                          'quantity': 1, // Инициализируем с количеством 1
-                                        });
-
-                                        Navigator.pop(context);
-                                      } catch (e) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(content: Text('Error: $e')),
-                                        );
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center, // Центрируем кнопки по горизонтали
+                            children: [
+                              AddButton(
+                                onPressed: () async {
+                                  if (_titleController.text.isNotEmpty &&
+                                      _descriptionController.text.isNotEmpty &&
+                                      _typeController.text.isNotEmpty) {
+                                    try {
+                                      // Если изображение выбрано, загрузим его
+                                      if (_selectedImage != null) {
+                                        _imageUrl = await _uploadImage(_selectedImage!);
                                       }
-                                    } else {
+
+                                      // Проверка на наличие цвета для типа
+                                      final type = _typeController.text.trim();
+                                      if (!typeColorsCache.containsKey(type)) {
+                                        typeColorsCache[type] = getRandomColor(); // Генерация нового цвета
+                                      }
+                                      final randomColor = typeColorsCache[type]!;
+                                      final items = await FirebaseFirestore.instance.collection('item').get();
+                                      for (var item in items.docs) {
+                                        await item.reference.update({'quantity': 1});
+                                      }
+                                      // Добавление элемента в Firestore
+                                      await FirebaseFirestore.instance.collection('item').add({
+                                        'title': _titleController.text,
+                                        'description': _descriptionController.text,
+                                        'type': type,
+                                        'userId': FirebaseAuth.instance.currentUser?.uid,
+                                        'color': randomColor, // Основной цвет
+                                        'typeColor': randomColor, // Цвет для типа
+                                        'timestamp': Timestamp.now(),
+                                        'imageUrl': _imageUrl,
+                                        'quantity': 1, // Инициализируем с количеством 1
+                                      });
+
+                                      Navigator.pop(context);
+                                    } catch (e) {
                                       ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Please fill all fields')),
+                                        SnackBar(content: Text('Error: $e')),
                                       );
                                     }
-                                  },
-                                ),
-                                const SizedBox(width: 20),
-                                CancelButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ],
-                            ),
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Please fill all fields')),
+                                    );
+                                  }
+                                },
+                              ),
+                              const SizedBox(width: 20),
+                              CancelButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ],
                           ),
                         ),
                       )

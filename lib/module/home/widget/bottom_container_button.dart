@@ -18,13 +18,14 @@ abstract class AbstractButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        minimumSize: const Size(180, 46), // Размер кнопки
+        //minimumSize: const Size(180, 46), // Размер кнопки
         backgroundColor: color, // Цвет кнопки
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8), // Закругленные углы
         ),
       ),
       child: Text(
+        textAlign: TextAlign.center,
         text,
         style: const TextStyle(fontSize: 18),
       ),
