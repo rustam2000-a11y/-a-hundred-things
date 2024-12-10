@@ -45,14 +45,10 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
-
-	<!-- Добавленные ключи для доступа к камере и фото -->
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Мы используем библиотеку фотографий для загрузки изображений.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Мы используем камеру для создания фотографий.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Мы добавляем изображения в вашу библиотеку фотографий.</string>
+	<key>NSMicrophoneUsageDescription</key>
 
 </dict>
 </plist>
