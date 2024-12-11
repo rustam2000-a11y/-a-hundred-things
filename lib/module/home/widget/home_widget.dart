@@ -45,174 +45,180 @@ class MyHomePageState extends State<MyHomePage> {
                 ? AppColors.blackSand
                 : Theme.of(context).primaryColor,
             flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                padding: EdgeInsets.only(
-                  top: screenHeight * 0.07,
-                  left: screenWidth * 0.05,
-                  right: screenWidth * 0.05,
-                  bottom: screenHeight * 0.03,
+              background: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(20), // Закругление слева внизу
+                  bottomRight: Radius.circular(20), // Закругление справа внизу
                 ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
-                  color: isDarkMode
-                      ? AppColors.blackSand
-                      : Theme.of(context).primaryColor,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Image.asset(
-                                'assets/images/IMG_4650(1).png',
-                                width: screenWidth * 0.09,
-                                height: screenWidth * 0.09,
-                                fit: BoxFit.cover,
+                child: Container(
+                  padding: EdgeInsets.only(
+                    top: screenHeight * 0.07,
+                    left: screenWidth * 0.05,
+                    right: screenWidth * 0.05,
+                    bottom: screenHeight * 0.03,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isDarkMode
+                        ? AppColors.blackSand
+                        : Theme.of(context).primaryColor,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.asset(
+                                  'assets/images/IMG_4650(1).png',
+                                  width: screenWidth * 0.09,
+                                  height: screenWidth * 0.09,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 2),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Image.asset(
-                                'assets/images/100 Things(3).png',
-                                width: screenWidth * 0.22,
-                                height: screenWidth * 0.04,
-                                fit: BoxFit.cover,
+                              const SizedBox(width: 2),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.asset(
+                                  'assets/images/100 Things(3).png',
+                                  width: screenWidth * 0.22,
+                                  height: screenWidth * 0.04,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            const SizedBox(width: 10),
-                            ReusableIconButton(
-                              icon: Icons.search_rounded,
-                              onPressed: () {
-                                showSearchBottomSheet(context);
-                              },
-                              screenWidth: screenWidth,
-                              borderRadius: 10,
-                            ),
-                            const SizedBox(width: 4),
-                            const SizedBox(width: 10),
-                            ReusableIconButton(
-                              icon: Icons.more_vert,
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute<dynamic>(
-                                    builder: (context) => UserProfileScreen(
-                                      toggleTheme: () {
-                                        final state = context
-                                            .findAncestorStateOfType<MyAppState>();
-                                        state?.toggleTheme();
-                                      },
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              const SizedBox(width: 10),
+                              ReusableIconButton(
+                                icon: Icons.search_rounded,
+                                onPressed: () {
+                                  showSearchBottomSheet(context);
+                                },
+                                screenWidth: screenWidth,
+                                borderRadius: 10,
+                              ),
+                              const SizedBox(width: 4),
+                              const SizedBox(width: 10),
+                              ReusableIconButton(
+                                icon: Icons.more_vert,
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute<dynamic>(
+                                      builder: (context) => UserProfileScreen(
+                                        toggleTheme: () {
+                                          final state = context
+                                              .findAncestorStateOfType<MyAppState>();
+                                          state?.toggleTheme();
+                                        },
+                                      ),
                                     ),
-                                  ),
-                                );
+                                  );
+                                },
+                                screenWidth: screenWidth,
+                                borderRadius: 10,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 40),
+                      StreamBuilder<QuerySnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection('item')
+                            .where('userId',
+                            isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          int totalQuantity = 0;
+
+                          if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                            totalQuantity = snapshot.data!.docs.fold<int>(
+                              0,
+                                  (accumulator, doc) {
+                                final quantity = doc['quantity'] as int? ?? 1;
+                                return accumulator + quantity;
                               },
-                              screenWidth: screenWidth,
-                              borderRadius: 10,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 40),
-                    StreamBuilder<QuerySnapshot>(
-                      stream: FirebaseFirestore.instance
-                          .collection('item')
-                          .where('userId',
-                          isEqualTo: FirebaseAuth.instance.currentUser?.uid)
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        int totalQuantity = 0;
+                            );
+                          }
 
-                        if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
-                          totalQuantity = snapshot.data!.docs.fold<int>(
-                            0,
-                                (accumulator, doc) {
-                              final quantity = doc['quantity'] as int? ?? 1;
-                              return accumulator + quantity;
-                            },
-                          );
-                        }
+                          final progress = (totalQuantity / 100).clamp(0.0, 1.0);
+                          final isDarkTheme =
+                              Theme.of(context).brightness == Brightness.dark;
 
-                        final progress = (totalQuantity / 100).clamp(0.0, 1.0);
-                        final isDarkTheme =
-                            Theme.of(context).brightness == Brightness.dark;
-
-                        return Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: SizedBox(
-                                height: 10,
-                                child: LinearProgressIndicator(
-                                  value: progress,
-                                  backgroundColor: AppColors.lightviolet,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    isDarkTheme
-                                        ? AppColors.blueSand
-                                        : AppColors.violetSand,
+                          return Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: SizedBox(
+                                  height: 10,
+                                  child: LinearProgressIndicator(
+                                    value: progress,
+                                    backgroundColor: AppColors.lightviolet,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      isDarkTheme
+                                          ? AppColors.blueSand
+                                          : AppColors.violetSand,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            Positioned(
-                              left: progress *
-                                  (MediaQuery.of(context).size.width * 0.85) -
-                                  10,
-                              top: -30,
-                              child: Column(
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: isDarkMode
-                                          ? AppColors.blueSand
-                                          : AppColors.violetSand,
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 6, vertical: 2),
-                                    child: Text(
-                                      '${(progress * 100).toInt()}%',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
+                              Positioned(
+                                left: progress *
+                                    (MediaQuery.of(context).size.width * 0.85) -
+                                    10,
+                                top: -30,
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: isDarkMode
+                                            ? AppColors.blueSand
+                                            : AppColors.violetSand,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 6, vertical: 2),
+                                      child: Text(
+                                        '${(progress * 100).toInt()}%',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  Container(
-                                    width: 24,
-                                    height: 23,
-                                    decoration: BoxDecoration(
-                                      color: isDarkMode
-                                          ? AppColors.blueSand
-                                          : Colors.white,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                          color: AppColors.violetSand, width: 4),
+                                    Container(
+                                      width: 24,
+                                      height: 23,
+                                      decoration: BoxDecoration(
+                                        color: isDarkMode
+                                            ? AppColors.blueSand
+                                            : Colors.white,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                            color: AppColors.violetSand, width: 4),
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
-                        );
-                      },
-                    )
-                  ],
+                            ],
+                          );
+                        },
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
+
           SliverToBoxAdapter(
             child: SizedBox(
               height: screenHeight * 0.03,
@@ -237,42 +243,57 @@ class MyHomePageState extends State<MyHomePage> {
             delegate: _FixedHeaderDelegate(
               minHeight: 50,
               maxHeight: 50,
-              child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('item')
-                    .where('userId',
-                    isEqualTo: FirebaseAuth.instance.currentUser?.uid)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return const Center(child: Text('No items found.'));
-                  }
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  // Фон контейнера
+                  Container(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? AppColors.blackSand // Темная тема
+                        : Colors.white,       // Светлая тема
+                  ),
+                  // Контейнер с типами
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('item')
+                          .where('userId', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                          return const Center(child: Text('No items found.'));
+                        }
 
-                  final items = snapshot.data!.docs;
-                  final typesWithColors =
-                  items.fold<Map<String, String>>({}, (map, item) {
-                    final type = item['type'] as String;
-                    final color =
-                        item['typeColor'] as String? ?? getRandomColor();
-                    map[type] = color;
-                    return map;
-                  });
+                        final items = snapshot.data!.docs;
+                        final typesWithColors =
+                        items.fold<Map<String, String>>({}, (map, item) {
+                          final type = item['type'] as String;
+                          final color = item['typeColor'] as String? ?? getRandomColor();
+                          map[type] = color;
+                          return map;
+                        });
 
-                  return ListView(
-                    scrollDirection: Axis.horizontal,
-                    padding: EdgeInsets.only(left: screenWidth * 0.02),
-                    children: typesWithColors.entries.map((entry) {
-                      return _buildCategoryButton(
-                        entry.key,
-                        entry.value,
-                        isDarkMode,
-                      );
-                    }).toList(),
-                  );
-                },
+                        return ListView(
+                          scrollDirection: Axis.horizontal,
+                          padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.02),
+                          children: typesWithColors.entries.map((entry) {
+                            return _buildCategoryButton(
+                              entry.key,
+                              entry.value,
+                              Theme.of(context).brightness == Brightness.dark,
+                            );
+                          }).toList(),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
+
+
           SliverFillRemaining(
             child: Padding(
               padding: EdgeInsets.only(
