@@ -30,25 +30,46 @@ Future<void> showItemDetailsBottomSheet({
             color: isDarkMode ? AppColors.blackSand : Colors.white,
             child: Stack(
               children: [
-                Container(
-                  height: screenHeight * 0.6,
-                  color: isDarkMode
-                      ? AppColors.blackSand
-                      : Colors.deepPurpleAccent[200],
-                  child: imageUrl != null
-                      ? Image.network(
-                    imageUrl,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: double.infinity,
-                  )
-                      : Center(
-                    child: Icon(
-                      Icons.image,
-                      size: 100,
-                      color: Colors.grey[400],
-                    ),
-                  ),
+                StreamBuilder<DocumentSnapshot>(
+                  stream: FirebaseFirestore.instance.collection('item').doc(itemId).snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData || snapshot.data == null) {
+                      return Center(
+                        child: CircularProgressIndicator(color: AppColors.violetSand),
+                      );
+                    }
+
+                    final data = snapshot.data!.data() as Map<String, dynamic>?;
+                    final imageUrls = (data?['imageUrls'] as List<dynamic>?)
+                        ?.map((e) => e.toString())
+                        .toList();
+
+                    return Container(
+                      height: screenHeight * 0.6,
+                      color: isDarkMode
+                          ? AppColors.blackSand
+                          : Colors.deepPurpleAccent[200],
+                      child: imageUrls != null && imageUrls.isNotEmpty
+                          ? PageView.builder(
+                        itemCount: imageUrls.length,
+                        itemBuilder: (context, index) {
+                          return Image.network(
+                            imageUrls[index],
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                          );
+                        },
+                      )
+                          : Center(
+                        child: Icon(
+                          Icons.image,
+                          size: 100,
+                          color: Colors.grey[400],
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 Positioned(
                   top: screenHeight * 0.05,
@@ -202,6 +223,7 @@ Future<void> showItemDetailsBottomSheet({
     },
   );
 }
+
 
 
 

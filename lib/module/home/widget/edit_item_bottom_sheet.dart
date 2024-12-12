@@ -12,7 +12,7 @@ void showEditItemBottomSheet(
       required String initialTitle,
       required String initialDescription,
       required String initialType,
-      required String? imageUrl, // URL текущего изображения
+      required String? imageUrl,
     }) {
   final TextEditingController _titleController =
   TextEditingController(text: initialTitle);
@@ -21,14 +21,36 @@ void showEditItemBottomSheet(
   final TextEditingController _typeController =
   TextEditingController(text: initialType);
 
-  File? _selectedImage; // Для хранения нового изображения
+  List<File> _newImages = []; // Новые изображения для замены
+  List<String> _existingImageUrls = []; // Существующие изображения
+  final ImagePicker _picker = ImagePicker();
 
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      _selectedImage = File(pickedFile.path);
+  Future<void> _pickNewImages(StateSetter setState) async {
+    try {
+      final pickedFiles = await _picker.pickMultiImage();
+      if (pickedFiles != null && pickedFiles.isNotEmpty) {
+        setState(() {
+          _newImages = pickedFiles.map((e) => File(e.path)).toList();
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ошибка выбора изображений: $e')),
+      );
     }
+  }
+
+  Future<List<String>> _uploadImages(List<File> images) async {
+    List<String> urls = [];
+    for (var image in images) {
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('item_images/${itemId}_${DateTime.now().millisecondsSinceEpoch}');
+      await storageRef.putFile(image);
+      final downloadUrl = await storageRef.getDownloadURL();
+      urls.add(downloadUrl);
+    }
+    return urls;
   }
 
   showModalBottomSheet(
@@ -42,53 +64,60 @@ void showEditItemBottomSheet(
       return SafeArea(
         child: StatefulBuilder(
           builder: (context, setState) {
-            return SafeArea(
-              child: SingleChildScrollView(
-                child: Container(
-                  height: screenHeight * 0.9,
-                  color: isDarkMode ? AppColors.blackSand : Colors.white,
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      GestureDetector(
-                        onTap: () async {
-                          await _pickImage();
-                          setState(() {}); // Обновляем состояние после выбора изображения
-                        },
-                        child: Container(
-                          height: screenHeight * 0.6,
-                          width: double.infinity,
-                          color: isDarkMode ? AppColors.blackSand : null,
-                          decoration: isDarkMode
-                              ? null
-                              : BoxDecoration(
-                            gradient: AppColors.greyWhite,
-                          ),
-                          child: Center(
-                            child: _selectedImage != null
-                                ? Image.file(
-                              _selectedImage!,
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: screenHeight * 0.6,
+            return SingleChildScrollView(
+              child: Container(
+                height: screenHeight * 0.9,
+                color: isDarkMode ? AppColors.blackSand : Colors.white,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    StreamBuilder<DocumentSnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('item')
+                          .doc(itemId)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData && snapshot.data != null) {
+                          final data =
+                          snapshot.data!.data() as Map<String, dynamic>;
+                          _existingImageUrls =
+                              (data['imageUrls'] as List<dynamic>)
+                                  .map((e) => e.toString())
+                                  .toList();
+                        }
+
+                        return GestureDetector(
+                          onTap: () async {
+                            await _pickNewImages(setState);
+                          },
+                          child: Container(
+                            height: screenHeight * 0.6,
+                            color:Colors.yellow,
+                            child: _newImages.isNotEmpty
+                                ? PageView.builder(
+                              itemCount: _newImages.length,
+                              itemBuilder: (context, index) {
+                                return Image.file(
+                                  _newImages[index],
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: screenHeight * 0.6,
+                                );
+                              },
                             )
-                                : ((imageUrl ?? '').isNotEmpty
-                                ? Image.network(
-                              imageUrl!, // Текущее изображение
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: screenHeight * 0.6,
+                                : _existingImageUrls.isNotEmpty
+                                ? PageView.builder(
+                              itemCount: _existingImageUrls.length,
+                              itemBuilder: (context, index) {
+                                return Image.network(
+                                  _existingImageUrls[index],
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: screenHeight * 0.6,
+                                );
+                              },
                             )
-                                : Container(
-                              width: screenWidth * 0.5,
-                              height: screenWidth * 0.5,
-                              decoration: BoxDecoration(
-                                color: isDarkMode
-                                    ? AppColors.greySand
-                                    : Colors.grey[300],
-                                borderRadius:
-                                BorderRadius.circular(20),
-                              ),
+                                : Center(
                               child: Icon(
                                 Icons.edit,
                                 color: isDarkMode
@@ -96,175 +125,169 @@ void showEditItemBottomSheet(
                                     : Colors.black,
                                 size: screenWidth * 0.15,
                               ),
-                            )),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    Positioned(
+                      top: screenHeight * 0.05,
+                      left: 0,
+                      right: 0,
+                      child: Center(
+                        child: TextField(
+                          controller: _typeController,
+                          textAlign: TextAlign.center,
+                          readOnly: true,
+                          decoration: const InputDecoration(
+                            hintText: "Тип",
+                            border: InputBorder.none,
+                          ),
+                          style: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.black,
+                            fontSize: screenWidth * 0.05,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                      Positioned(
-                        top: screenHeight * 0.05,
-                        left: 0,
-                        right: 0,
-                        child: Center(
-                          child: TextField(
-                            controller: _typeController,
-                            textAlign: TextAlign.center,
-                            readOnly: true, // Запрещаем редактирование
-                            decoration: const InputDecoration(
-                              hintText: "Тип",
-                              border: InputBorder.none,
+                    ),
+                    Positioned(
+                      top: screenHeight * 0.55,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        height: screenHeight * 0.50,
+                        padding: EdgeInsets.all(screenWidth * 0.05),
+                        decoration: BoxDecoration(
+                          gradient: isDarkMode
+                              ? AppColors.darkBlueGradient
+                              : null,
+                          color: isDarkMode ? null : AppColors.silverColor,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              spreadRadius: 3,
+                              blurRadius: 5,
+                              offset: const Offset(0, 3),
                             ),
-                            style: TextStyle(
-                              color: isDarkMode ? Colors.white : Colors.black,
-                              fontSize: screenWidth * 0.05,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          ],
                         ),
-                      ),
-                      Positioned(
-                        top: screenHeight * 0.55,
-                        left: 0,
-                        right: 0,
-                        child: Container(
-                          height: screenHeight * 0.50,
-                          padding: EdgeInsets.all(screenWidth * 0.05),
-                          decoration: BoxDecoration(
-                            gradient: isDarkMode
-                                ? AppColors.darkBlueGradient
-                                : null,
-                            color: isDarkMode ? null : AppColors.silverColor,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                spreadRadius: 3,
-                                blurRadius: 5,
-                                offset: const Offset(0, 3),
+                        child: Column(
+                          children: [
+                            TextField(
+                              controller: _titleController,
+                              decoration: InputDecoration(
+                                labelText: "Название предмета",
+                                labelStyle: TextStyle(
+                                  color: isDarkMode
+                                      ? Colors.white
+                                      : Colors.grey[600],
+                                ),
+                                border: InputBorder.none,
                               ),
-                            ],
+                            ),
+                            SizedBox(height: screenHeight * 0.02),
+                            TextField(
+                              controller: _descriptionController,
+                              decoration: InputDecoration(
+                                labelText: "Описание предмета",
+                                labelStyle: TextStyle(
+                                  color: isDarkMode
+                                      ? Colors.white
+                                      : Colors.grey[600],
+                                ),
+                                border: InputBorder.none,
+                              ),
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.045,
+                                color: isDarkMode ? Colors.white : Colors.black,
+                              ),
+                              maxLines: 4,
+                              minLines: 1,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: isDarkMode
+                              ? AppColors.blackSand
+                              : AppColors.whiteColor,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(50),
+                            topRight: Radius.circular(50),
                           ),
-                          child: Column(
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 26),
+                        child: SafeArea(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              TextField(
-                                controller: _titleController,
-                                decoration: InputDecoration(
-                                  labelText: "Название предмета",
-                                  labelStyle: TextStyle(
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.grey[600],
-                                  ),
-                                  border: InputBorder.none,
-                                ),
-                              ),
-                              SizedBox(height: screenHeight * 0.02),
-                              TextField(
-                                controller: _descriptionController,
-                                decoration: InputDecoration(
-                                  labelText: "Описание предмета",
-                                  labelStyle: TextStyle(
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.grey[600],
-                                  ),
-                                  border: InputBorder.none,
-                                ),
-                                style: TextStyle(
-                                  fontSize: screenWidth * 0.045,
-                                  color: isDarkMode ? Colors.white : Colors.black,
-                                ),
-                                maxLines: 4,
-                                minLines: 1,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: isDarkMode
-                                ? AppColors.blackSand
-                                : AppColors.whiteColor,
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(50),
-                              topRight: Radius.circular(50),
-                            ),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 26),
-                          child: SafeArea(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SaveButton(
-                                  onPressed: () async {
-                                    if (_titleController.text.isNotEmpty &&
-                                        _descriptionController.text.isNotEmpty &&
-                                        _typeController.text.isNotEmpty) {
-                                      try {
-                                        String? newImageUrl = imageUrl;
+                              SaveButton(
+                                onPressed: () async {
+                                  if (_titleController.text.isNotEmpty &&
+                                      _descriptionController
+                                          .text.isNotEmpty &&
+                                      _typeController.text.isNotEmpty) {
+                                    try {
+                                      List<String> updatedImageUrls =
+                                          _existingImageUrls;
 
-                                        if (_selectedImage != null) {
-                                          final storageRef = FirebaseStorage
-                                              .instance
-                                              .ref()
-                                              .child(
-                                              'images/${itemId}_${DateTime.now().millisecondsSinceEpoch}');
-                                          await storageRef.putFile(
-                                              _selectedImage!);
-                                          newImageUrl = await storageRef
-                                              .getDownloadURL(); // Получаем URL нового изображения
-                                        }
-
-                                        await FirebaseFirestore.instance
-                                            .collection('item')
-                                            .doc(itemId)
-                                            .update({
-                                          'title': _titleController.text,
-                                          'description':
-                                          _descriptionController.text,
-                                          'type': _typeController.text,
-                                          'imageUrl': newImageUrl, // Сохраняем новое или текущее изображение
-                                          'timestamp': Timestamp.now(),
-                                        });
-
-                                        Navigator.pop(context);
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                              content: Text(
-                                                  'Item updated successfully')),
-                                        );
-                                      } catch (e) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(content: Text('Error: $e')),
-                                        );
+                                      if (_newImages.isNotEmpty) {
+                                        updatedImageUrls =
+                                        await _uploadImages(_newImages);
                                       }
-                                    } else {
+
+                                      await FirebaseFirestore.instance
+                                          .collection('item')
+                                          .doc(itemId)
+                                          .update({
+                                        'title': _titleController.text,
+                                        'description':
+                                        _descriptionController.text,
+                                        'type': _typeController.text,
+                                        'imageUrls': updatedImageUrls,
+                                        'timestamp': Timestamp.now(),
+                                      });
+
+                                      Navigator.pop(context);
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         const SnackBar(
                                             content: Text(
-                                                'Please fill all fields')),
+                                                'Item updated successfully')),
+                                      );
+                                    } catch (e) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(content: Text('Error: $e')),
                                       );
                                     }
-                                  },
-                                ),
-                                const SizedBox(width: 10),
-                                CancelButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ],
-                            ),
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              'Please fill all fields')),
+                                    );
+                                  }
+                                },
+                              ),
+                              const SizedBox(width: 10),
+                              CancelButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             );
@@ -274,3 +297,4 @@ void showEditItemBottomSheet(
     },
   );
 }
+

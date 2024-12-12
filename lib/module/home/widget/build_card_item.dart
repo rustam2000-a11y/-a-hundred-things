@@ -99,7 +99,7 @@ Widget buildCardItem({
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildImage(imageUrl, isDarkTheme),
+                          _buildImage(imageUrl, isDarkTheme, itemId),
                           const SizedBox(width: 16),
                           Expanded(
                             child: _buildItemDetails(
@@ -140,29 +140,47 @@ Widget buildCardItem({
   );
 }
 
-Widget _buildImage(String? imageUrl, bool isDarkTheme) {
-  return Container(
-    width: 100,
-    height: 90,
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(10),
-      color: imageUrl == null
-          ? (isDarkTheme ? AppColors.blackSand : Colors.grey[300])
-          : null,
-      image: imageUrl != null
-          ? DecorationImage(
-        image: NetworkImage(imageUrl),
-        fit: BoxFit.cover,
-      )
-          : null,
-    ),
-    child: imageUrl == null
-        ? Center(
-      child: Icon(Icons.image, size: 40, color: Colors.grey[600]),
-    )
-        : null,
+Widget _buildImage(String? imageUrl, bool isDarkTheme, String itemId) {
+  return StreamBuilder<DocumentSnapshot>(
+    stream: FirebaseFirestore.instance.collection('item').doc(itemId).snapshots(),
+    builder: (context, snapshot) {
+      String? firstImageUrl;
+
+      if (snapshot.hasData && snapshot.data != null) {
+        final data = snapshot.data!.data() as Map<String, dynamic>?;
+        if (data != null && data['imageUrls'] is List<dynamic>) {
+          final imageUrls = data['imageUrls'] as List<dynamic>;
+          if (imageUrls.isNotEmpty) {
+            firstImageUrl = imageUrls.first as String?;
+          }
+        }
+      }
+
+      return Container(
+        width: 100,
+        height: 90,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: firstImageUrl == null
+              ? Colors.grey[300] // Серый фон, если изображения нет
+              : null,
+          image: firstImageUrl != null
+              ? DecorationImage(
+            image: NetworkImage(firstImageUrl),
+            fit: BoxFit.cover,
+          )
+              : null,
+        ),
+        child: firstImageUrl == null
+            ? Center(
+          child: Icon(Icons.image, size: 40, color: Colors.grey[600]),
+        )
+            : null,
+      );
+    },
   );
 }
+
 
 Widget _buildItemDetails({
   required BuildContext context,
@@ -211,15 +229,6 @@ Widget _buildItemDetails({
         ),
       ),
       const SizedBox(height: 8),
-      // Удаляем отображение типа
-      // Text(
-      //   type,
-      //   style: TextStyle(
-      //     color: isDarkTheme ? Colors.white : Colors.black,
-      //     fontSize: 14,
-      //     fontWeight: FontWeight.bold,
-      //   ),
-      // ),
     ],
   );
 }
@@ -258,8 +267,6 @@ Widget _buildActionIcons({
           color: isDarkTheme ? Colors.white : Colors.white,
         ),
         onPressed: () {
-
-
           showEditItemBottomSheet(
             context,
             itemId: itemId,
@@ -345,8 +352,6 @@ Widget _buildCounterControls(BuildContext context, String itemId,
   );
 }
 
-
-
 Future<void> _incrementItem(String itemId, String itemType, VoidCallback onStateUpdate,
     String? selectedCategoryType) async {
   if (selectedCategoryType == null || selectedCategoryType == itemType) {
@@ -367,8 +372,6 @@ Future<void> _incrementItem(String itemId, String itemType, VoidCallback onState
     });
   }
 }
-
-
 
 Future<void> _decrementItem(String itemId, String itemType, VoidCallback onStateUpdate,
     String? selectedCategoryType) async {
