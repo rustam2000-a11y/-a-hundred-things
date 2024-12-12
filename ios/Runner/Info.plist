@@ -41,6 +41,17 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>CFBundleURLTypes</key>
+    	<array>
+    		<dict>
+    			<key>CFBundleTypeRole</key>
+    			<string>Editor</string>
+    			<key>CFBundleURLSchemes</key>
+    			<array>
+	                <string>com.googleusercontent.apps.563104722540-7lbaergo0pv7ocgnjrl9ora4vg9m05p2</string>
+    			</array>
+    		</dict>
+    	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
@@ -49,6 +60,5 @@
 	<key>NSCameraUsageDescription</key>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<key>NSMicrophoneUsageDescription</key>
-
 </dict>
 </plist>

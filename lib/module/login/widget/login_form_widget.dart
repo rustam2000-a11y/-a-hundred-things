@@ -145,8 +145,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                   User? user = await signInWithGoogle();
                   if (user != null) {
                     await addUserToFirestore(user);
-                    await Navigator.pushReplacement(
-                      context,
+                    await Navigator.of(context).pushReplacement(
                       MaterialPageRoute<dynamic>(
                           builder: (_) => MyHomePage(toggleTheme: () {})),
                     );
