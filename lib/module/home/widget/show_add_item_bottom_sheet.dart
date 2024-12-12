@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-
+import 'package:cropperx/cropperx.dart';
 import '../../../presentation/colors.dart';
 import 'bottom_container_button.dart';
 
@@ -36,21 +36,61 @@ void showAddItemBottomSheet(BuildContext context) {
   List<File> _selectedImages = [];
   List<String> _imageUrls = [];
 
-  Future<void> _pickImages(BuildContext context, StateSetter setState) async {
+  Future<void> _pickAndCropImage(BuildContext context, StateSetter setState) async {
     try {
-      final pickedFiles = await _picker.pickMultiImage();
-      if (pickedFiles != null && pickedFiles.isNotEmpty) {
-        setState(() {
-          _selectedImages =
-              pickedFiles.map((pickedFile) => File(pickedFile.path)).toList();
-        });
+      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        final _cropperKey = GlobalKey(debugLabel: 'cropperKey'); // Определяем ключ
+        File imageFile = File(pickedFile.path);
+
+        // Открываем диалог для обрезки
+        await showDialog(
+          context: context,
+          builder: (context) {
+            return Dialog(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Cropper(
+                      cropperKey: _cropperKey, // Используем ключ
+                      image: Image.file(imageFile), // Загружаем выбранное изображение
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      // Получаем данные обрезанного изображения
+                      final imageBytes = await Cropper.crop(
+                        cropperKey: _cropperKey, // Указываем ключ
+                      );
+
+                      if (imageBytes != null) {
+                        final tempDir = Directory.systemTemp;
+                        final tempFile = File(
+                            '${tempDir.path}/cropped_${DateTime.now().millisecondsSinceEpoch}.png');
+                        tempFile.writeAsBytesSync(imageBytes);
+                        setState(() {
+                          _selectedImages.add(tempFile); // Добавляем обрезанное изображение
+                        });
+                      }
+                      Navigator.pop(context); // Закрываем диалог
+                    },
+                    child: const Text('Обрезать'),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка выбора изображений: $e')),
+        SnackBar(content: Text('Ошибка обрезки изображения: $e')),
       );
     }
   }
+
+
+
 
   Future<List<String>> _uploadImages(List<File> images) async {
     List<String> urls = [];
@@ -88,9 +128,10 @@ void showAddItemBottomSheet(BuildContext context) {
                   clipBehavior: Clip.none,
                   children: [
                     // Выбор изображений
+                    // Обновляем GestureDetector для выбора и обрезки изображений
                     GestureDetector(
                       onTap: () async {
-                        await _pickImages(context, setState);
+                        await _pickAndCropImage(context, setState);
                       },
                       child: Container(
                         height: screenHeight * 0.6,
@@ -132,6 +173,7 @@ void showAddItemBottomSheet(BuildContext context) {
                         ),
                       ),
                     ),
+
                     // Тип по центру
                     Positioned(
                       top: screenHeight * 0.05,
