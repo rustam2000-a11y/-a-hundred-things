@@ -40,7 +40,7 @@ class MyHomePageState extends State<MyHomePage> {
         slivers: [
           SliverAppBar(
             pinned: true,
-            expandedHeight: screenHeight * 0.15,
+            expandedHeight: screenHeight * 0.20,
             backgroundColor: isDarkMode
                 ? AppColors.blackSand
                 : Theme.of(context).primaryColor,

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:one_hundred_things/generated/l10n.dart';
 import 'package:one_hundred_things/module/login/widget/text_filed.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../../main.dart';
@@ -42,7 +43,7 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
           children: [
             Align(
               alignment: Alignment.bottomLeft,
-              child: Text("Почта",
+              child: Text(S.of(context).mail,
                   style: TextStyle(
                     fontSize: 16,
                     color: isDarkMode ? Colors.white : Colors.black,
@@ -57,7 +58,7 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
             SizedBox(height: 16),
             Align(
               alignment: Alignment.bottomLeft,
-              child: Text("Пароль",
+              child: Text(S.of(context).password,
                   style: TextStyle(
                     fontSize: 16,
                     color: isDarkMode ? Colors.white : Colors.black,
@@ -67,13 +68,13 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
             SizedBox(height: 4,),
             CustomTextField(
               controller: _passwordController,
-              labelText: "Пароль",
+              labelText: "Password",
               isPasswordField: true, // Включаем скрытие пароля
             ),
             SizedBox(height: 16),
             Align(
               alignment: Alignment.bottomLeft,
-              child: Text("Дата рождения",
+              child: Text(S.of(context).dateOfBirth,
                   style: TextStyle(
                     fontSize: 16,
                     color: isDarkMode ? Colors.white : Colors.black,
@@ -83,7 +84,7 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
             SizedBox(height: 4,),
             CustomTextField(
               controller: _birthdayController,
-              labelText: "Дата рождения",
+              labelText: "Date of birth",
             ),
             SizedBox(height: 18),
             ReusableButton(
@@ -114,7 +115,7 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
                 Expanded(child: Divider(thickness: 1, color: Colors.grey)),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Text("или", style: TextStyle(color: Colors.grey)),
+                  child: Text(S.of(context).or, style: TextStyle(color: Colors.grey)),
                 ),
                 Expanded(child: Divider(thickness: 1, color: Colors.grey)),
               ],
@@ -137,7 +138,7 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
                 }
               },
               icon: Icon(Icons.login, color: Colors.red),
-              label: Text("Продолжить с Google"),
+              label: Text(S.of(context).continueWithGoogle),
               style: ElevatedButton.styleFrom(
                 minimumSize: Size(double.infinity, 50),
                 backgroundColor: Colors.white,
@@ -167,7 +168,7 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
                 }
               },
               icon: Icon(Icons.apple, color: Colors.black),
-              label: Text("Продолжить с Apple"),
+              label: Text(S.of(context).continueWithApple),
               style: ElevatedButton.styleFrom(
                 minimumSize: Size(double.infinity, 50),
                 backgroundColor: Colors.white,

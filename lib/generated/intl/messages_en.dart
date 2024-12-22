@@ -22,12 +22,55 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+        "aPasswordResetLinkHasBeenSentToYourEmail":
+            MessageLookupByLibrary.simpleMessage(
+                "A password reset link has been sent to your email."),
+        "aboutUs": MessageLookupByLibrary.simpleMessage("About Us"),
         "accountSettings":
             MessageLookupByLibrary.simpleMessage("Account settings"),
+        "applicationLanguage":
+            MessageLookupByLibrary.simpleMessage("Application language"),
+        "category": MessageLookupByLibrary.simpleMessage("Сategories"),
+        "change": MessageLookupByLibrary.simpleMessage("Change"),
+        "continueWithApple":
+            MessageLookupByLibrary.simpleMessage("Continue with Apple"),
+        "continueWithGoogle":
+            MessageLookupByLibrary.simpleMessage("Continue with Google"),
+        "dateOfBirth": MessageLookupByLibrary.simpleMessage("Date of birth"),
         "delete": MessageLookupByLibrary.simpleMessage("delete"),
+        "description": MessageLookupByLibrary.simpleMessage("Descriptionа"),
+        "editProfile": MessageLookupByLibrary.simpleMessage("Edit profile"),
         "email": MessageLookupByLibrary.simpleMessage("Email"),
+        "enterAName": MessageLookupByLibrary.simpleMessage("Enter a name"),
+        "enterName": MessageLookupByLibrary.simpleMessage("Enter name"),
+        "enterNumber": MessageLookupByLibrary.simpleMessage("Enter number"),
+        "enterYourEmail":
+            MessageLookupByLibrary.simpleMessage("Enter your email"),
+        "enterYourPassword":
+            MessageLookupByLibrary.simpleMessage("Enter your password"),
+        "forgotYourPassword":
+            MessageLookupByLibrary.simpleMessage("Forgot your password?"),
+        "login": MessageLookupByLibrary.simpleMessage("Login"),
+        "mail": MessageLookupByLibrary.simpleMessage("Mail"),
+        "name": MessageLookupByLibrary.simpleMessage("Name"),
+        "number": MessageLookupByLibrary.simpleMessage("Number"),
         "or": MessageLookupByLibrary.simpleMessage("or"),
         "password": MessageLookupByLibrary.simpleMessage("Password"),
-        "title": MessageLookupByLibrary.simpleMessage("Flutter Example App")
+        "pleaseEnterYourEmailAddressToResetYourPassword":
+            MessageLookupByLibrary.simpleMessage(
+                "Please enter your email address to reset your password"),
+        "privacyPolicy": MessageLookupByLibrary.simpleMessage("Privacy policy"),
+        "pushNotifications":
+            MessageLookupByLibrary.simpleMessage("Push notifications"),
+        "registerOrLoginToLearnMoreAboutOurApplication":
+            MessageLookupByLibrary.simpleMessage(
+                "Register or login to learn more about our application."),
+        "remember": MessageLookupByLibrary.simpleMessage("Remember"),
+        "sendRequest": MessageLookupByLibrary.simpleMessage("Send request"),
+        "startNow": MessageLookupByLibrary.simpleMessage("Start now"),
+        "termsOfUse": MessageLookupByLibrary.simpleMessage("Terms of use"),
+        "theme": MessageLookupByLibrary.simpleMessage("Theme"),
+        "title": MessageLookupByLibrary.simpleMessage("Flutter Example App"),
+        "type": MessageLookupByLibrary.simpleMessage("Type")
       };
 }

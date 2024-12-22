@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../generated/l10n.dart';
 import '../../../presentation/colors.dart';
 import '../../login/widget/text_filed.dart';
 
@@ -109,10 +110,10 @@ class _AccountState extends State<Account> {
                               },
                             ),
                           ),
-                          const Center(
+                           Center(
                             // Текст всегда по центру
                             child: Text(
-                              'Редактировать Профиль',
+                              S.of(context).editProfile,
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -130,9 +131,9 @@ class _AccountState extends State<Account> {
               ),
             ),
             SizedBox(height: screenHeight * 0.08),
-            const Center(
+             Center(
               child: Text(
-                "Изменить",
+                S.of(context).change,
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.blue,
@@ -146,8 +147,8 @@ class _AccountState extends State<Account> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Имя',
+                   Text(
+                    S.of(context).name,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -157,12 +158,12 @@ class _AccountState extends State<Account> {
                   SizedBox(height: screenHeight * 0.01),
                   CustomTextField(
                     controller: nameController,
-                    labelText: 'Введите имя',
+                    labelText: S.of(context).enterName,
                     height: 40,
                   ),
                   SizedBox(height: screenHeight * 0.02),
                   const Text(
-                    'Емеил',
+                    'Email',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -172,12 +173,12 @@ class _AccountState extends State<Account> {
                   SizedBox(height: screenHeight * 0.01),
                   CustomTextField(
                     controller: emailController,
-                    labelText: 'Введите имеил',
+                    labelText: S.of(context).enterYourEmail,
                     height: 40,
                   ),
                   SizedBox(height: screenHeight * 0.02),
-                  const Text(
-                    'Номер',
+                   Text(
+                    S.of(context).number,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -187,12 +188,12 @@ class _AccountState extends State<Account> {
                   SizedBox(height: screenHeight * 0.01),
                   CustomTextField(
                     controller: phoneController,
-                    labelText: 'Введите номер',
+                    labelText: S.of(context).enterNumber,
                     height: 40,
                   ),
                   SizedBox(height: screenHeight * 0.02),
-                  const Text(
-                    'Пароль',
+                   Text(
+                    S.of(context).password,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -202,7 +203,7 @@ class _AccountState extends State<Account> {
                   SizedBox(height: screenHeight * 0.01),
                   CustomTextField(
                     controller: passwordController,
-                    labelText: 'Введите пароль',
+                    labelText: S.of(context).enterYourPassword,
                     height: 40,
                   ),
                   SizedBox(

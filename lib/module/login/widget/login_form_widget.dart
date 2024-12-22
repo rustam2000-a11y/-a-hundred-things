@@ -6,6 +6,7 @@ import 'package:one_hundred_things/module/login/widget/text_field_custom.dart';
 import 'package:one_hundred_things/module/login/widget/text_filed.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
+import '../../../generated/l10n.dart';
 import '../../../main.dart';
 import '../../../presentation/colors.dart';
 import '../../home/widget/home_widget.dart';
@@ -73,18 +74,18 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SizedBox(height: 25),
-              Text("Почта", style: TextStyle(fontSize: 16)),
+              Text(S.of(context).mail, style: TextStyle(fontSize: 16)),
               SizedBox(height: 5),
               CustomTextField(
                 controller: _loginEmailController,
                 labelText: "Email", // Замените на подходящий текст
               ),
               SizedBox(height: 16),
-              Text("Пароль", style: TextStyle(fontSize: 16)),
+              Text(S.of(context).password, style: TextStyle(fontSize: 16)),
               SizedBox(height: 5),
               CustomTextField(
                 controller: _loginPasswordController,
-                labelText: "Пароль",
+                labelText: "Password",
                 isPasswordField: true, // Включение функционала скрытия/отображения пароля
               ),
               SizedBox(height: 16),
@@ -101,7 +102,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                           // });
                         },
                       ),
-                      Text("Запомнить", style: TextStyle(fontSize: 14)),
+                      Text(S.of(context).remember, style: TextStyle(fontSize: 14)),
                     ],
                   ),
                   GestureDetector(
@@ -113,7 +114,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                       );
                     },
                     child: Text(
-                      "Забыл пароль?",
+                      S.of(context).forgotYourPassword,
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.blue,
@@ -125,7 +126,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
               ),
               SizedBox(height: 16),
               ReusableButton(
-                text: 'Войти',
+                text: S.of(context).login,
                 onPressed: () => _login(context),
               ),
               SizedBox(height: 16),
@@ -134,7 +135,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                   Expanded(child: Divider(thickness: 1, color: Colors.grey)),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 10),
-                    child: Text("или", style: TextStyle(color: Colors.grey)),
+                    child: Text(S.of(context).or, style: TextStyle(color: Colors.grey)),
                   ),
                   Expanded(child: Divider(thickness: 1, color: Colors.grey)),
                 ],
@@ -156,7 +157,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                   }
                 },
                 icon: Icon(Icons.login, color: Colors.red),
-                label: Text("Продолжить с Google"),
+                label: Text(S.of(context).continueWithGoogle),
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(double.infinity, 50),
                   backgroundColor: Colors.white,
@@ -186,7 +187,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                   }
                 },
                 icon: Icon(Icons.apple, color: Colors.black),
-                label: Text("Продолжить с Apple"),
+                label: Text(S.of(context).continueWithApple),
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(double.infinity, 50),
                   backgroundColor: Colors.white,

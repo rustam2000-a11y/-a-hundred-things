@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../../generated/l10n.dart';
+
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({super.key});
 
@@ -41,7 +43,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               ],
             ),
             Text(
-              "Забыли пароль?",
+              S.of(context).forgotYourPassword,
               style: TextStyle(
                 fontSize: screenWidth * 0.07,
                 // Размер шрифта зависит от ширины экрана
@@ -51,7 +53,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             SizedBox(height: screenHeight * 0.03),
             // Отступ между текстом и следующим элементом
             Text(
-              "Пожалуйста, введите свой адрес электронной почты для сброса пароля",
+              S.of(context).pleaseEnterYourEmailAddressToResetYourPassword,
               style: TextStyle(
                 fontSize: screenWidth * 0.04,
                 // Размер шрифта зависит от ширины экрана
@@ -60,7 +62,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             ),
             SizedBox(height: screenHeight * 0.05),
             // Отступ перед текстфилдом
-            Text("Введите почту"),
+            Text(S.of(context).enterYourEmail),
             TextField(
               controller: _emailController,
               decoration: InputDecoration(
@@ -88,8 +90,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                        content: Text(
-                            "Ссылка для сброса пароля отправлена на ваш email")),
+                        content: Text(S.of(context).aPasswordResetLinkHasBeenSentToYourEmail)),
                   );
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -97,7 +98,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   );
                 }
               },
-              child: Text("Отправить запрос"),
+              child: Text(S.of(context).sendRequest),
               style: ElevatedButton.styleFrom(
                 minimumSize: Size(screenWidth * 0.9, 50),
                 // Кнопка займет 90% ширины экрана

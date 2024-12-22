@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:one_hundred_things/module/login/widget/login_form_widget.dart';
+import '../../generated/l10n.dart';
 import '../../presentation/colors.dart';
 import 'widget/registration_form_widget.dart';
 class LoginPage extends StatefulWidget {
@@ -64,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     SizedBox(height: 10),
                     Text(
-                      "Начните сейчас",
+                      S.of(context).startNow,
                       style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
@@ -73,7 +74,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      "Зарегистрируйтесь или войдите в систему, чтобы узнать больше о нашем приложении.",
+                      S.of(context).registerOrLoginToLearnMoreAboutOurApplication,
                       style: TextStyle(fontSize: 12, color: Colors.white),
                     ),
                   ],

@@ -149,19 +149,20 @@ void showSearchBottomSheet(BuildContext context) {
                             final data = item.data() as Map<String, dynamic>;
                             final quantity = data['quantity'] ?? 1;
 
-                            final color = item['color'] as String? ?? '';
-                            final imageUrl = item['imageUrl'] as String?;
-
+                            final color = data.containsKey('color') ? data['color'] as String : '';
+                            final imageUrl = data.containsKey('imageUrl') ? data['imageUrl'] as String? : null;
 
                             return buildCardItem(
-                                itemId: item.id,
-                                title: item['title'],
-                                description: item['description'],
-                                type: item['type'],
-                                color: color,
-                                context: context,
-                                imageUrl: imageUrl,
-                                onStateUpdate: () {}, quantity: quantity);
+                              itemId: item.id,
+                              title: data['title'] as String,
+                              description: data['description'] as String,
+                              type: data['type'] as String,
+                              color: color,
+                              context: context,
+                              imageUrl: imageUrl,
+                              onStateUpdate: () {},
+                              quantity: quantity,
+                            );
                           },
                         );
                       },

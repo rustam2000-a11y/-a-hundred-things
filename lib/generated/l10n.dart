@@ -60,11 +60,11 @@ class S {
     );
   }
 
-  /// `or`
-  String get or {
+  /// `Сategories`
+  String get category {
     return Intl.message(
-      'or',
-      name: 'or',
+      'Сategories',
+      name: 'category',
       desc: '',
       args: [],
     );
@@ -105,6 +105,306 @@ class S {
     return Intl.message(
       'Account settings',
       name: 'accountSettings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit profile`
+  String get editProfile {
+    return Intl.message(
+      'Edit profile',
+      name: 'editProfile',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Application language`
+  String get applicationLanguage {
+    return Intl.message(
+      'Application language',
+      name: 'applicationLanguage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Push notifications`
+  String get pushNotifications {
+    return Intl.message(
+      'Push notifications',
+      name: 'pushNotifications',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Theme`
+  String get theme {
+    return Intl.message(
+      'Theme',
+      name: 'theme',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `About Us`
+  String get aboutUs {
+    return Intl.message(
+      'About Us',
+      name: 'aboutUs',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Privacy policy`
+  String get privacyPolicy {
+    return Intl.message(
+      'Privacy policy',
+      name: 'privacyPolicy',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Terms of use`
+  String get termsOfUse {
+    return Intl.message(
+      'Terms of use',
+      name: 'termsOfUse',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Type`
+  String get type {
+    return Intl.message(
+      'Type',
+      name: 'type',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter a name`
+  String get enterAName {
+    return Intl.message(
+      'Enter a name',
+      name: 'enterAName',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Descriptionа`
+  String get description {
+    return Intl.message(
+      'Descriptionа',
+      name: 'description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Start now`
+  String get startNow {
+    return Intl.message(
+      'Start now',
+      name: 'startNow',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Register or login to learn more about our application.`
+  String get registerOrLoginToLearnMoreAboutOurApplication {
+    return Intl.message(
+      'Register or login to learn more about our application.',
+      name: 'registerOrLoginToLearnMoreAboutOurApplication',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Mail`
+  String get mail {
+    return Intl.message(
+      'Mail',
+      name: 'mail',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Remember`
+  String get remember {
+    return Intl.message(
+      'Remember',
+      name: 'remember',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Forgot your password?`
+  String get forgotYourPassword {
+    return Intl.message(
+      'Forgot your password?',
+      name: 'forgotYourPassword',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Login`
+  String get login {
+    return Intl.message(
+      'Login',
+      name: 'login',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `or`
+  String get or {
+    return Intl.message(
+      'or',
+      name: 'or',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Continue with Google`
+  String get continueWithGoogle {
+    return Intl.message(
+      'Continue with Google',
+      name: 'continueWithGoogle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Continue with Apple`
+  String get continueWithApple {
+    return Intl.message(
+      'Continue with Apple',
+      name: 'continueWithApple',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Date of birth`
+  String get dateOfBirth {
+    return Intl.message(
+      'Date of birth',
+      name: 'dateOfBirth',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enter your email address to reset your password`
+  String get pleaseEnterYourEmailAddressToResetYourPassword {
+    return Intl.message(
+      'Please enter your email address to reset your password',
+      name: 'pleaseEnterYourEmailAddressToResetYourPassword',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter your email`
+  String get enterYourEmail {
+    return Intl.message(
+      'Enter your email',
+      name: 'enterYourEmail',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `A password reset link has been sent to your email.`
+  String get aPasswordResetLinkHasBeenSentToYourEmail {
+    return Intl.message(
+      'A password reset link has been sent to your email.',
+      name: 'aPasswordResetLinkHasBeenSentToYourEmail',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Send request`
+  String get sendRequest {
+    return Intl.message(
+      'Send request',
+      name: 'sendRequest',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Change`
+  String get change {
+    return Intl.message(
+      'Change',
+      name: 'change',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Name`
+  String get name {
+    return Intl.message(
+      'Name',
+      name: 'name',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter name`
+  String get enterName {
+    return Intl.message(
+      'Enter name',
+      name: 'enterName',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Number`
+  String get number {
+    return Intl.message(
+      'Number',
+      name: 'number',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter number`
+  String get enterNumber {
+    return Intl.message(
+      'Enter number',
+      name: 'enterNumber',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter your password`
+  String get enterYourPassword {
+    return Intl.message(
+      'Enter your password',
+      name: 'enterYourPassword',
       desc: '',
       args: [],
     );

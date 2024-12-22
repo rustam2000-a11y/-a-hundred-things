@@ -7,27 +7,35 @@ import '../../../presentation/colors.dart';
 import '../../login/login_page.dart';
 import 'account.dart';
 
+
 class UserProfileScreen extends StatefulWidget {
   final VoidCallback toggleTheme;
 
-
   const UserProfileScreen({Key? key, required this.toggleTheme}) : super(key: key);
+
   @override
   _UserProfileScreenState createState() => _UserProfileScreenState();
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
   String _selectedTheme = 'Light';
+  String _selectedLanguage = 'en';
 
   @override
   void initState() {
     super.initState();
     _loadThemePreference();
+    _loadLanguagePreference();
   }
 
   Future<void> saveThemePreference(String theme) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('themeMode', theme);
+  }
+
+  Future<void> saveLanguagePreference(String languageCode) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('languageCode', languageCode);
   }
 
   Future<void> _loadThemePreference() async {
@@ -38,6 +46,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     });
   }
 
+  Future<void> _loadLanguagePreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedLanguageCode = prefs.getString('languageCode') ?? 'en';
+    setState(() {
+      _selectedLanguage = savedLanguageCode;
+    });
+    await S.load(Locale(savedLanguageCode));
+  }
+
   void _changeTheme(String theme) {
     final appState = context.findAncestorStateOfType<MyAppState>();
     if (theme == 'Dark') {
@@ -45,30 +62,35 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     } else {
       appState?.themeMode = ThemeMode.light;
     }
-    appState?.saveThemePreference(); // Сохраните тему через MyAppState
-    appState?.setState(() {}); // Примените изменения
+    appState?.saveThemePreference();
+    appState?.setState(() {});
     setState(() {
-      _selectedTheme = theme; // Обновите текущую тему в Dropdown
+      _selectedTheme = theme;
     });
+  }
+
+  Future<void> _changeLanguage(String languageCode) async {
+    setState(() {
+      _selectedLanguage = languageCode;
+    });
+    await saveLanguagePreference(languageCode);
+    await S.load(Locale(languageCode));
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
-    final double spacing = screenHeight * 0.01; // Отступы между элементами
-    final double horizontalPadding = MediaQuery.of(context).size.width * 0.06; // Горизонтальные отступы
+    final double spacing = screenHeight * 0.01;
+    final double horizontalPadding = MediaQuery.of(context).size.width * 0.06;
 
-    // Проверяем текущую тему
     final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
-
-    // Получение текущего аутентифицированного пользователя
     final User? currentUser = FirebaseAuth.instance.currentUser;
     final String userEmail = currentUser?.email ?? 'Неизвестный пользователь';
 
     return Scaffold(
       body: Stack(
         children: [
-          // Фоновый контейнер, занимающий весь экран
           Container(
             width: double.infinity,
             height: double.infinity,
@@ -77,55 +99,50 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               color: !isDarkTheme ? AppColors.silverColor : null,
             ),
           ),
-          // Верхний контейнер
           Container(
             width: double.infinity,
-            color: isDarkTheme
-                ? Colors.transparent
-                : AppColors.silverColor, // Светлая тема
+            color: isDarkTheme ? Colors.transparent : AppColors.silverColor,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 40.0),
               child: Column(
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.start, // Иконка слева
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       IconButton(
                         onPressed: () {
-                          Navigator.pop(
-                              context); // Действие при нажатии — возвращение назад
+                          Navigator.pop(context);
                         },
-                        icon: const Icon(Icons.arrow_back), // Иконка "назад"
-                        color: isDarkTheme ? Colors.white : Colors.black, // Цвет иконки
+                        icon: const Icon(Icons.arrow_back),
+                        color: isDarkTheme ? Colors.white : Colors.black,
                       ),
                     ],
                   ),
-                  // Опускаем содержимое на несколько пикселей вниз
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [Row(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10), // Закругленные углы для первой картинки
-                          child: Image.asset(
-                            'assets/images/IMG_4650(1).png', // Путь к первой картинке
-                            width: 32, // Ширина картинки
-                            height: 32, // Высота картинки
-                            fit: BoxFit.cover, // Масштабируем изображение под размеры
+                    children: [
+                      Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.asset(
+                              'assets/images/IMG_4650(1).png',
+                              width: 32,
+                              height: 32,
+                              fit: BoxFit.cover,
+                            ),
                           ),
-                        ),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10), // Закругленные углы для второй картинки
-                          child: Image.asset(
-                            'assets/images/100 Things(3).png', // Путь ко второй картинке
-                            width: 106, // Ширина картинки
-                            height: 20, // Высота картинки
-                            fit: BoxFit.cover, // Масштабируем изображение под размеры
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.asset(
+                              'assets/images/100 Things(3).png',
+                              width: 106,
+                              height: 20,
+                              fit: BoxFit.cover,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                      // Иконка настроек с другой стороны
+                        ],
+                      ),
                       IconButton(
                         icon: Icon(Icons.settings,
                             color: isDarkTheme ? Colors.white : Colors.white),
@@ -137,14 +154,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               context,
                               MaterialPageRoute<dynamic>(
                                 builder: (context) => LoginPage(
-                                  toggleTheme: () {
-                                    // Логика переключения темы
-                                  },
+                                  toggleTheme: () {},
                                 ),
                               ),
                             );
                           } catch (e) {
-                            print('Ошибка при выходе: $e');
+                            print('Error signing out: $e');
                           }
                         },
                       ),
@@ -204,7 +219,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: spacing),
                       child: Text(
-                        S.of(context).accountSettings,
+                        S.of(context).accountSettings, // Локализованный текст
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -217,7 +232,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       child: ListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text(
-                          'Редактировать профиль',
+                          S.of(context).editProfile,
                           style: TextStyle(
                             color: isDarkTheme ? Colors.white : Colors.black,
                           ),
@@ -238,16 +253,36 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       child: ListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text(
-                          'Язык приложения',
+                          S.of(context).applicationLanguage,
                           style: TextStyle(
                             color: isDarkTheme ? Colors.white : Colors.black,
                           ),
                         ),
-                        trailing: Icon(Icons.arrow_forward_ios,
-                            color: isDarkTheme ? Colors.white : Colors.black),
-                        onTap: () {
-                          // Действие при нажатии
-                        },
+                        trailing: DropdownButton<String>(
+                          value: _selectedLanguage,
+                          icon: Icon(
+                            Icons.arrow_drop_down,
+                            color: isDarkTheme ? Colors.white : Colors.black,
+                          ),
+                          underline: const SizedBox(),
+                          onChanged: (String? newValue) {
+                            if (newValue != null) {
+                              _changeLanguage(newValue);
+                            }
+                          },
+                          items: <String>['en', 'ru']
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(
+                                value == 'en' ? 'English' : 'Русский',
+                                style: TextStyle(
+                                  color: isDarkTheme ? Colors.white : Colors.black,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
                       ),
                     ),
                     Padding(
@@ -255,7 +290,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       child: ListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text(
-                          'Push-уведомления',
+                          S.of(context).pushNotifications,
                           style: TextStyle(
                             color: isDarkTheme ? Colors.white : Colors.black,
                           ),
@@ -273,7 +308,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       child: ListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text(
-                          'Тема',
+                          S.of(context).theme,
                           style: TextStyle(
                             color: isDarkTheme ? Colors.white : Colors.black,
                           ),
@@ -323,7 +358,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       child: ListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text(
-                          'О нас',
+                          S.of(context).aboutUs,
                           style: TextStyle(
                             color: isDarkTheme ? Colors.white : Colors.black,
                           ),
@@ -340,7 +375,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       child: ListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text(
-                          'Политика конфиденциальности',
+                          S.of(context).privacyPolicy,
                           style: TextStyle(
                             color: isDarkTheme ? Colors.white : Colors.black,
                           ),
@@ -357,7 +392,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       child: ListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text(
-                          'Условия использования',
+                          S.of(context).termsOfUse,
                           style: TextStyle(
                             color: isDarkTheme ? Colors.white : Colors.black,
                           ),

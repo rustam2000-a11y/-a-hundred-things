@@ -6,8 +6,10 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:cropperx/cropperx.dart';
+import '../../../generated/l10n.dart';
 import '../../../presentation/colors.dart';
 import 'bottom_container_button.dart';
+
 
 
 final Map<String, String> typeColorsCache = {};
@@ -186,8 +188,8 @@ void showAddItemBottomSheet(BuildContext context) {
                           TextField(
                             controller: _typeController,
                             textAlign: TextAlign.center,
-                            decoration: const InputDecoration(
-                              hintText: 'Тип',
+                            decoration:  InputDecoration(
+                              hintText: S.of(context).type,
                               border: InputBorder.none,
                             ),
                             style: TextStyle(
@@ -243,16 +245,16 @@ void showAddItemBottomSheet(BuildContext context) {
                           children: [
                             TextField(
                               controller: _titleController,
-                              decoration: const InputDecoration(
-                                labelText: 'Название предмета',
+                              decoration:  InputDecoration(
+                                labelText: S.of(context).enterAName,
                                 border: InputBorder.none,
                               ),
                             ),
                             SizedBox(height: screenHeight * 0.02),
                             TextField(
                               controller: _descriptionController,
-                              decoration: const InputDecoration(
-                                labelText: 'Описание предмета',
+                              decoration:   InputDecoration(
+                                labelText: S.of(context).description,
                                 border: InputBorder.none,
                               ),
                               style: TextStyle(fontSize: screenWidth * 0.045),
