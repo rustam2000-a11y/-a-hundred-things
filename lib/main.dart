@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/di/service_locator.dart';
 import 'generated/l10n.dart';
-import 'module/home/widget/home_widget.dart';
+import 'module/home/my_home_page.dart';
 import 'module/login/login_page.dart';
 import 'presentation/colors.dart';
 
