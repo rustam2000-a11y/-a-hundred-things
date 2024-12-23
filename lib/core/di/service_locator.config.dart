@@ -11,6 +11,7 @@
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 
+import '../../module/home/home_bloc.dart' as _i17;
 import '../../network/base_data_api.dart' as _i323;
 import '../../repository/things_repository.dart' as _i878;
 
@@ -30,5 +31,7 @@ _i174.GetIt $initGetIt(
     () => _i878.ThingsRepository(baseDataApi: gh<_i323.BaseDataApiI>()),
     dispose: (i) => i.dispose(),
   );
+  gh.factory<_i17.HomeBloc>(
+      () => _i17.HomeBloc(thingsRepository: gh<_i878.ThingsRepositoryI>()));
   return getIt;
 }
