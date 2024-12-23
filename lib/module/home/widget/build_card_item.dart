@@ -1,9 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import '../../../presentation/colors.dart';
 import 'edit_item_bottom_sheet.dart';
-import 'home_widget.dart' as home;
 import 'show_add_item_bottom_sheet.dart'; // Импорт функции showAddItemBottomSheet
 import 'show_modal_buttom_sheet.dart';
 
