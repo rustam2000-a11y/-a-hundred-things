@@ -23,17 +23,16 @@ class BaseDataApi implements BaseDataApiI {
 
   @override
   Stream<List<ThingsModel>> fetchAllThings() {
-    return getCurrentUserUid()
-        .asStream()
-        .asyncExpand((currentUserUid) => databaseReference
-            .collection('item')
-            .where('userId', isEqualTo: currentUserUid)
-            //.orderBy('timestamp', descending: true)
-            .snapshots())
-        .map(
-      (event) {
-        return event.docs.map((e) => ThingsModel.fromJson(e.data())).toList();
-      },
+    return Stream.fromFuture(getCurrentUserUid()).asyncExpand(
+      (userUid) => databaseReference
+          .collection('item')
+          .where('userId', isEqualTo: userUid)
+          .snapshots()
+          .map(
+            (event) => event.docs
+                .map((e) => ThingsModel.fromJson(e.data()).copyWith(id: e.id))
+                .toList(),
+          ),
     );
   }
 }

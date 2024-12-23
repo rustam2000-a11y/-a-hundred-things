@@ -13,7 +13,7 @@ class ThingsRepository implements ThingsRepositoryI {
       BehaviorSubject<List<ThingsModel>>();
 
   @override
-  Stream<List<ThingsModel>> fetchMyContacts() {
+  Stream<List<ThingsModel>> fetchMyThings() {
     _baseDataApi.fetchAllThings().listen((things) {
       appStateStream!.sink.add(things);
     });
@@ -30,5 +30,5 @@ class ThingsRepository implements ThingsRepositoryI {
 abstract class ThingsRepositoryI {
   void dispose();
 
-  Stream<List<ThingsModel>> fetchMyContacts();
+  Stream<List<ThingsModel>> fetchMyThings();
 }
