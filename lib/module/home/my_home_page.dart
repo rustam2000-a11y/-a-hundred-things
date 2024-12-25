@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,6 +12,7 @@ import '../../presentation/colors.dart';
 import '../settings/widget/user_profile_screen.dart';
 import 'home_bloc.dart';
 import 'widget/build_card_item.dart';
+import 'widget/category_card_widget.dart';
 import 'widget/icon_home.dart';
 import 'widget/show_add_item_bottom_sheet.dart';
 import 'widget/show_search_bottom_sheet.dart';
@@ -56,7 +56,7 @@ class MyHomePageState extends State<MyHomePage> {
             slivers: [
               SliverAppBar(
                 pinned: true,
-                expandedHeight: screenHeight * 0.15,
+                expandedHeight: screenHeight * 0.19,
                 backgroundColor: isDarkMode
                     ? AppColors.blackSand
                     : Theme.of(context).primaryColor,
@@ -64,9 +64,7 @@ class MyHomePageState extends State<MyHomePage> {
                   background: ClipRRect(
                     borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(20),
-                      // Закругление слева внизу
-                      bottomRight:
-                          Radius.circular(20), // Закругление справа внизу
+                      bottomRight: Radius.circular(20),
                     ),
                     child: Container(
                       padding: EdgeInsets.only(
@@ -274,54 +272,44 @@ class MyHomePageState extends State<MyHomePage> {
                   child: Stack(
                     clipBehavior: Clip.none,
                     children: [
-                      // Фон контейнера
                       Container(
                         color: Theme.of(context).brightness == Brightness.dark
-                            ? AppColors.blackSand // Темная тема
-                            : Colors.white, // Светлая тема
+                            ? AppColors.blackSand
+                            : Colors.white,
                       ),
-                      // Контейнер с типами
                       Align(
                         alignment: Alignment.centerLeft,
-                        child: StreamBuilder<QuerySnapshot>(
-                          stream: FirebaseFirestore.instance
-                              .collection('item')
-                              .where('userId',
-                                  isEqualTo:
-                                      FirebaseAuth.instance.currentUser?.uid)
-                              .snapshots(),
-                          builder: (context, snapshot) {
-                            if (!snapshot.hasData ||
-                                snapshot.data!.docs.isEmpty) {
-                              return const Center(
-                                  child: Text('No items found.'));
-                            }
-
-                            final items = snapshot.data!.docs;
-                            final typesWithColors = items
-                                .fold<Map<String, String>>({}, (map, item) {
-                              final type = item['type'] as String;
-                              final color = item['typeColor'] as String? ??
-                                  getRandomColor();
-                              map[type] = color;
-                              return map;
-                            });
-
-                            return ListView(
-                              scrollDirection: Axis.horizontal,
-                              padding: EdgeInsets.only(
-                                  left:
-                                      MediaQuery.of(context).size.width * 0.02),
-                              children: typesWithColors.entries.map((entry) {
-                                return _buildCategoryButton(
-                                  entry.key,
-                                  entry.value,
-                                  Theme.of(context).brightness ==
-                                      Brightness.dark,
-                                );
-                              }).toList(),
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          padding: EdgeInsets.only(
+                              left: MediaQuery.of(context).size.width * 0.02),
+                          children: state.typesWithColors.entries.map((entry) {
+                            final type = entry.key;
+                            return CategoryCardWidget(
+                              selectedCategoryType: _selectedCategoryType,
+                              onChangeCategory: (String? category) {
+                                setState(() {
+                                  if (_selectedCategoryType == category) {
+                                    _selectedCategoryType = null;
+                                    _bloc.add(HomeSelectTypeThingsEvent(
+                                        selectedTypeThings:
+                                            _selectedCategoryType));
+                                  } else {
+                                    _selectedCategoryType = category;
+                                    _bloc.add(HomeSelectTypeThingsEvent(
+                                        selectedTypeThings:
+                                            _selectedCategoryType));
+                                  }
+                                });
+                              },
+                              onDeleteThings: () {
+                                _bloc.add(DeleteThingsByTypeEvent(type: type));
+                              },
+                              isDarkMode: isDarkMode,
+                              color: '',
+                              type: type,
                             );
-                          },
+                          }).toList(),
                         ),
                       ),
                     ],
@@ -422,95 +410,6 @@ class MyHomePageState extends State<MyHomePage> {
         );
       },
     );
-  }
-
-  Widget _buildCategoryButton(String type, String color, bool isDarkMode) {
-    final backgroundColor = getColorFromHex(color) ?? AppColors.silverColor;
-
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          if (_selectedCategoryType == type) {
-            _selectedCategoryType = null;
-          } else {
-            _selectedCategoryType = type;
-          }
-        });
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            gradient: isDarkMode ? AppColors.whiteToBlackGradient : null,
-            color: !isDarkMode ? backgroundColor : null,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                type,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(width: 8),
-              GestureDetector(
-                onTap: () async {
-                  await _deleteItemsByType(type);
-                },
-                child: const Icon(
-                  Icons.close,
-                  color: Colors.white,
-                  size: 18,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _deleteItemsByType(String type) async {
-    try {
-      final items = await FirebaseFirestore.instance
-          .collection('item')
-          .where('type', isEqualTo: type)
-          .get();
-
-      for (final doc in items.docs) {
-        await doc.reference.delete();
-      }
-
-      setState(() {
-        _selectedCategoryType = null;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Категория "$type" удалена.')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка при удалении категории: $e')),
-      );
-    }
-  }
-}
-
-String getRandomColor() {
-  final random = Random();
-  return '#${random.nextInt(0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
-}
-
-Color? getColorFromHex(String? hexColor) {
-  if (hexColor == null || !hexColor.startsWith('#')) return null;
-  try {
-    return Color(int.parse(hexColor.replaceFirst('#', '0xff')));
-  } catch (e) {
-    return null;
   }
 }
 

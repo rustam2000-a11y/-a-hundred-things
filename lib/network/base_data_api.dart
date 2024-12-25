@@ -1,8 +1,10 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:injectable/injectable.dart';
 
-import '../model/base_card_model.dart';
+import '../model/things_model.dart';
 
 @LazySingleton(as: BaseDataApiI)
 class BaseDataApi implements BaseDataApiI {
@@ -11,7 +13,7 @@ class BaseDataApi implements BaseDataApiI {
   @override
   Future<String> getCurrentUserUid() async {
     final User? userCredential = getCurrentUser();
-    print('@@@ userCredential.user.uid=${userCredential?.uid}');
+    log('@@@ userCredential.user.uid=${userCredential?.uid}');
     return userCredential!.uid;
   }
 
@@ -35,6 +37,18 @@ class BaseDataApi implements BaseDataApiI {
           ),
     );
   }
+
+  @override
+  Future<void> deleteThingsByType(String type) async {
+    final items = await databaseReference
+        .collection('item')
+        .where('type', isEqualTo: type)
+        .get();
+
+    for (final doc in items.docs) {
+      await doc.reference.delete();
+    }
+  }
 }
 
 abstract class BaseDataApiI {
@@ -43,4 +57,6 @@ abstract class BaseDataApiI {
   User? getCurrentUser();
 
   Stream<List<ThingsModel>> fetchAllThings();
+
+  Future<void> deleteThingsByType(String type);
 }

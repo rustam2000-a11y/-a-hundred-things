@@ -1,6 +1,6 @@
 import 'package:injectable/injectable.dart';
 import 'package:rxdart/rxdart.dart';
-import '../model/base_card_model.dart';
+import '../model/things_model.dart';
 import '../network/base_data_api.dart';
 
 @LazySingleton(as: ThingsRepositoryI)
@@ -20,6 +20,11 @@ class ThingsRepository implements ThingsRepositoryI {
     return appStateStream!;
   }
 
+  @override
+  Future<void> deleteThingsByType(String type) async {
+    return _baseDataApi.deleteThingsByType(type);
+  }
+
   @disposeMethod
   @override
   void dispose() {
@@ -31,4 +36,6 @@ abstract class ThingsRepositoryI {
   void dispose();
 
   Stream<List<ThingsModel>> fetchMyThings();
+
+  Future<void> deleteThingsByType(String type);
 }

@@ -28,3 +28,37 @@ class HomeThingsEvent extends HomeEvent {
   @override
   List<Object?> get props => [things];
 }
+
+class HomeTypeThingsEvent extends HomeEvent {
+  const HomeTypeThingsEvent({
+    //required this.typeThings
+    required this.typesWithColors,
+  });
+
+  // final List<ThingsModel> typeThings;
+  final Map<String, String> typesWithColors;
+
+  @override
+  List<Object?> get props => [
+        typesWithColors
+        //typeThings
+      ];
+}
+
+class HomeSelectTypeThingsEvent extends HomeEvent {
+  const HomeSelectTypeThingsEvent({required this.selectedTypeThings});
+
+  final String? selectedTypeThings;
+
+  @override
+  List<Object?> get props => [selectedTypeThings];
+}
+
+class DeleteThingsByTypeEvent extends HomeEvent {
+  const DeleteThingsByTypeEvent({required this.type});
+
+  final String type;
+
+  @override
+  List<Object?> get props => [type];
+}
