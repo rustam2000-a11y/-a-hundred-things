@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../core/utils/presentation.utils.dart';
 import '../../generated/l10n.dart';
 import '../../main.dart';
 import '../../presentation/colors.dart';
@@ -285,6 +286,9 @@ class MyHomePageState extends State<MyHomePage> {
                               left: MediaQuery.of(context).size.width * 0.02),
                           children: state.typesWithColors.entries.map((entry) {
                             final type = entry.key;
+                            final color = entry.value.isEmpty
+                                ? PresentationUtils.getRandomColor()
+                                : entry.value;
                             return CategoryCardWidget(
                               selectedCategoryType: _selectedCategoryType,
                               onChangeCategory: (String? category) {
@@ -306,7 +310,7 @@ class MyHomePageState extends State<MyHomePage> {
                                 _bloc.add(DeleteThingsByTypeEvent(type: type));
                               },
                               isDarkMode: isDarkMode,
-                              color: '',
+                              color: color,
                               type: type,
                             );
                           }).toList(),
