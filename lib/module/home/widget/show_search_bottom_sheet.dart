@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../../presentation/colors.dart';
-import 'build_card_item.dart';
+import 'things_card_item.dart';
 
 void showSearchBottomSheet(BuildContext context) {
   final StreamController<String> _searchStreamController =
@@ -149,20 +149,34 @@ void showSearchBottomSheet(BuildContext context) {
                             final data = item.data() as Map<String, dynamic>;
                             final quantity = data['quantity'] ?? 1;
 
-                            final color = data.containsKey('color') ? data['color'] as String : '';
-                            final imageUrl = data.containsKey('imageUrl') ? data['imageUrl'] as String? : null;
+                            final color = data.containsKey('color')
+                                ? data['color'] as String
+                                : '';
+                            final imageUrl = data.containsKey('imageUrl')
+                                ? data['imageUrl'] as String?
+                                : null;
 
-                            return buildCardItem(
+                            return ThingsCardWidget(
                               itemId: item.id,
                               title: data['title'] as String,
                               description: data['description'] as String,
                               type: data['type'] as String,
                               color: color,
-                              context: context,
                               imageUrl: imageUrl,
                               onStateUpdate: () {},
                               quantity: quantity,
                             );
+                            //   buildCardItem(
+                            //   itemId: item.id,
+                            //   title: data['title'] as String,
+                            //   description: data['description'] as String,
+                            //   type: data['type'] as String,
+                            //   color: color,
+                            //   context: context,
+                            //   imageUrl: imageUrl,
+                            //   onStateUpdate: () {},
+                            //   quantity: quantity,
+                            // );
                           },
                         );
                       },

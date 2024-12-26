@@ -12,11 +12,11 @@ import '../../main.dart';
 import '../../presentation/colors.dart';
 import '../settings/widget/user_profile_screen.dart';
 import 'home_bloc.dart';
-import 'widget/build_card_item.dart';
 import 'widget/category_card_widget.dart';
 import 'widget/icon_home.dart';
 import 'widget/show_add_item_bottom_sheet.dart';
 import 'widget/show_search_bottom_sheet.dart';
+import 'widget/things_card_item.dart';
 
 export 'my_home_page.dart';
 
@@ -34,6 +34,7 @@ class MyHomePageState extends State<MyHomePage> {
   List<String> selectedItems = [];
   String? _selectedCategoryType;
   late HomeBloc _bloc;
+  ValueNotifier<List<String>> selectedItemsNotifier = ValueNotifier([]);
 
   @override
   void initState() {
@@ -338,23 +339,26 @@ class MyHomePageState extends State<MyHomePage> {
                           itemBuilder: (context, index) {
                             final item = state.things[index];
                             return Padding(
-                              padding:
-                                  EdgeInsets.only(bottom: screenHeight * 0.01),
-                              child: buildCardItem(
-                                context: context,
-                                itemId: item.id,
-                                title: item.title,
-                                description: item.description,
-                                type: item.type,
-                                color: item.color,
-                                imageUrl: item.imageUrl,
-                                selectedCategoryType: _selectedCategoryType,
-                                onStateUpdate: () {
-                                  setState(() {});
-                                },
-                                quantity: item.quantity,
-                              ),
-                            );
+                                padding: EdgeInsets.only(
+                                    bottom: screenHeight * 0.01),
+                                child: ThingsCardWidget(
+                                  itemId: item.id,
+                                  title: item.title,
+                                  description: item.description,
+                                  type: item.type,
+                                  color: item.color,
+                                  imageUrl: item.imageUrl,
+                                  selectedCategoryType: _selectedCategoryType,
+                                  onStateUpdate: () {
+                                    setState(() {});
+                                  },
+                                  quantity: item.quantity,
+                                  onDeleteItem: () {
+                                    _bloc.add(
+                                        DeleteItemByUidEvent(uid: item.id));
+                                  },
+                                  selectedItemsNotifier: selectedItemsNotifier,
+                                ));
                           },
                         ),
                       ),
@@ -415,21 +419,24 @@ class MyHomePageState extends State<MyHomePage> {
       },
     );
   }
-}
 
-Future<void> deleteSelectedItems(BuildContext context) async {
-  try {
-    for (String itemId in selectedItemsNotifier.value) {
-      await FirebaseFirestore.instance.collection('item').doc(itemId).delete();
+  Future<void> deleteSelectedItems(BuildContext context) async {
+    try {
+      for (String itemId in selectedItemsNotifier.value) {
+        await FirebaseFirestore.instance
+            .collection('item')
+            .doc(itemId)
+            .delete();
+      }
+      selectedItemsNotifier.value = [];
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Выбранные элементы удалены')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ошибка при удалении элементов: $e')),
+      );
     }
-    selectedItemsNotifier.value = [];
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Выбранные элементы удалены')),
-    );
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Ошибка при удалении элементов: $e')),
-    );
   }
 }
 

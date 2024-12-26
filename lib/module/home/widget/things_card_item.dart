@@ -5,15 +5,11 @@ import 'edit_item_bottom_sheet.dart';
 import 'show_add_item_bottom_sheet.dart'; // Импорт функции showAddItemBottomSheet
 import 'show_modal_buttom_sheet.dart';
 
-List<String> selectedItems = [];
-final ValueNotifier<List<String>> selectedItemsNotifier = ValueNotifier([]);
-bool isSelectionMode = false; // Переменная для режима выбора
-
 final Map<String, int> itemCounts = {};
 
 /// Глобальный словарь для сохранения цветов по типу
 final Map<String, String> typeColors =
-{}; // Словарь для хранения цветов по типу
+    {}; // Словарь для хранения цветов по типу
 
 /// Функция для получения цвета для типа из глобального словаря
 Color getColorForType(String type) {
@@ -24,123 +20,177 @@ Color getColorForType(String type) {
   return getColorFromHex(typeColorsCache[type]) ?? Colors.grey;
 }
 
-Widget buildCardItem({
-  required BuildContext context,
-  required String itemId,
-  required String title,
-  required String description,
-  required String type,
-  required String color,
-  required VoidCallback onStateUpdate,
-  String? imageUrl,
-  String? selectedCategoryType,
-  required int quantity,
-}) {
-  return ValueListenableBuilder<List<String>>(
-    valueListenable: selectedItemsNotifier,
-    builder: (context, selectedItems, child) {
-      final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
-      final isSelected = selectedItems.contains(itemId);
+class ThingsCardWidget extends StatefulWidget {
+  const ThingsCardWidget({
+    super.key,
+    required this.itemId,
+    required this.title,
+    required this.description,
+    required this.type,
+    required this.color,
+    required this.onStateUpdate,
+    this.onDeleteItem,
+    this.imageUrl,
+    this.selectedCategoryType,
+    required this.quantity,
+    this.selectedItemsNotifier,
+  });
 
-      final backgroundColor = isDarkTheme
-          ? (isSelected ? Colors.blueGrey : Colors.black54)
-          : getColorForType(type);
+  final String itemId;
+  final String title;
+  final String description;
+  final String type;
+  final String color;
+  final VoidCallback onStateUpdate;
+  final VoidCallback? onDeleteItem;
+  final String? imageUrl;
+  final String? selectedCategoryType;
+  final int quantity;
+  final ValueNotifier<List<String>>? selectedItemsNotifier;
 
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4.0),
-        child: GestureDetector(
-          onTap: () {
-            if (isSelectionMode) {
-              _toggleSelection(itemId);
-            } else {
-              showItemDetailsBottomSheet(
-                context: context,
-                title: title,
-                description: description,
-                type: type,
-                itemId: itemId,
-                imageUrl: imageUrl,
-              );
-            }
-          },
-          onLongPress: () {
-            if (!isSelectionMode) {
-              isSelectionMode = true;
-              _toggleSelection(itemId);
-            }
-          },
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              borderRadius: BorderRadius.circular(25),
-              border: Border.all(
-                color: isSelected ? Colors.blueAccent : Colors.transparent,
-                width: isSelected ? 2 : 0,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.5), // Цвет тени с прозрачностью
-                  offset: const Offset(0, 1), // Смещение по X и Y
-                  blurRadius: 5, // Радиус размытия
-                  spreadRadius: 1, // Радиус распространения
+  @override
+  State<ThingsCardWidget> createState() => _ThingsCardWidgetState();
+}
+
+class _ThingsCardWidgetState extends State<ThingsCardWidget> {
+  bool isSelectionMode = false;
+  List<String> selectedItems = [];
+  late ValueNotifier<List<String>> selectedNotifier;
+
+  @override
+  void initState() {
+    selectedNotifier = widget.selectedItemsNotifier ?? ValueNotifier([]);
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<List<String>>(
+      valueListenable: selectedNotifier,
+      builder: (context, selectedItems, child) {
+        final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+        final isSelected = selectedItems.contains(widget.itemId);
+
+        final backgroundColor = isDarkTheme
+            ? (isSelected ? Colors.blueGrey : Colors.black54)
+            : getColorForType(widget.type);
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          child: GestureDetector(
+            onTap: () {
+              if (isSelectionMode) {
+                _toggleSelection(widget.itemId);
+              } else {
+                showItemDetailsBottomSheet(
+                  context: context,
+                  title: widget.title,
+                  description: widget.description,
+                  type: widget.type,
+                  itemId: widget.itemId,
+                  imageUrl: widget.imageUrl,
+                );
+              }
+            },
+            onLongPress: () {
+              if (!isSelectionMode) {
+                isSelectionMode = true;
+                _toggleSelection(widget.itemId);
+              }
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              decoration: BoxDecoration(
+                color: backgroundColor,
+                borderRadius: BorderRadius.circular(25),
+                border: Border.all(
+                  color: isSelected ? Colors.blueAccent : Colors.transparent,
+                  width: isSelected ? 2 : 0,
                 ),
-              ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Stack(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildImage(imageUrl, isDarkTheme, itemId),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildItemDetails(
-                              context: context,
-                              title: title,
-                              description: description,
-                              type: type,
-                              isDarkTheme: isDarkTheme,
-                              isSelected: isSelected,
-                              itemId: itemId,
-                              imageUrl: imageUrl,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.5),
+                    // Цвет тени с прозрачностью
+                    offset: const Offset(0, 1),
+                    // Смещение по X и Y
+                    blurRadius: 5,
+                    // Радиус размытия
+                    spreadRadius: 1, // Радиус распространения
                   ),
-                  if (selectedCategoryType != null || selectedCategoryType == type)
-                    Positioned(
-                      right: 8,
-                      bottom: 8,
-                      child: _buildCounterControls(
-                        context,
-                        itemId,
-                        type,
-                        onStateUpdate,
-                        selectedCategoryType,
-                      ),
-                    ),
                 ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Stack(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildImage(
+                                widget.imageUrl, isDarkTheme, widget.itemId),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _buildItemDetails(
+                                context: context,
+                                title: widget.title,
+                                description: widget.description,
+                                type: widget.type,
+                                isDarkTheme: isDarkTheme,
+                                isSelected: isSelected,
+                                itemId: widget.itemId,
+                                imageUrl: widget.imageUrl,
+                                onDeleteItem: widget.onDeleteItem,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    if (widget.selectedCategoryType != null ||
+                        widget.selectedCategoryType == widget.type)
+                      Positioned(
+                        right: 8,
+                        bottom: 8,
+                        child: _buildCounterControls(
+                          context,
+                          widget.itemId,
+                          widget.type,
+                          widget.onStateUpdate,
+                          widget.selectedCategoryType,
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
+        );
+      },
+    );
+  }
 
-        ),
-      );
-    },
-  );
+  void _toggleSelection(String itemId) {
+    final currentItems = List<String>.from(selectedNotifier.value);
+    if (currentItems.contains(itemId)) {
+      currentItems.remove(itemId);
+    } else {
+      currentItems.add(itemId);
+    }
+    selectedNotifier.value = currentItems;
+
+    if (currentItems.isEmpty) {
+      isSelectionMode = false;
+    }
+  }
 }
 
 Widget _buildImage(String? imageUrl, bool isDarkTheme, String itemId) {
   return StreamBuilder<DocumentSnapshot>(
-    stream: FirebaseFirestore.instance.collection('item').doc(itemId).snapshots(),
+    stream:
+        FirebaseFirestore.instance.collection('item').doc(itemId).snapshots(),
     builder: (context, snapshot) {
       String? firstImageUrl;
 
@@ -164,21 +214,20 @@ Widget _buildImage(String? imageUrl, bool isDarkTheme, String itemId) {
               : null,
           image: firstImageUrl != null
               ? DecorationImage(
-            image: NetworkImage(firstImageUrl),
-            fit: BoxFit.cover,
-          )
+                  image: NetworkImage(firstImageUrl),
+                  fit: BoxFit.cover,
+                )
               : null,
         ),
         child: firstImageUrl == null
             ? Center(
-          child: Icon(Icons.image, size: 40, color: Colors.grey[600]),
-        )
+                child: Icon(Icons.image, size: 40, color: Colors.grey[600]),
+              )
             : null,
       );
     },
   );
 }
-
 
 Widget _buildItemDetails({
   required BuildContext context,
@@ -187,6 +236,7 @@ Widget _buildItemDetails({
   required String type,
   required bool isDarkTheme,
   required bool isSelected,
+  VoidCallback? onDeleteItem,
   required String itemId,
   String? imageUrl,
 }) {
@@ -215,6 +265,7 @@ Widget _buildItemDetails({
             description: description,
             type: type,
             imageUrl: imageUrl,
+            onDeleteItem: onDeleteItem,
           ),
         ],
       ),
@@ -238,6 +289,7 @@ Widget _buildActionIcons({
   required String itemId,
   required String title,
   required String description,
+  VoidCallback? onDeleteItem,
   required String type,
   String? imageUrl,
 }) {
@@ -270,7 +322,8 @@ Widget _buildActionIcons({
             itemId: itemId,
             initialTitle: title,
             initialDescription: description,
-            initialType: type, imageUrl: imageUrl ,
+            initialType: type,
+            imageUrl: imageUrl,
           );
         },
       ),
@@ -279,47 +332,23 @@ Widget _buildActionIcons({
           Icons.close,
           color: isDarkTheme ? Colors.white : Colors.white,
         ),
-        onPressed: () async {
-          try {
-            await FirebaseFirestore.instance
-                .collection('item')
-                .doc(itemId)
-                .delete();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Item deleted successfully')),
-            );
-          } catch (e) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error: $e')),
-            );
-          }
-        },
+        onPressed: onDeleteItem,
       ),
     ],
   );
 }
 
-void _toggleSelection(String itemId) {
-  final currentItems = List<String>.from(selectedItemsNotifier.value);
-  if (currentItems.contains(itemId)) {
-    currentItems.remove(itemId);
-  } else {
-    currentItems.add(itemId);
-  }
-  selectedItemsNotifier.value = currentItems;
-
-  if (currentItems.isEmpty) {
-    isSelectionMode = false;
-  }
-}
-
 Widget _buildCounterControls(BuildContext context, String itemId,
     String itemType, VoidCallback onStateUpdate, String? selectedCategoryType) {
   return StreamBuilder<DocumentSnapshot>(
-    stream: FirebaseFirestore.instance.collection('item').doc(itemId).snapshots(),
+    stream:
+        FirebaseFirestore.instance.collection('item').doc(itemId).snapshots(),
     builder: (context, snapshot) {
-      if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
-        return const SizedBox.shrink(); // Возвращаем пустой виджет, пока данные загружаются
+      if (!snapshot.hasData ||
+          snapshot.data == null ||
+          snapshot.data!.data() == null) {
+        return const SizedBox
+            .shrink(); // Возвращаем пустой виджет, пока данные загружаются
       }
 
       // Приводим данные к Map<String, dynamic>
@@ -331,7 +360,8 @@ Widget _buildCounterControls(BuildContext context, String itemId,
           IconButton(
             icon: const Icon(Icons.remove, color: Colors.white),
             onPressed: () {
-              _decrementItem(itemId, itemType, onStateUpdate, selectedCategoryType);
+              _decrementItem(
+                  itemId, itemType, onStateUpdate, selectedCategoryType);
             },
           ),
           Text(
@@ -341,7 +371,8 @@ Widget _buildCounterControls(BuildContext context, String itemId,
           IconButton(
             icon: const Icon(Icons.add, color: Colors.white),
             onPressed: () {
-              _incrementItem(itemId, itemType, onStateUpdate, selectedCategoryType);
+              _incrementItem(
+                  itemId, itemType, onStateUpdate, selectedCategoryType);
             },
           ),
         ],
@@ -350,8 +381,8 @@ Widget _buildCounterControls(BuildContext context, String itemId,
   );
 }
 
-Future<void> _incrementItem(String itemId, String itemType, VoidCallback onStateUpdate,
-    String? selectedCategoryType) async {
+Future<void> _incrementItem(String itemId, String itemType,
+    VoidCallback onStateUpdate, String? selectedCategoryType) async {
   if (selectedCategoryType == null || selectedCategoryType == itemType) {
     // Увеличиваем локальный счетчик
     itemCounts[itemId] = (itemCounts[itemId] ?? 1) + 1;
@@ -371,8 +402,8 @@ Future<void> _incrementItem(String itemId, String itemType, VoidCallback onState
   }
 }
 
-Future<void> _decrementItem(String itemId, String itemType, VoidCallback onStateUpdate,
-    String? selectedCategoryType) async {
+Future<void> _decrementItem(String itemId, String itemType,
+    VoidCallback onStateUpdate, String? selectedCategoryType) async {
   if (selectedCategoryType == null || selectedCategoryType == itemType) {
     // Получаем текущий счетчик из локального хранилища
     final currentCount = itemCounts[itemId] ?? 1;
