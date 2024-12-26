@@ -25,6 +25,11 @@ class ThingsRepository implements ThingsRepositoryI {
     return _baseDataApi.deleteThingsByType(type);
   }
 
+  @override
+  Future<void> deleteItemByUid(String uid) async {
+    return _baseDataApi.deleteItemByUid(uid);
+  }
+
   @disposeMethod
   @override
   void dispose() {
@@ -38,4 +43,6 @@ abstract class ThingsRepositoryI {
   Stream<List<ThingsModel>> fetchMyThings();
 
   Future<void> deleteThingsByType(String type);
+
+  Future<void> deleteItemByUid(String uid);
 }

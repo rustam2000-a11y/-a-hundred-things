@@ -35,6 +35,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<DeleteThingsByTypeEvent>((event, emit) {
       deleteThingsByType(event.type);
     });
+    on<DeleteItemByUidEvent>((event, emit) {
+      deleteItemByUid(event.uid);
+    });
   }
 
   final ThingsRepositoryI _thingsRepository;
@@ -67,6 +70,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   Future<void> deleteThingsByType(String type) async {
     await _thingsRepository.deleteThingsByType(type);
+  }
+
+  Future<void> deleteItemByUid(String uid) async {
+    await _thingsRepository.deleteItemByUid(uid);
   }
 
   @override

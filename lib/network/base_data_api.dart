@@ -49,6 +49,11 @@ class BaseDataApi implements BaseDataApiI {
       await doc.reference.delete();
     }
   }
+
+  @override
+  Future<void> deleteItemByUid(String uid) async {
+    await databaseReference.collection('item').doc(uid).delete();
+  }
 }
 
 abstract class BaseDataApiI {
@@ -59,4 +64,6 @@ abstract class BaseDataApiI {
   Stream<List<ThingsModel>> fetchAllThings();
 
   Future<void> deleteThingsByType(String type);
+
+  Future<void> deleteItemByUid(String uid);
 }
