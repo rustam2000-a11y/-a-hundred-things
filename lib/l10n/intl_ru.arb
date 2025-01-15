@@ -40,5 +40,6 @@
   "enterName": "Введите имя",
   "number": "Номер",
   "enterNumber": "Enter number",
-  "enterYourPassword": "Введите пароль"
+  "enterYourPassword": "Введите пароль",
+  "ategories": "Категории"
 }

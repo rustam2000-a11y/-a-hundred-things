@@ -32,6 +32,7 @@ class HomeThingsEvent extends HomeEvent {
 class HomeTypeThingsEvent extends HomeEvent {
   const HomeTypeThingsEvent({
     //required this.typeThings
+
     required this.typesWithColors,
   });
 

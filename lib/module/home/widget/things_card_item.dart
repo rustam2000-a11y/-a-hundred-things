@@ -6,21 +6,16 @@ import 'show_add_item_bottom_sheet.dart'; // Импорт функции showAdd
 import 'show_modal_buttom_sheet.dart';
 
 final Map<String, int> itemCounts = {};
+final Map<String, String> typeColors = {};
 
-/// Глобальный словарь для сохранения цветов по типу
-final Map<String, String> typeColors =
-    {}; // Словарь для хранения цветов по типу
-
-/// Функция для получения цвета для типа из глобального словаря
 Color getColorForType(String type) {
   if (!typeColorsCache.containsKey(type)) {
-    // Если типа нет в кэше, генерируем цвет и сохраняем
     typeColorsCache[type] = getRandomColor();
   }
   return getColorFromHex(typeColorsCache[type]) ?? Colors.grey;
 }
 
-class ThingsCardWidget extends StatefulWidget {
+class ThingsCardWidget extends StatelessWidget {
   const ThingsCardWidget({
     super.key,
     required this.itemId,
@@ -49,53 +44,37 @@ class ThingsCardWidget extends StatefulWidget {
   final ValueNotifier<List<String>>? selectedItemsNotifier;
 
   @override
-  State<ThingsCardWidget> createState() => _ThingsCardWidgetState();
-}
-
-class _ThingsCardWidgetState extends State<ThingsCardWidget> {
-  bool isSelectionMode = false;
-  List<String> selectedItems = [];
-  late ValueNotifier<List<String>> selectedNotifier;
-
-  @override
-  void initState() {
-    selectedNotifier = widget.selectedItemsNotifier ?? ValueNotifier([]);
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<List<String>>(
-      valueListenable: selectedNotifier,
-      builder: (context, selectedItems, child) {
-        final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
-        final isSelected = selectedItems.contains(widget.itemId);
+    final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
 
+    return ValueListenableBuilder<List<String>>(
+      valueListenable: selectedItemsNotifier ?? ValueNotifier([]),
+      builder: (context, selectedItems, child) {
+        final isSelected = selectedItems.contains(itemId);
         final backgroundColor = isDarkTheme
             ? (isSelected ? Colors.blueGrey : Colors.black54)
-            : getColorForType(widget.type);
+            : getColorForType(type);
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 4.0),
           child: GestureDetector(
             onTap: () {
-              if (isSelectionMode) {
-                _toggleSelection(widget.itemId);
+              if (selectedItemsNotifier != null && selectedItems.isNotEmpty) {
+                _toggleSelection(selectedItemsNotifier!, itemId);
               } else {
                 showItemDetailsBottomSheet(
                   context: context,
-                  title: widget.title,
-                  description: widget.description,
-                  type: widget.type,
-                  itemId: widget.itemId,
-                  imageUrl: widget.imageUrl,
+                  title: title,
+                  description: description,
+                  type: type,
+                  itemId: itemId,
+                  imageUrl: imageUrl,
                 );
               }
             },
             onLongPress: () {
-              if (!isSelectionMode) {
-                isSelectionMode = true;
-                _toggleSelection(widget.itemId);
+              if (selectedItemsNotifier != null) {
+                _toggleSelection(selectedItemsNotifier!, itemId);
               }
             },
             child: AnimatedContainer(
@@ -110,12 +89,9 @@ class _ThingsCardWidgetState extends State<ThingsCardWidget> {
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.5),
-                    // Цвет тени с прозрачностью
                     offset: const Offset(0, 1),
-                    // Смещение по X и Y
                     blurRadius: 5,
-                    // Радиус размытия
-                    spreadRadius: 1, // Радиус распространения
+                    spreadRadius: 1,
                   ),
                 ],
               ),
@@ -129,37 +105,77 @@ class _ThingsCardWidgetState extends State<ThingsCardWidget> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildImage(
-                                widget.imageUrl, isDarkTheme, widget.itemId),
+                            ItemImage(
+                              imageUrl: imageUrl,
+                              itemId: itemId,
+                              isSelected: isSelected,
+                            ),
                             const SizedBox(width: 16),
                             Expanded(
-                              child: _buildItemDetails(
-                                context: context,
-                                title: widget.title,
-                                description: widget.description,
-                                type: widget.type,
-                                isDarkTheme: isDarkTheme,
-                                isSelected: isSelected,
-                                itemId: widget.itemId,
-                                imageUrl: widget.imageUrl,
-                                onDeleteItem: widget.onDeleteItem,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          title,
+                                          style: TextStyle(
+                                            color: isDarkTheme ? Colors.white : Colors.black,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      ActionIcons(
+                                        isDarkTheme: isDarkTheme,
+                                        isSelected: isSelected,
+                                        itemId: itemId,
+                                        title: title,
+                                        description: description,
+                                        type: type,
+                                        imageUrl: imageUrl,
+                                        onDeleteItem: onDeleteItem,
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    description.length > 20
+                                        ? '${description.substring(0, 20)}...'
+                                        : description,
+                                    style: TextStyle(
+                                      color: isDarkTheme ? Colors.white : Colors.black,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                ],
                               ),
+                              // ItemDetails(
+                              //   title: title,
+                              //   description: description,
+                              //   type: type,
+                              //   isDarkTheme: isDarkTheme,
+                              //   isSelected: isSelected,
+                              //   itemId: itemId,
+                              //   imageUrl: imageUrl,
+                              //   onDeleteItem: onDeleteItem,
+                              // ),
                             ),
                           ],
                         ),
                       ],
                     ),
-                    if (widget.selectedCategoryType != null ||
-                        widget.selectedCategoryType == widget.type)
+                    if (selectedCategoryType != null ||
+                        selectedCategoryType == type)
                       Positioned(
                         right: 8,
                         bottom: 8,
-                        child: _buildCounterControls(
-                          context,
-                          widget.itemId,
-                          widget.type,
-                          widget.onStateUpdate,
-                          widget.selectedCategoryType,
+                        child: CounterControls(
+                          itemId: itemId,
+                          itemType: type,
+                          onStateUpdate: onStateUpdate,
+                          selectedCategoryType: selectedCategoryType,
                         ),
                       ),
                   ],
@@ -172,263 +188,293 @@ class _ThingsCardWidgetState extends State<ThingsCardWidget> {
     );
   }
 
-  void _toggleSelection(String itemId) {
-    final currentItems = List<String>.from(selectedNotifier.value);
+  void _toggleSelection(ValueNotifier<List<String>> notifier, String itemId) {
+    final currentItems = List<String>.from(notifier.value);
     if (currentItems.contains(itemId)) {
       currentItems.remove(itemId);
     } else {
       currentItems.add(itemId);
     }
-    selectedNotifier.value = currentItems;
-
-    if (currentItems.isEmpty) {
-      isSelectionMode = false;
-    }
+    notifier.value = currentItems;
   }
 }
 
-Widget _buildImage(String? imageUrl, bool isDarkTheme, String itemId) {
-  return StreamBuilder<DocumentSnapshot>(
-    stream:
-        FirebaseFirestore.instance.collection('item').doc(itemId).snapshots(),
-    builder: (context, snapshot) {
-      String? firstImageUrl;
+class ItemImage extends StatelessWidget {
 
-      if (snapshot.hasData && snapshot.data != null) {
-        final data = snapshot.data!.data() as Map<String, dynamic>?;
-        if (data != null && data['imageUrls'] is List<dynamic>) {
-          final imageUrls = data['imageUrls'] as List<dynamic>;
-          if (imageUrls.isNotEmpty) {
-            firstImageUrl = imageUrls.first as String?;
-          }
-        }
-      }
+  const ItemImage({
+    Key? key,
+    required this.imageUrl,
+    required this.itemId,
+    required this.isSelected,
+  }) : super(key: key);
+  final String? imageUrl;
+  final String itemId;
+  final bool isSelected;
 
-      return Container(
-        width: 100,
-        height: 90,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: firstImageUrl == null
-              ? Colors.grey[300] // Серый фон, если изображения нет
-              : null,
-          image: firstImageUrl != null
-              ? DecorationImage(
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        StreamBuilder<DocumentSnapshot>(
+          stream: FirebaseFirestore.instance.collection('item').doc(itemId).snapshots(),
+          builder: (context, snapshot) {
+            String? firstImageUrl;
+
+            if (snapshot.hasData && snapshot.data != null) {
+              final data = snapshot.data!.data() as Map<String, dynamic>?;
+              if (data != null && data['imageUrls'] is List<dynamic>) {
+                final imageUrls = data['imageUrls'] as List<dynamic>;
+                if (imageUrls.isNotEmpty) {
+                  firstImageUrl = imageUrls.first as String?;
+                }
+              }
+            }
+
+            return Container(
+              width: 100,
+              height: 90,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: firstImageUrl == null
+                    ? Colors.grey[300]
+                    : null,
+                image: firstImageUrl != null
+                    ? DecorationImage(
                   image: NetworkImage(firstImageUrl),
                   fit: BoxFit.cover,
                 )
-              : null,
-        ),
-        child: firstImageUrl == null
-            ? Center(
+                    : null,
+              ),
+              child: firstImageUrl == null
+                  ? Center(
                 child: Icon(Icons.image, size: 40, color: Colors.grey[600]),
               )
-            : null,
-      );
-    },
-  );
-}
-
-Widget _buildItemDetails({
-  required BuildContext context,
-  required String title,
-  required String description,
-  required String type,
-  required bool isDarkTheme,
-  required bool isSelected,
-  VoidCallback? onDeleteItem,
-  required String itemId,
-  String? imageUrl,
-}) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Text(
-              title,
-              style: TextStyle(
-                color: isDarkTheme ? Colors.white : Colors.black,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+                  : null,
+            );
+          },
+        ),
+        if (isSelected)
+          Positioned(
+            top: 4,
+            right: 4,
+            child: Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: Colors.blue,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.check,
+                color: Colors.white,
+                size: 16,
               ),
             ),
           ),
-          _buildActionIcons(
-            context: context,
-            isDarkTheme: isDarkTheme,
-            isSelected: isSelected,
-            itemId: itemId,
-            title: title,
-            description: description,
-            type: type,
-            imageUrl: imageUrl,
-            onDeleteItem: onDeleteItem,
-          ),
-        ],
-      ),
-      Text(
-        description.length > 20
-            ? '${description.substring(0, 20)}...'
-            : description,
-        style: TextStyle(
-          color: isDarkTheme ? Colors.white : Colors.black,
-        ),
-      ),
-      const SizedBox(height: 8),
-    ],
-  );
+      ],
+    );
+  }
 }
 
-Widget _buildActionIcons({
-  required BuildContext context,
-  required bool isDarkTheme,
-  required bool isSelected,
-  required String itemId,
-  required String title,
-  required String description,
-  VoidCallback? onDeleteItem,
-  required String type,
-  String? imageUrl,
-}) {
-  if (isSelected) {
-    return Container(
-      width: 24,
-      height: 24,
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: const Icon(
-        Icons.check,
-        color: Colors.white,
-        size: 18,
-      ),
+class ItemDetails extends StatelessWidget {
+
+  const ItemDetails({
+    Key? key,
+    required this.title,
+    required this.description,
+    required this.type,
+    required this.isDarkTheme,
+    required this.isSelected,
+    this.onDeleteItem,
+    required this.itemId,
+    this.imageUrl,
+  }) : super(key: key);
+
+  final String title;
+  final String description;
+  final String type;
+  final bool isDarkTheme;
+  final bool isSelected;
+  final VoidCallback? onDeleteItem;
+  final String itemId;
+  final String? imageUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: isDarkTheme ? Colors.white : Colors.black,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            ActionIcons(
+              isDarkTheme: isDarkTheme,
+              isSelected: isSelected,
+              itemId: itemId,
+              title: title,
+              description: description,
+              type: type,
+              imageUrl: imageUrl,
+              onDeleteItem: onDeleteItem,
+            ),
+          ],
+        ),
+        Text(
+          description.length > 20
+              ? '${description.substring(0, 20)}...'
+              : description,
+          style: TextStyle(
+            color: isDarkTheme ? Colors.white : Colors.black,
+          ),
+        ),
+        const SizedBox(height: 8),
+      ],
+    );
+  }
+}
+
+class ActionIcons extends StatelessWidget {
+
+  const ActionIcons({
+    Key? key,
+    required this.isDarkTheme,
+    required this.isSelected,
+    required this.itemId,
+    required this.title,
+    required this.description,
+    required this.type,
+    this.imageUrl,
+    this.onDeleteItem,
+  }) : super(key: key);
+  final bool isDarkTheme;
+  final bool isSelected;
+  final String itemId;
+  final String title;
+  final String description;
+  final String type;
+  final String? imageUrl;
+  final VoidCallback? onDeleteItem;
+
+  @override
+  Widget build(BuildContext context) {
+    if (isSelected) {
+      return Container(
+        width: 24,
+        height: 24,
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: const Icon(
+          Icons.check,
+          color: Colors.white,
+          size: 18,
+        ),
+      );
+    }
+
+    return Row(
+      children: [
+        IconButton(
+          icon: Icon(
+            Icons.edit,
+            color: isDarkTheme ? Colors.white : Colors.black,
+          ),
+          onPressed: () {
+            showEditItemBottomSheet(
+              context,
+              itemId: itemId,
+              initialTitle: title,
+              initialDescription: description,
+              initialType: type,
+              imageUrl: imageUrl,
+            );
+          },
+        ),
+        IconButton(
+          icon: Icon(
+            Icons.close,
+            color: isDarkTheme ? Colors.white : Colors.black,
+          ),
+          onPressed: onDeleteItem,
+        ),
+      ],
+    );
+  }
+}
+
+class CounterControls extends StatelessWidget {
+
+  const CounterControls({
+    Key? key,
+    required this.itemId,
+    required this.itemType,
+    required this.onStateUpdate,
+    this.selectedCategoryType,
+  }) : super(key: key);
+  final String itemId;
+  final String itemType;
+  final VoidCallback onStateUpdate;
+  final String? selectedCategoryType;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance.collection('item').doc(itemId).snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
+          return const SizedBox.shrink();
+        }
+
+        final data = snapshot.data!.data() as Map<String, dynamic>;
+        final quantity = data['quantity'] ?? 1;
+
+        return Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.remove, color: Colors.white),
+              onPressed: () => _updateQuantity(itemId, itemType, -1, onStateUpdate, selectedCategoryType),
+            ),
+            Text(
+              '$quantity',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            IconButton(
+              icon: const Icon(Icons.add, color: Colors.white),
+              onPressed: () => _updateQuantity(itemId, itemType, 1, onStateUpdate, selectedCategoryType),
+            ),
+          ],
+        );
+      },
     );
   }
 
-  return Row(
-    children: [
-      IconButton(
-        icon: Icon(
-          Icons.edit,
-          color: isDarkTheme ? Colors.white : Colors.white,
-        ),
-        onPressed: () {
-          showEditItemBottomSheet(
-            context,
-            itemId: itemId,
-            initialTitle: title,
-            initialDescription: description,
-            initialType: type,
-            imageUrl: imageUrl,
-          );
-        },
-      ),
-      IconButton(
-        icon: Icon(
-          Icons.close,
-          color: isDarkTheme ? Colors.white : Colors.white,
-        ),
-        onPressed: onDeleteItem,
-      ),
-    ],
-  );
-}
-
-Widget _buildCounterControls(BuildContext context, String itemId,
-    String itemType, VoidCallback onStateUpdate, String? selectedCategoryType) {
-  return StreamBuilder<DocumentSnapshot>(
-    stream:
-        FirebaseFirestore.instance.collection('item').doc(itemId).snapshots(),
-    builder: (context, snapshot) {
-      if (!snapshot.hasData ||
-          snapshot.data == null ||
-          snapshot.data!.data() == null) {
-        return const SizedBox
-            .shrink(); // Возвращаем пустой виджет, пока данные загружаются
-      }
-
-      // Приводим данные к Map<String, dynamic>
-      final data = snapshot.data!.data() as Map<String, dynamic>;
-      final quantity = data['quantity'] ?? 1;
-
-      return Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.remove, color: Colors.white),
-            onPressed: () {
-              _decrementItem(
-                  itemId, itemType, onStateUpdate, selectedCategoryType);
-            },
-          ),
-          Text(
-            '$quantity',
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          IconButton(
-            icon: const Icon(Icons.add, color: Colors.white),
-            onPressed: () {
-              _incrementItem(
-                  itemId, itemType, onStateUpdate, selectedCategoryType);
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
-
-Future<void> _incrementItem(String itemId, String itemType,
-    VoidCallback onStateUpdate, String? selectedCategoryType) async {
-  if (selectedCategoryType == null || selectedCategoryType == itemType) {
-    // Увеличиваем локальный счетчик
-    itemCounts[itemId] = (itemCounts[itemId] ?? 1) + 1;
-    onStateUpdate();
-
-    // Обновляем количество в Firebase
-    final itemRef = FirebaseFirestore.instance.collection('item').doc(itemId);
-
-    await FirebaseFirestore.instance.runTransaction((transaction) async {
-      final snapshot = await transaction.get(itemRef);
-
-      if (snapshot.exists) {
-        final currentQuantity = snapshot.data()?['quantity'] ?? 1;
-        transaction.update(itemRef, {'quantity': currentQuantity + 1});
-      }
-    });
-  }
-}
-
-Future<void> _decrementItem(String itemId, String itemType,
-    VoidCallback onStateUpdate, String? selectedCategoryType) async {
-  if (selectedCategoryType == null || selectedCategoryType == itemType) {
-    // Получаем текущий счетчик из локального хранилища
-    final currentCount = itemCounts[itemId] ?? 1;
-
-    if (currentCount > 1) {
-      // Уменьшаем локальный счетчик
-      itemCounts[itemId] = currentCount - 1;
-      onStateUpdate();
-
-      // Обновляем количество в Firebase
+  Future<void> _updateQuantity(String itemId, String itemType, int change, VoidCallback onStateUpdate, String? selectedCategoryType) async {
+    if (selectedCategoryType == null || selectedCategoryType == itemType) {
       final itemRef = FirebaseFirestore.instance.collection('item').doc(itemId);
-
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         final snapshot = await transaction.get(itemRef);
-
         if (snapshot.exists) {
-          final currentQuantity = snapshot.data()?['quantity'] as int? ?? 1;
-          if (currentQuantity > 1) {
-            transaction.update(itemRef, {'quantity': currentQuantity - 1});
+          final currentQuantity = snapshot.data()?['quantity'] ?? 1;
+          final newQuantity = currentQuantity + change;
+          if (newQuantity > 0) {
+            transaction.update(itemRef, {'quantity': newQuantity});
           } else {
-            // Если количество становится 1, удаляем элемент из базы данных
             transaction.delete(itemRef);
           }
         }
       });
+      onStateUpdate();
     }
   }
 }

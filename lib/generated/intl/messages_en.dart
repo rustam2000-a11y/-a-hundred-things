@@ -30,6 +30,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Account settings"),
         "applicationLanguage":
             MessageLookupByLibrary.simpleMessage("Application language"),
+        "ategories": MessageLookupByLibrary.simpleMessage("Categories"),
         "category": MessageLookupByLibrary.simpleMessage("Сategories"),
         "change": MessageLookupByLibrary.simpleMessage("Change"),
         "continueWithApple":

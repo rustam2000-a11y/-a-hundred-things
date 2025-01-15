@@ -30,6 +30,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Настройки учетной записи"),
         "applicationLanguage":
             MessageLookupByLibrary.simpleMessage("Язык приложения"),
+        "ategories": MessageLookupByLibrary.simpleMessage("Категории"),
         "category": MessageLookupByLibrary.simpleMessage("Категории"),
         "change": MessageLookupByLibrary.simpleMessage("Изменить"),
         "continueWithApple":

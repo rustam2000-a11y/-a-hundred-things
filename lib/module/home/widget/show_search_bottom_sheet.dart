@@ -22,25 +22,23 @@ void showSearchBottomSheet(BuildContext context) {
       final screenWidth = MediaQuery.of(context).size.width;
       final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-      return Padding(
-        padding: EdgeInsets.only(
+      return FractionallySizedBox(
+          heightFactor: 0.8,
+          child: Padding(
+          padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: Container(
-          padding: const EdgeInsets.only(top: 20),
-          height: screenHeight * 0.8,
-          decoration: BoxDecoration(
-            gradient: isDarkMode
-                ? AppColors
-                    .darkBlueGradient // Устанавливаем градиент для темной темы
-                : null, // Без градиента для светлой темы
-            color: !isDarkMode
-                ? AppColors.silverColor // Устанавливаем цвет для светлой темы
-                : null, // Цвет не нужен в темной теме
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: Column(
-            children: [
+      ),
+      child: Container(
+      padding: const EdgeInsets.only(top: 20),
+      decoration: BoxDecoration(
+      gradient: isDarkMode
+      ? AppColors.darkBlueGradient
+          : null,
+      color: !isDarkMode ? AppColors.silverColor : null,
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+      children: [
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.09),
                 child: Row(
@@ -64,6 +62,7 @@ void showSearchBottomSheet(BuildContext context) {
                     // SizedBox(width: 20),
                     Expanded(
                       child: TextField(
+
                         controller: searchController,
                         style: TextStyle(
                           color: isDarkMode
@@ -187,6 +186,7 @@ void showSearchBottomSheet(BuildContext context) {
             ],
           ),
         ),
+      ),
       );
     },
   ).whenComplete(_searchStreamController.close);
