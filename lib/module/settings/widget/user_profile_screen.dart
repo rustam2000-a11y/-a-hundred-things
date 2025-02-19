@@ -9,9 +9,9 @@ import 'account.dart';
 
 
 class UserProfileScreen extends StatefulWidget {
-  final VoidCallback toggleTheme;
 
   const UserProfileScreen({Key? key, required this.toggleTheme}) : super(key: key);
+  final VoidCallback toggleTheme;
 
   @override
   _UserProfileScreenState createState() => _UserProfileScreenState();
@@ -147,22 +147,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         icon: Icon(Icons.settings,
                             color: isDarkTheme ? Colors.white : Colors.white),
                         iconSize: 38,
-                        onPressed: () async {
-                          try {
-                            await FirebaseAuth.instance.signOut();
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute<dynamic>(
-                                builder: (context) => LoginPage(
-                                  toggleTheme: () {},
-                                ),
-                              ),
-                            );
-                          } catch (e) {
-                            print('Error signing out: $e');
-                          }
-                        },
-                      ),
+                        onPressed: (){},),
                     ],
                   ),
                 ],

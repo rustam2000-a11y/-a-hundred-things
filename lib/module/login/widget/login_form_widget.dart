@@ -2,16 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:one_hundred_things/module/login/widget/text_field_custom.dart';
-import 'package:one_hundred_things/module/login/widget/text_filed.dart';
+import 'package:one_hundred_things/module/login/widget/registration_form_widget.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-
 import '../../../generated/l10n.dart';
-import '../../../main.dart';
-import '../../../presentation/colors.dart';
 import '../../home/my_home_page.dart';
 import 'button_basic.dart';
 import 'forgot_widget.dart';
+import 'text_filed.dart';
 
 class LoginFormWidget extends StatefulWidget {
   const LoginFormWidget({super.key});
@@ -26,7 +23,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
   final TextEditingController _birthdayController = TextEditingController();
   final TextEditingController _loginEmailController = TextEditingController();
   final TextEditingController _loginPasswordController =
-  TextEditingController();
+      TextEditingController();
 
   Future<void> addUserToFirestore(User? user) async {
     if (user != null) {
@@ -41,13 +38,12 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
 
   Future<void> _login(BuildContext context) async {
     try {
-      UserCredential userCredential =
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      final UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _loginEmailController.text.trim(),
         password: _loginPasswordController.text.trim(),
       );
 
-      // Действия после успешного входа
       await Navigator.pushReplacement(
         context,
         MaterialPageRoute<dynamic>(
@@ -73,22 +69,23 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SizedBox(height: 25),
-              Text(S.of(context).mail, style: TextStyle(fontSize: 16)),
-              SizedBox(height: 5),
+              const SizedBox(height: 25),
+              Text(S.of(context).mail, style: const TextStyle(fontSize: 16)),
+              const SizedBox(height: 5),
               CustomTextField(
                 controller: _loginEmailController,
-                labelText: "Email", // Замените на подходящий текст
+                labelText: 'Email',
               ),
-              SizedBox(height: 16),
-              Text(S.of(context).password, style: TextStyle(fontSize: 16)),
-              SizedBox(height: 5),
+              const SizedBox(height: 16),
+              Text(S.of(context).password,
+                  style: const TextStyle(fontSize: 16)),
+              const SizedBox(height: 5),
               CustomTextField(
                 controller: _loginPasswordController,
-                labelText: "Password",
-                isPasswordField: true, // Включение функционала скрытия/отображения пароля
+                labelText: 'Password',
+                isPasswordField: true,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -102,7 +99,8 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                           // });
                         },
                       ),
-                      Text(S.of(context).remember, style: TextStyle(fontSize: 14)),
+                      Text(S.of(context).remember,
+                          style: const TextStyle(fontSize: 14)),
                     ],
                   ),
                   GestureDetector(
@@ -110,12 +108,12 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                       Navigator.push(
                         context,
                         MaterialPageRoute<dynamic>(
-                            builder: (context) => ForgotPassword()),
+                            builder: (context) => const ForgotPassword()),
                       );
                     },
                     child: Text(
                       S.of(context).forgotYourPassword,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14,
                         color: Colors.blue,
                         decoration: TextDecoration.underline,
@@ -124,26 +122,29 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                   ),
                 ],
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               ReusableButton(
                 text: S.of(context).login,
                 onPressed: () => _login(context),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Row(
                 children: [
-                  Expanded(child: Divider(thickness: 1, color: Colors.grey)),
+                  const Expanded(
+                      child: Divider(thickness: 1, color: Colors.grey)),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    child: Text(S.of(context).or, style: TextStyle(color: Colors.grey)),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(S.of(context).or,
+                        style: const TextStyle(color: Colors.grey)),
                   ),
-                  Expanded(child: Divider(thickness: 1, color: Colors.grey)),
+                  const Expanded(
+                      child: Divider(thickness: 1, color: Colors.grey)),
                 ],
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               ElevatedButton.icon(
                 onPressed: () async {
-                  User? user = await signInWithGoogle();
+                  final User? user = await signInWithGoogle();
                   if (user != null) {
                     await addUserToFirestore(user);
                     await Navigator.of(context).pushReplacement(
@@ -152,54 +153,63 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Ошибка входа через Google")),
+                      const SnackBar(
+                          content: Text('Ошибка входа через Google')),
                     );
                   }
                 },
-                icon: Icon(Icons.login, color: Colors.red),
+                icon: const Icon(Icons.login, color: Colors.red),
                 label: Text(S.of(context).continueWithGoogle),
                 style: ElevatedButton.styleFrom(
-                  minimumSize: Size(double.infinity, 50),
+                  minimumSize: const Size(double.infinity, 50),
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.black,
-                  side: BorderSide(color: Colors.grey),
+                  side: const BorderSide(color: Colors.grey),
                   shape: RoundedRectangleBorder(
                     borderRadius:
-                    BorderRadius.circular(10), // Added border radius
+                        BorderRadius.circular(10), // Added border radius
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton.icon(
                 onPressed: () async {
-                  User? user = await signInWithApple();
-                  if (user != null) {
-                    await addUserToFirestore(user);
-                    await Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute<dynamic>(
-                          builder: (_) => MyHomePage(toggleTheme: () {})),
-                    );
-                  } else {
+                  try {
+                    User? user = await signInWithApple();
+                    if (user != null) {
+                      await addUserToFirestore(user);
+                      if (context.mounted) {
+                        await Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute<dynamic>(
+                            builder: (_) => MyHomePage(toggleTheme: () {}),
+                          ),
+                        );
+                      }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Ошибка входа через Apple")),
+                      );
+                    }
+                  } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Ошибка входа через Apple")),
+                      SnackBar(content: Text("Ошибка: $e")),
                     );
                   }
                 },
-                icon: Icon(Icons.apple, color: Colors.black),
+                icon: const Icon(Icons.apple, color: Colors.black),
                 label: Text(S.of(context).continueWithApple),
                 style: ElevatedButton.styleFrom(
-                  minimumSize: Size(double.infinity, 50),
+                  minimumSize: const Size(double.infinity, 50),
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.black,
-                  side: BorderSide(color: Colors.grey),
+                  side: const BorderSide(color: Colors.grey),
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                    BorderRadius.circular(10), // Added border radius
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
             ],
           ),
         ),
@@ -208,22 +218,30 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
   }
 }
 
-
 Future<User?> signInWithGoogle() async {
   final GoogleSignIn googleSignIn = GoogleSignIn();
-  final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-  if (googleUser == null) {
+  try {
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+    if (googleUser == null) {
+      print('Google sign-in cancelled');
+      return null;
+    }
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
+    final OAuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+    final UserCredential userCredential =
+        await FirebaseAuth.instance.signInWithCredential(credential);
+    print('Google sign-in successful: ${userCredential.user?.uid}');
+    return userCredential.user;
+  } catch (e) {
+    print('Error signing in with Google: $e');
     return null;
   }
-  final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-  final OAuthCredential credential = GoogleAuthProvider.credential(
-    accessToken: googleAuth.accessToken,
-    idToken: googleAuth.idToken,
-  );
-  final UserCredential userCredential =
-      await FirebaseAuth.instance.signInWithCredential(credential);
-  return userCredential.user;
 }
+
 
 Future<User?> signInWithApple() async {
   final appleCredential = await SignInWithApple.getAppleIDCredential(
@@ -237,6 +255,6 @@ Future<User?> signInWithApple() async {
     accessToken: appleCredential.authorizationCode,
   );
   final userCredential =
-      await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+  await FirebaseAuth.instance.signInWithCredential(oauthCredential);
   return userCredential.user;
 }

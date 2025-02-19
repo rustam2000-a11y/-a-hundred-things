@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:one_hundred_things/module/home/widget/drawer.dart';
 
 import '../../core/utils/presentation.utils.dart';
 import '../../generated/l10n.dart';
@@ -49,13 +50,14 @@ class MyHomePageState extends State<MyHomePage> {
       bloc: _bloc,
       builder: (context, state) {
         return Scaffold(
+          drawer: const CustomDrawer(),
           backgroundColor: isDarkMode ? AppColors.blackSand : Colors.white,
           body: CustomScrollView(
             slivers: [
-            CustomAppBar(
-            screenWidth: screenWidth,
-            screenHeight: screenHeight,
-            toggleTheme: widget.toggleTheme,
+              CustomAppBar(
+                screenWidth: screenWidth,
+                screenHeight: screenHeight,
+                toggleTheme: widget.toggleTheme,
               ),
               SliverToBoxAdapter(
                 child: SizedBox(
@@ -66,7 +68,7 @@ class MyHomePageState extends State<MyHomePage> {
                 child: Padding(
                   padding: const EdgeInsets.only(left: 16.0),
                   child: Text(
-                  S.of(context).ategories,
+                    S.of(context).ategories,
                     style: const TextStyle(fontSize: 24),
                   ),
                 ),
@@ -265,12 +267,12 @@ Future<void> loadTypeColorsFromFirestore() async {
 }
 
 class _FixedHeaderDelegate extends SliverPersistentHeaderDelegate {
-
   _FixedHeaderDelegate({
     required this.minHeight,
     required this.maxHeight,
     required this.child,
   });
+
   final double minHeight;
   final double maxHeight;
   final Widget child;

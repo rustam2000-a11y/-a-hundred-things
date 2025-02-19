@@ -2,13 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:one_hundred_things/generated/l10n.dart';
-import 'package:one_hundred_things/module/login/widget/text_filed.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import '../../../main.dart';
-import '../../../presentation/colors.dart';
+import '../../../generated/l10n.dart';
 import '../../home/my_home_page.dart';
 import 'button_basic.dart';
+import 'text_filed.dart';
 
 class RegistrationFormWidget extends StatefulWidget {
   const RegistrationFormWidget({super.key});
@@ -50,12 +48,14 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
                   ),
                   textAlign: TextAlign.left),
             ),
-            SizedBox(height: 4,),
+            const SizedBox(
+              height: 4,
+            ),
             CustomTextField(
               controller: _emailController,
               labelText: 'Email',
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Align(
               alignment: Alignment.bottomLeft,
               child: Text(S.of(context).password,
@@ -65,13 +65,15 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
                   ),
                   textAlign: TextAlign.left),
             ),
-            SizedBox(height: 4,),
+            const SizedBox(
+              height: 4,
+            ),
             CustomTextField(
               controller: _passwordController,
-              labelText: "Password",
-              isPasswordField: true, // Включаем скрытие пароля
+              labelText: 'Password',
+              isPasswordField: true,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Align(
               alignment: Alignment.bottomLeft,
               child: Text(S.of(context).dateOfBirth,
@@ -81,18 +83,21 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
                   ),
                   textAlign: TextAlign.left),
             ),
-            SizedBox(height: 4,),
+            const SizedBox(
+              height: 4,
+            ),
             CustomTextField(
               controller: _birthdayController,
-              labelText: "Date of birth",
+              labelText: 'Date of birth',
             ),
-            SizedBox(height: 18),
+            const SizedBox(height: 18),
             ReusableButton(
               text: 'Register',
               onPressed: () async {
                 try {
-                  final UserCredential userCredential =
-                  await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                  final UserCredential userCredential = await FirebaseAuth
+                      .instance
+                      .createUserWithEmailAndPassword(
                     email: _emailController.text.trim(),
                     password: _passwordController.text.trim(),
                   );
@@ -109,23 +114,27 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
                 }
               },
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Row(
               children: [
-                Expanded(child: Divider(thickness: 1, color: Colors.grey)),
+                const Expanded(
+                    child: Divider(thickness: 1, color: Colors.grey)),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Text(S.of(context).or, style: TextStyle(color: Colors.grey)),
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Text(S.of(context).or,
+                      style: const TextStyle(color: Colors.grey)),
                 ),
-                Expanded(child: Divider(thickness: 1, color: Colors.grey)),
+                const Expanded(
+                    child: Divider(thickness: 1, color: Colors.grey)),
               ],
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: () async {
-                User? user = await signInWithGoogle();
+                final User? user = await signInWithGoogle();
                 if (user != null) {
                   await addUserToFirestore(user);
+
                   await Navigator.pushReplacement(
                     context,
                     MaterialPageRoute<dynamic>(
@@ -133,53 +142,62 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Ошибка входа через Google")),
+                    const SnackBar(content: Text('Ошибка входа через Google')),
                   );
                 }
               },
-              icon: Icon(Icons.login, color: Colors.red),
+              icon: const Icon(Icons.login, color: Colors.red),
               label: Text(S.of(context).continueWithGoogle),
               style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50),
+                minimumSize: const Size(double.infinity, 50),
                 backgroundColor: Colors.white,
                 foregroundColor: Colors.black,
-                side: BorderSide(color: Colors.grey),
+                side: const BorderSide(color: Colors.grey),
                 shape: RoundedRectangleBorder(
                   borderRadius:
-                  BorderRadius.circular(10), // Added border radius
+                      BorderRadius.circular(10), // Added border radius
                 ),
               ),
             ),
-            SizedBox(height: 15),
+            const SizedBox(height: 15),
             ElevatedButton.icon(
               onPressed: () async {
-                User? user = await signInWithApple();
-                if (user != null) {
-                  await addUserToFirestore(user);
-                  await Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute<dynamic>(
-                        builder: (_) => MyHomePage(toggleTheme: () {})),
-                  );
-                } else {
+                try {
+                  User? user = await signInWithApple();
+                  if (user != null) {
+                    await addUserToFirestore(user);
+                    if (context.mounted) {
+                      await Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute<dynamic>(
+                          builder: (_) => MyHomePage(toggleTheme: () {}),
+                        ),
+                      );
+                    }
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Ошибка входа через Apple")),
+                    );
+                  }
+                } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Ошибка входа через Apple")),
+                    SnackBar(content: Text("Ошибка: $e")),
                   );
                 }
               },
-              icon: Icon(Icons.apple, color: Colors.black),
+              icon: const Icon(Icons.apple, color: Colors.black),
               label: Text(S.of(context).continueWithApple),
               style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50),
+                minimumSize: const Size(double.infinity, 50),
                 backgroundColor: Colors.white,
                 foregroundColor: Colors.black,
-                side: BorderSide(color: Colors.grey),
+                side: const BorderSide(color: Colors.grey),
                 shape: RoundedRectangleBorder(
-                  borderRadius:
-                  BorderRadius.circular(10), // Added border radius
+                  borderRadius: BorderRadius.circular(10),
                 ),
               ),
             ),
+
           ],
         ),
       ),
@@ -189,19 +207,38 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
 
 Future<User?> signInWithGoogle() async {
   final GoogleSignIn googleSignIn = GoogleSignIn();
-  final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-  if (googleUser == null) {
+  try {
+    await googleSignIn.signOut();
+    await FirebaseAuth.instance.signOut();
+
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+    if (googleUser == null) {
+      print('Google sign-in cancelled');
+      return null;
+    }
+
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
+
+    if (googleAuth.accessToken == null || googleAuth.idToken == null) {
+      print('Google Sign-In token is null');
+      return null;
+    }
+
+    final OAuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    final UserCredential userCredential =
+        await FirebaseAuth.instance.signInWithCredential(credential);
+
+    print('Google sign-in successful: ${userCredential.user?.uid}');
+    return userCredential.user;
+  } catch (e) {
+    print('Error signing in with Google: $e');
     return null;
   }
-  final GoogleSignInAuthentication googleAuth =
-  await googleUser.authentication;
-  final OAuthCredential credential = GoogleAuthProvider.credential(
-    accessToken: googleAuth.accessToken,
-    idToken: googleAuth.idToken,
-  );
-  final UserCredential userCredential =
-  await FirebaseAuth.instance.signInWithCredential(credential);
-  return userCredential.user;
 }
 
 Future<User?> signInWithApple() async {
@@ -216,6 +253,6 @@ Future<User?> signInWithApple() async {
     accessToken: appleCredential.authorizationCode,
   );
   final userCredential =
-  await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+      await FirebaseAuth.instance.signInWithCredential(oauthCredential);
   return userCredential.user;
 }

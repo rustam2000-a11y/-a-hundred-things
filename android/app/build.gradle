@@ -21,11 +21,12 @@ android {
     compileSdk = 34 // Указано конкретное значение для compileSdk
 
     defaultConfig {
-        applicationId "com.example.one_hundred_things" // Исправлено на корректное имя пакета
+        applicationId "com.example.one_hundred_things"
         minSdk = 23
-        targetSdk = 34 // Указано конкретное значение для targetSdk
+        targetSdk = 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        multiDexEnabled true // ✅ Добавляем поддержку multiDex
     }
 
     compileOptions {
@@ -46,4 +47,6 @@ flutter {
 
 dependencies {
     implementation platform('com.google.firebase:firebase-bom:33.4.0') // Обновленная версия Firebase BoM
+    implementation 'androidx.multidex:multidex:2.0.1' // ✅ Добавляем multiDex
 }
+apply plugin: 'com.google.gms.google-services'

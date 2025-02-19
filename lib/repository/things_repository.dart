@@ -29,6 +29,16 @@ class ThingsRepository implements ThingsRepositoryI {
   Future<void> deleteItemByUid(String uid) async {
     return _baseDataApi.deleteItemByUid(uid);
   }
+  @override
+  Stream<List<ThingsModel>> searchThingsByTitle(String searchQuery) {
+    final searchStreamController = BehaviorSubject<String>();
+    searchStreamController.add(searchQuery);
+
+
+    return searchStreamController.switchMap(
+          (query) => _baseDataApi.searchThingsByTitle(query),
+    );
+  }
 
   @disposeMethod
   @override
@@ -45,4 +55,6 @@ abstract class ThingsRepositoryI {
   Future<void> deleteThingsByType(String type);
 
   Future<void> deleteItemByUid(String uid);
+
+  Stream<List<ThingsModel>> searchThingsByTitle(String searchQuery);
 }

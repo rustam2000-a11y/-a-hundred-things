@@ -37,6 +37,23 @@ class BaseDataApi implements BaseDataApiI {
           ),
     );
   }
+  @override
+  Stream<List<ThingsModel>> searchThingsByTitle(String searchQuery) {
+    return FirebaseFirestore.instance
+        .collection('item')
+        .where('userId', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs
+          .where((item) {
+        final title = (item['title'] as String?)?.toLowerCase() ?? '';
+        return title.contains(searchQuery);
+      })
+          .map((doc) => ThingsModel.fromJson(doc.data()).copyWith(id: doc.id))
+          .toList();
+    });
+  }
+
 
   @override
   Future<void> deleteThingsByType(String type) async {
@@ -54,7 +71,10 @@ class BaseDataApi implements BaseDataApiI {
   Future<void> deleteItemByUid(String uid) async {
     await databaseReference.collection('item').doc(uid).delete();
   }
+
+
 }
+
 
 abstract class BaseDataApiI {
   Future<String> getCurrentUserUid();
@@ -66,4 +86,6 @@ abstract class BaseDataApiI {
   Future<void> deleteThingsByType(String type);
 
   Future<void> deleteItemByUid(String uid);
+
+  Stream<List<ThingsModel>> searchThingsByTitle(String searchQuery);
 }

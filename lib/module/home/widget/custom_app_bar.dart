@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import '../../../presentation/colors.dart';
+import '../../../repository/things_repository.dart';
 import '../../settings/widget/user_profile_screen.dart';
 import 'icon_home.dart';
 import 'show_search_bottom_sheet.dart';
@@ -14,6 +17,7 @@ class CustomAppBar extends StatelessWidget {
     required this.screenWidth,
     required this.screenHeight,
     required this.toggleTheme,
+
   }) : super(key: key);
   final double screenWidth;
   final double screenHeight;
@@ -22,7 +26,7 @@ class CustomAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
+    final repository = GetIt.instance<ThingsRepositoryI>();
     return SliverAppBar(
       pinned: true,
       expandedHeight: screenHeight * 0.21,
@@ -78,24 +82,19 @@ class CustomAppBar extends StatelessWidget {
                         ReusableIconButton(
                           icon: Icons.search_rounded,
                           onPressed: () {
-                            showSearchBottomSheet(context);
+                            // Получение экземпляра ThingsRepositoryI через DI
+                            showSearchBottomSheet(context, repository);
                           },
                           screenWidth: screenWidth,
                           borderRadius: 10,
                         ),
+
                         const SizedBox(width: 4),
                         const SizedBox(width: 10),
                         ReusableIconButton(
                           icon: Icons.more_vert,
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute<dynamic>(
-                                builder: (context) => UserProfileScreen(
-                                  toggleTheme: toggleTheme,
-                                ),
-                              ),
-                            );
+                            Scaffold.of(context).openDrawer();
                           },
                           screenWidth: screenWidth,
                           borderRadius: 10,
