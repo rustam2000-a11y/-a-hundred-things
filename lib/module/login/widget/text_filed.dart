@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import '../../../presentation/colors.dart';
 
 class CustomTextField extends StatefulWidget {
-  final TextEditingController controller;
-  final String labelText;
-  final bool isPasswordField;
-  final double? height; // Высота текстового поля
-
   const CustomTextField({
     Key? key,
     required this.controller,
-    required this.labelText,
-    this.isPasswordField = false, // По умолчанию это не поле для пароля
-    this.height, // Высота может быть задана или null
+     this.hintText,
+    this.isPasswordField = false,
+    this.height,
   }) : super(key: key);
+
+  final TextEditingController controller;
+  final Widget? hintText;
+  final bool isPasswordField;
+  final double? height;
 
   @override
   _CustomTextFieldState createState() => _CustomTextFieldState();
@@ -27,47 +27,60 @@ class _CustomTextFieldState extends State<CustomTextField> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return SizedBox(
-      height: widget.height, // Используем высоту, если она задана
-      child: TextField(
-        controller: widget.controller,
-        obscureText: widget.isPasswordField && _isObscured, // Скрытие текста
-        decoration: InputDecoration(
-          labelText: widget.labelText,
-          labelStyle: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.grey[400],
-          ),
-          filled: true,
-          fillColor: Colors.transparent, // Прозрачный фон текстового поля
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(
-              color: isDarkMode
-                  ? AppColors.blueGradient.colors.first // Цвет для темной темы
-                  : Colors.grey[400]!, // Цвет для светлой темы
+      height: widget.height ?? 60,
+      child: Stack(
+        children: [
+          TextField(
+            controller: widget.controller,
+            obscureText: widget.isPasswordField && _isObscured,
+            style: const TextStyle(color: Colors.black),
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              filled: true,
+              fillColor: Colors.transparent,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(4),
+                borderSide: BorderSide(
+                  color: isDarkMode ? Colors.black : Colors.black,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(4),
+                borderSide: BorderSide(
+                  color: isDarkMode
+                      ? AppColors.blueGradient.colors.first
+                      : Colors.black,
+                ),
+              ),
+              suffixIcon: widget.isPasswordField
+                  ? IconButton(
+                icon: Icon(
+                  size: 12,
+                  _isObscured ? Icons.visibility_off : Icons.visibility,
+                  color: isDarkMode
+                      ? Colors.white
+                      : AppColors.mutedBlueGrey,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _isObscured = !_isObscured;
+                  });
+                },
+              )
+                  : null,
             ),
           ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(
-              color: isDarkMode
-                  ? AppColors.blueGradient.colors.first // Цвет фокуса для темной темы
-                  : Colors.grey.shade600, // Цвет фокуса для светлой темы
+          Positioned(
+            left: 12,
+            top: 12,
+            child: IgnorePointer(
+              child: Opacity(
+                opacity: widget.controller.text.isEmpty ? 0.5 : 0,
+                child: widget.hintText,
+              ),
             ),
           ),
-          suffixIcon: widget.isPasswordField
-              ? IconButton(
-            icon: Icon(
-              _isObscured ? Icons.visibility : Icons.visibility_off,
-              color: isDarkMode ? Colors.white : Colors.grey[400],
-            ),
-            onPressed: () {
-              setState(() {
-                _isObscured = !_isObscured;
-              });
-            },
-          )
-              : null,
-        ),
+        ],
       ),
     );
   }

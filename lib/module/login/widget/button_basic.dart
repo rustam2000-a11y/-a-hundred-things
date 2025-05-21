@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../presentation/colors.dart'; // Путь к вашему файлу с цветами
 
 abstract class CustomButton {
   String get text;
@@ -7,43 +6,40 @@ abstract class CustomButton {
 }
 
 class ReusableButton extends StatelessWidget implements CustomButton {
-  @override
-  final String text;
-
-  @override
-  final VoidCallback onPressed;
 
   const ReusableButton({
     required this.text,
     required this.onPressed,
     Key? key,
   }) : super(key: key);
+  @override
+  final String text;
+
+  @override
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    // Использование одинаковой ширины, как у текстовых полей
-    final double buttonWidth = MediaQuery.of(context).size.width * 0.9;
+
+    const double buttonWidth = double.infinity;
 
     return Align(
-      alignment: Alignment.center,
       child: Container(
-        width: buttonWidth, // Используем фиксированную ширину
+        width: buttonWidth,
         decoration: BoxDecoration(
-          gradient: isDarkMode ? AppColors.blueGradient : null, // Градиент для тёмной темы
-          color: isDarkMode ? null : Colors.blueAccent, // Цвет для светлой темы
-          borderRadius: BorderRadius.circular(10),
+
+          color: isDarkMode ? null :Colors.black ,
+          borderRadius: BorderRadius.circular(4),
         ),
         child: ElevatedButton(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
             elevation: 0,
-            backgroundColor: Colors.transparent, // Прозрачный фон для ElevatedButton
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            padding: EdgeInsets.symmetric(vertical: 15), // Высота кнопки
+            backgroundColor: Colors.transparent,
+
+            padding: const EdgeInsets.symmetric(vertical: 14),
           ),
           child: Text(
             text,
@@ -54,3 +50,47 @@ class ReusableButton extends StatelessWidget implements CustomButton {
     );
   }
 }
+
+
+
+class CustomButtonRegist extends StatelessWidget {
+
+  const CustomButtonRegist({
+    super.key,
+    required this.text,
+    required this.icon,
+    required this.onPressed,
+    this.textColor = Colors.black,
+    this.backgroundColor = Colors.transparent,
+    this.borderRadius = 4,
+  });
+  final String text;
+  final IconData icon;
+  final VoidCallback onPressed;
+  final Color textColor;
+  final Color backgroundColor;
+  final double borderRadius;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, color: textColor),
+      label: Text(
+        text,
+        style: TextStyle(color: textColor),
+      ),
+      style: ElevatedButton.styleFrom(
+        minimumSize: const Size(double.infinity, 50),
+        backgroundColor: backgroundColor,
+        foregroundColor: textColor,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(borderRadius),
+          side: const BorderSide(color: Colors.black),
+        ),
+      ),
+    );
+  }
+}
+

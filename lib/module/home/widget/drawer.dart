@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../../presentation/colors.dart';
-import '../../login/login_page.dart';
+import '../../login/screen/login_screen.dart';
 import '../../settings/widget/user_profile_screen.dart';
 import 'custom_divider.dart';
 import 'custom_list_tile.dart';
