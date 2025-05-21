@@ -9,13 +9,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'core/di/service_locator.dart';
 import 'generated/l10n.dart';
 import 'module/home/my_home_page.dart';
-import 'module/login/login_page.dart';
+import 'module/login/screen/login_screen.dart';
 import 'presentation/colors.dart';
+import 'presentation/them/dark_theme.dart';
 
   void main() async {
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp();
-    await loadTypeColorsFromFirestore(); // Загружаем цвета типов
+    await loadTypeColorsFromFirestore();
     configureDependencies();
     runApp(
       const MyApp(),
@@ -36,14 +37,14 @@ import 'presentation/colors.dart';
     @override
     void initState() {
       super.initState();
-      _loadThemePreference(); // Загрузка сохраненной темы при запуске
+      _loadThemePreference();
     }
 
     Future<void> toggleTheme() async {
       setState(() {
         themeMode = themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
       });
-      await saveThemePreference(); // Сохранение текущей темы
+      await saveThemePreference();
     }
 
     Future<void> saveThemePreference() async {
@@ -52,14 +53,13 @@ import 'presentation/colors.dart';
     }
 
     Future<void> _loadThemePreference() async {
-
-      runApp(MyApp());
       final prefs = await SharedPreferences.getInstance();
       final savedTheme = prefs.getString('themeMode') ?? 'Light';
       setState(() {
         themeMode = savedTheme == 'Dark' ? ThemeMode.dark : ThemeMode.light;
       });
     }
+
 
     @override
     Widget build(BuildContext context) {
@@ -68,15 +68,14 @@ import 'presentation/colors.dart';
         theme: ThemeData(
           fontFamily: 'Roboto',
           primarySwatch: Colors.blue,
-          primaryColor: AppColors.silverColor,
-          scaffoldBackgroundColor: AppColors.silverColor,
-          appBarTheme: const AppBarTheme(color: AppColors.royalBlue),
+          primaryColor: Colors.white,
+          scaffoldBackgroundColor: Colors.white,
+          appBarTheme: const AppBarTheme(color:  Colors.white,),
           elevatedButtonTheme: ElevatedButtonThemeData(
-            style:
-            ElevatedButton.styleFrom(backgroundColor: AppColors.silverColor),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.silverColor),
           ),
         ),
-        darkTheme: ThemeData.dark(),
+        darkTheme: darkTheme,
         themeMode: themeMode,
         locale: const Locale('en'),
         supportedLocales: S.delegate.supportedLocales,
@@ -85,13 +84,14 @@ import 'presentation/colors.dart';
         ],
         home: AuthCheck(toggleTheme: toggleTheme),
       );
+
     }
   }
 
   class AuthCheck extends StatelessWidget {
-    final VoidCallback toggleTheme;
 
     const AuthCheck({super.key, required this.toggleTheme});
+    final VoidCallback toggleTheme;
     @override
     Widget build(BuildContext context) {
       return StreamBuilder<User?>(
@@ -105,7 +105,7 @@ import 'presentation/colors.dart';
               return MyHomePage(toggleTheme: toggleTheme);
             }
           } else {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
         },
       );
