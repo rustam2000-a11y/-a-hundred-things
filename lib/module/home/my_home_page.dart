@@ -1,20 +1,17 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:one_hundred_things/module/home/widget/drawer.dart';
-
 import '../../core/utils/presentation.utils.dart';
 import '../../generated/l10n.dart';
 import '../../presentation/colors.dart';
 import 'home_bloc.dart';
 import 'widget/category_card_widget.dart';
-import 'widget/custom_app_bar.dart';
+import 'widget/drawer.dart';
+import 'widget/new_custom_app_bar.dart';
 import 'widget/show_add_item_bottom_sheet.dart';
 import 'widget/things_card_item.dart';
-
 export 'my_home_page.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -27,8 +24,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class MyHomePageState extends State<MyHomePage> {
-  bool isLoading = false;
-  List<String> selectedItems = [];
   String? _selectedCategoryType;
   late HomeBloc _bloc;
   ValueNotifier<List<String>> selectedItemsNotifier = ValueNotifier([]);
@@ -42,8 +37,6 @@ class MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return BlocBuilder<HomeBloc, HomeState>(
@@ -52,130 +45,82 @@ class MyHomePageState extends State<MyHomePage> {
         return Scaffold(
           drawer: const CustomDrawer(),
           backgroundColor: isDarkMode ? AppColors.blackSand : Colors.white,
-          body: CustomScrollView(
-            slivers: [
-              CustomAppBar(
-                screenWidth: screenWidth,
-                screenHeight: screenHeight,
-                toggleTheme: widget.toggleTheme,
-              ),
-              SliverToBoxAdapter(
-                child: SizedBox(
-                  height: screenHeight * 0.03,
+          appBar: const NewCustomAppBar(
+            showBackButton :false,
+          ),
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  S.of(context).ategories,
+                  style: const TextStyle(fontSize: 24),
                 ),
               ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 16.0),
-                  child: Text(
-                    S.of(context).ategories,
-                    style: const TextStyle(fontSize: 24),
-                  ),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 50,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.only(left: 16),
+                  children: state.typesWithColors.entries.map((entry) {
+                    final type = entry.key;
+                    final color = entry.value.isEmpty
+                        ? PresentationUtils.getRandomColor()
+                        : entry.value;
+                    return CategoryCardWidget(
+                      selectedCategoryType: _selectedCategoryType,
+                      onChangeCategory: (String? category) {
+                        setState(() {
+                          if (_selectedCategoryType == category) {
+                            _selectedCategoryType = null;
+                          } else {
+                            _selectedCategoryType = category;
+                          }
+                          _bloc.add(HomeSelectTypeThingsEvent(
+                              selectedTypeThings: _selectedCategoryType));
+                        });
+                      },
+                      onDeleteThings: () {
+                        _bloc.add(DeleteThingsByTypeEvent(type: type));
+                      },
+                      isDarkMode: isDarkMode,
+                      color: color,
+                      type: type,
+                    );
+                  }).toList(),
                 ),
               ),
-              SliverToBoxAdapter(
-                child: SizedBox(
-                  height: screenHeight * 0.02,
-                ),
-              ),
-              SliverPersistentHeader(
-                pinned: true,
-                delegate: _FixedHeaderDelegate(
-                  minHeight: 50,
-                  maxHeight: 50,
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Container(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? AppColors.blackSand
-                            : Colors.white,
+              const SizedBox(height: 12),
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: state.things.length,
+                  itemBuilder: (context, index) {
+                    final item = state.things[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: ThingsCardWidget(
+                        itemId: item.id,
+                        title: item.title,
+                        description: item.description,
+                        type: item.type,
+                        color: item.color,
+                        imageUrl: item.imageUrl,
+                        selectedCategoryType: _selectedCategoryType,
+                        onStateUpdate: () {
+                          setState(() {});
+                        },
+                        quantity: item.quantity,
+                        onDeleteItem: () {
+                          _bloc.add(DeleteItemByUidEvent(uid: item.id));
+                        },
+                        selectedItemsNotifier: selectedItemsNotifier,
                       ),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: ListView(
-                          scrollDirection: Axis.horizontal,
-                          padding: EdgeInsets.only(
-                              left: MediaQuery.of(context).size.width * 0.02),
-                          children: state.typesWithColors.entries.map((entry) {
-                            final type = entry.key;
-                            final color = entry.value.isEmpty
-                                ? PresentationUtils.getRandomColor()
-                                : entry.value;
-                            return CategoryCardWidget(
-                              selectedCategoryType: _selectedCategoryType,
-                              onChangeCategory: (String? category) {
-                                setState(() {
-                                  if (_selectedCategoryType == category) {
-                                    _selectedCategoryType = null;
-                                    _bloc.add(HomeSelectTypeThingsEvent(
-                                        selectedTypeThings:
-                                            _selectedCategoryType));
-                                  } else {
-                                    _selectedCategoryType = category;
-                                    _bloc.add(HomeSelectTypeThingsEvent(
-                                        selectedTypeThings:
-                                            _selectedCategoryType));
-                                  }
-                                });
-                              },
-                              onDeleteThings: () {
-                                _bloc.add(DeleteThingsByTypeEvent(type: type));
-                              },
-                              isDarkMode: isDarkMode,
-                              color: color,
-                              type: type,
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SliverFillRemaining(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    top: screenHeight * 0.02,
-                  ).add(
-                    EdgeInsets.symmetric(
-                      horizontal: screenWidth * 0.02,
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: ListView.builder(
-                          padding: EdgeInsets.zero,
-                          itemCount: state.things.length,
-                          itemBuilder: (context, index) {
-                            final item = state.things[index];
-                            return Padding(
-                                padding: EdgeInsets.only(
-                                    bottom: screenHeight * 0.01),
-                                child: ThingsCardWidget(
-                                  itemId: item.id,
-                                  title: item.title,
-                                  description: item.description,
-                                  type: item.type,
-                                  color: item.color,
-                                  imageUrl: item.imageUrl,
-                                  selectedCategoryType: _selectedCategoryType,
-                                  onStateUpdate: () {
-                                    setState(() {});
-                                  },
-                                  quantity: item.quantity,
-                                  onDeleteItem: () {
-                                    _bloc.add(
-                                        DeleteItemByUidEvent(uid: item.id));
-                                  },
-                                  selectedItemsNotifier: selectedItemsNotifier,
-                                ));
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
               ),
             ],
@@ -189,41 +134,41 @@ class MyHomePageState extends State<MyHomePage> {
 
                 return selectedItems.isNotEmpty
                     ? FloatingActionButton(
-                        onPressed: () {
-                          deleteSelectedItems(context);
-                        },
-                        backgroundColor: Colors.redAccent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(Icons.delete),
-                      )
+                  onPressed: () {
+                    deleteSelectedItems(context);
+                  },
+                  backgroundColor: Colors.redAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.delete),
+                )
                     : Container(
-                        width: 60,
-                        height: 60,
-                        decoration: isDarkTheme
-                            ? BoxDecoration(
-                                gradient: AppColors.blueGradient,
-                                borderRadius: BorderRadius.circular(10),
-                              )
-                            : null,
-                        child: FloatingActionButton(
-                          onPressed: () {
-                            showAddItemBottomSheet(context);
-                          },
-                          backgroundColor: isDarkMode
-                              ? Colors.transparent
-                              : AppColors.orangeSand,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          elevation: 0,
-                          child: const Icon(
-                            Icons.add,
-                            color: Colors.white,
-                          ),
-                        ),
-                      );
+                  width: 60,
+                  height: 60,
+                  decoration: isDarkTheme
+                      ? BoxDecoration(
+                    gradient: AppColors.blueGradient,
+                    borderRadius: BorderRadius.circular(10),
+                  )
+                      : null,
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      showAddItemBottomSheet(context);
+                    },
+                    backgroundColor: isDarkMode
+                        ? Colors.transparent
+                        : AppColors.orangeSand,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    elevation: 0,
+                    child: const Icon(
+                      Icons.add,
+                      color: Colors.white,
+                    ),
+                  ),
+                );
               },
             ),
           ),
@@ -251,6 +196,10 @@ class MyHomePageState extends State<MyHomePage> {
     }
   }
 }
+
+
+
+
 
 Future<void> loadTypeColorsFromFirestore() async {
   final querySnapshot =
