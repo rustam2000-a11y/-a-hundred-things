@@ -28,6 +28,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "aboutUs": MessageLookupByLibrary.simpleMessage("About Us"),
         "accountSettings":
             MessageLookupByLibrary.simpleMessage("Account settings"),
+        "appleSignInError":
+            MessageLookupByLibrary.simpleMessage("Apple Sign In Error"),
         "applicationLanguage":
             MessageLookupByLibrary.simpleMessage("Application language"),
         "ategories": MessageLookupByLibrary.simpleMessage("Categories"),
@@ -42,6 +44,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "description": MessageLookupByLibrary.simpleMessage("Descriptionа"),
         "editProfile": MessageLookupByLibrary.simpleMessage("Edit profile"),
         "email": MessageLookupByLibrary.simpleMessage("Email"),
+        "emailAdderss": MessageLookupByLibrary.simpleMessage("Email Adderss"),
         "enterAName": MessageLookupByLibrary.simpleMessage("Enter a name"),
         "enterName": MessageLookupByLibrary.simpleMessage("Enter name"),
         "enterNumber": MessageLookupByLibrary.simpleMessage("Enter number"),
@@ -54,7 +57,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "login": MessageLookupByLibrary.simpleMessage("Login"),
         "mail": MessageLookupByLibrary.simpleMessage("Mail"),
         "name": MessageLookupByLibrary.simpleMessage("Name"),
+        "next": MessageLookupByLibrary.simpleMessage("NEXT"),
         "number": MessageLookupByLibrary.simpleMessage("Number"),
+        "openEmail": MessageLookupByLibrary.simpleMessage("Open Email"),
         "or": MessageLookupByLibrary.simpleMessage("or"),
         "password": MessageLookupByLibrary.simpleMessage("Password"),
         "pleaseEnterYourEmailAddressToResetYourPassword":

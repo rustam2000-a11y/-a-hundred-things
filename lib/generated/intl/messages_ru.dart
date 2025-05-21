@@ -28,6 +28,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "aboutUs": MessageLookupByLibrary.simpleMessage("О нас"),
         "accountSettings":
             MessageLookupByLibrary.simpleMessage("Настройки учетной записи"),
+        "appleSignInError":
+            MessageLookupByLibrary.simpleMessage("Apple Sign In Error"),
         "applicationLanguage":
             MessageLookupByLibrary.simpleMessage("Язык приложения"),
         "ategories": MessageLookupByLibrary.simpleMessage("Категории"),
@@ -55,6 +57,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "mail": MessageLookupByLibrary.simpleMessage("Почта"),
         "name": MessageLookupByLibrary.simpleMessage("Имя"),
         "number": MessageLookupByLibrary.simpleMessage("Номер"),
+        "openEmail": MessageLookupByLibrary.simpleMessage("Open Email"),
         "or": MessageLookupByLibrary.simpleMessage("или"),
         "password": MessageLookupByLibrary.simpleMessage("Пароль"),
         "pleaseEnterYourEmailAddressToResetYourPassword":

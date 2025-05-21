@@ -41,5 +41,9 @@
   "number": "Number",
   "enterNumber": "Enter number",
   "enterYourPassword": "Enter your password",
-  "ategories": "Categories"
+  "ategories": "Categories",
+  "emailAdderss": "Email Adderss",
+  "next": "NEXT",
+  "openEmail": "Open Email",
+  "appleSignInError": "Apple Sign In Error"
 }
