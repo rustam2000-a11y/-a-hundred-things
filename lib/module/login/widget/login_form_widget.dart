@@ -2,12 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:one_hundred_things/module/login/widget/registration_form_widget.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../../generated/l10n.dart';
+import '../../../presentation/colors.dart';
 import '../../home/my_home_page.dart';
+import '../screen/forgot_inform_screen.dart';
+import '../screen/registration_screen.dart';
 import 'button_basic.dart';
-import 'forgot_widget.dart';
+import 'custom_divider.dart';
+import 'custom_text.dart';
 import 'text_filed.dart';
 
 class LoginFormWidget extends StatefulWidget {
@@ -18,7 +21,6 @@ class LoginFormWidget extends StatefulWidget {
 }
 
 class _LoginFormWidgetState extends State<LoginFormWidget> {
-  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _birthdayController = TextEditingController();
   final TextEditingController _loginEmailController = TextEditingController();
@@ -31,7 +33,6 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
         'email': user.email ?? 'No Email',
         'birthday': _birthdayController.text.trim(),
         'password': _passwordController.text.trim(),
-        // Store password securely (for demo purposes only)
       });
     }
   }
@@ -51,166 +52,155 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
+        SnackBar(content: Text('Error: $e')),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     return Expanded(
       child: SingleChildScrollView(
         child: ConstrainedBox(
           constraints: BoxConstraints(
             minHeight: MediaQuery.of(context).size.height,
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 25),
-              Text(S.of(context).mail, style: const TextStyle(fontSize: 16)),
-              const SizedBox(height: 5),
-              CustomTextField(
-                controller: _loginEmailController,
-                labelText: 'Email',
-              ),
-              const SizedBox(height: 16),
-              Text(S.of(context).password,
-                  style: const TextStyle(fontSize: 16)),
-              const SizedBox(height: 5),
-              CustomTextField(
-                controller: _loginPasswordController,
-                labelText: 'Password',
-                isPasswordField: true,
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: false,
-                        onChanged: (value) {
-                          // setState(() {
-                          //   _rememberMe = value!;
-                          // });
-                        },
-                      ),
-                      Text(S.of(context).remember,
-                          style: const TextStyle(fontSize: 14)),
-                    ],
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute<dynamic>(
-                            builder: (context) => const ForgotPassword()),
-                      );
-                    },
-                    child: Text(
-                      S.of(context).forgotYourPassword,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.blue,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              ReusableButton(
-                text: S.of(context).login,
-                onPressed: () => _login(context),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  const Expanded(
-                      child: Divider(thickness: 1, color: Colors.grey)),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Text(S.of(context).or,
-                        style: const TextStyle(color: Colors.grey)),
-                  ),
-                  const Expanded(
-                      child: Divider(thickness: 1, color: Colors.grey)),
-                ],
-              ),
-              const SizedBox(height: 30),
-              ElevatedButton.icon(
-                onPressed: () async {
-                  final User? user = await signInWithGoogle();
-                  if (user != null) {
-                    await addUserToFirestore(user);
-                    await Navigator.of(context).pushReplacement(
-                      MaterialPageRoute<dynamic>(
-                          builder: (_) => MyHomePage(toggleTheme: () {})),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Ошибка входа через Google')),
-                    );
-                  }
-                },
-                icon: const Icon(Icons.login, color: Colors.red),
-                label: Text(S.of(context).continueWithGoogle),
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 50),
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  side: const BorderSide(color: Colors.grey),
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(10), // Added border radius
-                  ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(
+                  height: 64,
                 ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                onPressed: () async {
-                  try {
-                    User? user = await signInWithApple();
-                    if (user != null) {
-                      await addUserToFirestore(user);
-                      if (context.mounted) {
-                        await Navigator.pushReplacement(
+                const CustomText(text: 'LOGIN'),
+                const SizedBox(
+                  height: 64,
+                ),
+                CustomText3(
+                  text: S.of(context).mail,
+                ),
+                const SizedBox(height: 5),
+                CustomTextField(
+                  controller: _loginEmailController,
+                ),
+                const SizedBox(height: 16),
+                CustomText3(
+                  text: S.of(context).password,
+                ),
+                const SizedBox(height: 5),
+                CustomTextField(
+                  controller: _loginPasswordController,
+                  // ),
+                  isPasswordField: true,
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: false,
+                          onChanged: (value) {
+                            // setState(() {
+                            //   _rememberMe = value!;
+                            // });
+                          },
+                        ),
+                        CustomText2(
+                          text: S.of(context).remember,
+                          color: AppColors.grey,
+                        ),
+                      ],
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
                           context,
                           MaterialPageRoute<dynamic>(
-                            builder: (_) => MyHomePage(toggleTheme: () {}),
-                          ),
+                              builder: (context) => const ForgotInfoScreen()),
                         );
-                      }
+                      },
+                      child: CustomText2(
+                          text: S.of(context).forgotYourPassword,
+                          underline: true),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                ReusableButton(
+                  text: S.of(context).login,
+                  onPressed: () => _login(context),
+                ),
+                const SizedBox(height: 16),
+                DividerWithText(text: S.of(context).or),
+                const SizedBox(height: 30),
+                CustomButtonRegist(
+                  text: S.of(context).continueWithGoogle,
+                  icon: Icons.login,
+                  onPressed: () async {
+                    final User? user = await signInWithGoogle();
+                    if (user != null) {
+                      await addUserToFirestore(user);
+                      await Navigator.of(context).pushReplacement(
+                        MaterialPageRoute<dynamic>(
+                            builder: (_) => MyHomePage(toggleTheme: () {})),
+                      );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Ошибка входа через Apple")),
+                        const SnackBar(
+                            content: Text('Ошибка входа через Google')),
                       );
                     }
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Ошибка: $e")),
+                  },
+                ),
+                const SizedBox(height: 20),
+                CustomButtonRegist(
+                  text: S.of(context).continueWithApple,
+                  icon: Icons.apple,
+                  onPressed: () async {
+                    try {
+                      final User? user = await signInWithApple();
+                      if (user != null) {
+                        await addUserToFirestore(user);
+                        if (context.mounted) {
+                          await Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute<dynamic>(
+                              builder: (_) => MyHomePage(toggleTheme: () {}),
+                            ),
+                          );
+                        }
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                           SnackBar(content: Text(S.of(context).appleSignInError)),
+                        );
+                      }
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('error: $e')),
+                      );
+                    }
+                  },
+                ),
+                const SizedBox(height: 40),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push<void>(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (context) => const RegistrationScreen(),
+                      ),
                     );
-                  }
-                },
-                icon: const Icon(Icons.apple, color: Colors.black),
-                label: Text(S.of(context).continueWithApple),
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 50),
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  side: const BorderSide(color: Colors.grey),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                  },
+                  child: const CustomText2(
+                    text: 'Create My Profile',
+                    underline: true,
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -242,7 +232,6 @@ Future<User?> signInWithGoogle() async {
   }
 }
 
-
 Future<User?> signInWithApple() async {
   final appleCredential = await SignInWithApple.getAppleIDCredential(
     scopes: [
@@ -250,11 +239,11 @@ Future<User?> signInWithApple() async {
       AppleIDAuthorizationScopes.email
     ],
   );
-  final oauthCredential = OAuthProvider("apple.com").credential(
+  final oauthCredential = OAuthProvider('apple.com').credential(
     idToken: appleCredential.identityToken,
     accessToken: appleCredential.authorizationCode,
   );
   final userCredential =
-  await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+      await FirebaseAuth.instance.signInWithCredential(oauthCredential);
   return userCredential.user;
 }

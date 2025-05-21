@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import '../../../generated/l10n.dart';
 import '../../../presentation/colors.dart';
+import '../../login/widget/custom_text.dart';
 import '../../login/widget/text_filed.dart';
-
 
 class Account extends StatefulWidget {
   const Account({super.key});
@@ -30,7 +30,7 @@ class _AccountState extends State<Account> {
 
     if (userId != null) {
       final userDoc =
-      await FirebaseFirestore.instance.collection('user').doc(userId).get();
+          await FirebaseFirestore.instance.collection('user').doc(userId).get();
 
       if (userDoc.exists) {
         final userData = userDoc.data()!;
@@ -79,8 +79,7 @@ class _AccountState extends State<Account> {
               height: screenHeight * 0.25,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
-                gradient:
-                isDarkTheme ? AppColors.tealGradient : null, // Градиент
+                gradient: isDarkTheme ? AppColors.tealGradient : null,
                 color: !isDarkTheme ? AppColors.silverColor : null,
               ),
               child: Stack(
@@ -99,22 +98,24 @@ class _AccountState extends State<Account> {
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Stack(
-                        alignment: Alignment.center, // Центрируем содержимое
+                        alignment: Alignment.center,
                         children: [
                           Align(
-                            alignment: Alignment.centerLeft, // Кнопка "назад" всегда слева
+                            alignment: Alignment.centerLeft,
                             child: IconButton(
-                              icon: const Icon(Icons.arrow_back_ios_new,color: Colors.white,),
+                              icon: const Icon(
+                                Icons.arrow_back_ios_new,
+                                color: Colors.white,
+                              ),
                               onPressed: () {
                                 Navigator.pop(context);
                               },
                             ),
                           ),
-                           Center(
-                            // Текст всегда по центру
+                          Center(
                             child: Text(
                               S.of(context).editProfile,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
@@ -126,15 +127,14 @@ class _AccountState extends State<Account> {
                       ),
                     ),
                   ),
-
                 ],
               ),
             ),
             SizedBox(height: screenHeight * 0.08),
-             Center(
+            Center(
               child: Text(
                 S.of(context).change,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   color: Colors.blue,
                   fontWeight: FontWeight.bold,
@@ -147,63 +147,60 @@ class _AccountState extends State<Account> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                   Text(
+                  Text(
                     S.of(context).name,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                        color: AppColors.grey
-                    ),
+                    style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.grey),
                   ),
                   SizedBox(height: screenHeight * 0.01),
                   CustomTextField(
                     controller: nameController,
-                    labelText: S.of(context).enterName,
+                    hintText: CustomText4(text: S.of(context).enterName),
                     height: 40,
                   ),
                   SizedBox(height: screenHeight * 0.02),
                   const Text(
                     'Email',
                     style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                        color: AppColors.grey
-                    ),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.grey),
                   ),
                   SizedBox(height: screenHeight * 0.01),
                   CustomTextField(
                     controller: emailController,
-                    labelText: S.of(context).enterYourEmail,
+                    hintText: CustomText4(text: S.of(context).enterYourEmail),
                     height: 40,
                   ),
                   SizedBox(height: screenHeight * 0.02),
-                   Text(
+                  Text(
                     S.of(context).number,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                        color: AppColors.grey
-                    ),
+                    style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.grey),
                   ),
                   SizedBox(height: screenHeight * 0.01),
                   CustomTextField(
                     controller: phoneController,
-                    labelText: S.of(context).enterNumber,
+                    hintText: CustomText4(text: S.of(context).enterNumber),
                     height: 40,
                   ),
                   SizedBox(height: screenHeight * 0.02),
-                   Text(
+                  Text(
                     S.of(context).password,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.grey
-                    ),
+                    style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.grey),
                   ),
                   SizedBox(height: screenHeight * 0.01),
                   CustomTextField(
                     controller: passwordController,
-                    labelText: S.of(context).enterYourPassword,
+                    hintText:
+                        CustomText4(text: S.of(context).enterYourPassword),
                     height: 40,
                   ),
                   SizedBox(
@@ -213,10 +210,6 @@ class _AccountState extends State<Account> {
                     child: SafeArea(
                       child: ElevatedButton(
                         onPressed: _updateUserData,
-                        child: const Text(
-                          "Обновить",
-                          style: TextStyle(color: Colors.white),
-                        ),
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.symmetric(
                             horizontal: screenWidth * 0.3,
@@ -226,8 +219,12 @@ class _AccountState extends State<Account> {
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                           backgroundColor: isDarkTheme
-                              ? AppColors.blueGradient.colors.first // Используем первый цвет из градиента
-                              : AppColors.silverColor, // Цвет для светлой темы
+                              ? AppColors.blueGradient.colors.first
+                              : AppColors.silverColor,
+                        ),
+                        child: const Text(
+                          'Обновить',
+                          style: TextStyle(color: Colors.white),
                         ),
                       ),
                     ),
