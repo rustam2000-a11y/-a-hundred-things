@@ -14,7 +14,7 @@ class AppColors {
   static const Color blackSand = Color(0xFF242C3B);
   static const Color blueSand = Color(0xFF3C9EEA);
   static const Color lightviolet = Color(0xFFD0D4FF);
-  static const Color grey = Color(0xFFADADAD);
+  static const Color grey = Color(0xFF747474);
   static const Color greyNew = Color(0xFF5D5D5D);
   static const Color mutedBlueGrey = Color(0xFFACB5BB);
   static const LinearGradient whiteToBlackGradient = LinearGradient(

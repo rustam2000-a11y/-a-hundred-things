@@ -27,11 +27,11 @@ class ActionIcons extends StatelessWidget {
   Widget build(BuildContext context) {
     if (isSelected) {
       return Container(
-        width: 24,
-        height: 24,
+        width: 20,
+        height: 20,
         decoration: BoxDecoration(
           color: Colors.black.withOpacity(0.5),
-          borderRadius: BorderRadius.circular(4),
+
         ),
         child: const Icon(
           Icons.check,
@@ -42,12 +42,15 @@ class ActionIcons extends StatelessWidget {
     }
 
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         IconButton(
+          padding: EdgeInsets.zero,
           icon: Icon(
             Icons.edit,
             color: isDarkTheme ? Colors.white : Colors.black,
           ),
+
           onPressed: () {
             showEditItemBottomSheet(
               context,
@@ -60,6 +63,7 @@ class ActionIcons extends StatelessWidget {
           },
         ),
         IconButton(
+          padding: EdgeInsets.zero,
           icon: Icon(
             Icons.close,
             color: isDarkTheme ? Colors.white : Colors.black,

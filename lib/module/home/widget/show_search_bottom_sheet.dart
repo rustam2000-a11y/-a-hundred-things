@@ -137,7 +137,7 @@ void showSearchBottomSheet(BuildContext context, ThingsRepositoryI repository) {
                                 title: item.title,
                                 description: item.description,
                                 type: item.type,
-                                color: item.color,
+
                                 imageUrl: item.imageUrl,
                                 onStateUpdate: () {},
                                 quantity: item.quantity,

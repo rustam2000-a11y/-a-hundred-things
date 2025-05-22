@@ -136,3 +136,37 @@ class CustomText4 extends StatelessWidget {
     );
   }
 }
+
+class CustomText5 extends StatelessWidget {
+  const CustomText5({
+    super.key,
+    required this.text,
+    this.fontSize = 18,
+    this.color = Colors.black,
+    this.fontWeight = FontWeight.normal,
+    this.textAlign = TextAlign.start,
+    this.underline = false,
+  });
+
+  final String text;
+  final double fontSize;
+  final Color color;
+  final FontWeight fontWeight;
+  final TextAlign textAlign;
+  final bool underline;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      textAlign: textAlign,
+      style: TextStyle(
+        fontFamily: 'Inter',
+        fontSize: fontSize,
+        color: color,
+        fontWeight: fontWeight,
+        decoration: underline ? TextDecoration.underline : TextDecoration.none,
+      ),
+    );
+  }
+}

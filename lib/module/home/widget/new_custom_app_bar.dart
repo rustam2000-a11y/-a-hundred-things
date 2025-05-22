@@ -53,13 +53,14 @@ class NewCustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         if (showSearchIcon)
           IconButton(
             icon: Icon(Icons.search, color: theme.iconTheme.color),
+
             onPressed: () {},
           ),
       ],
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1.0),
         child: Container(
-          color: theme.dividerColor,
+          color: Colors.black,
           height: 1.0,
         ),
       ),

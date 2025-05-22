@@ -34,9 +34,9 @@ class ItemImage extends StatelessWidget {
 
             return Container(
               width: 100,
-              height: 90,
+              height: 100,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(4),
                 color: firstImageUrl == null ? Colors.grey[300] : null,
                 image: firstImageUrl != null
                     ? DecorationImage(
