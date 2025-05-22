@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../generated/l10n.dart';
 import '../../../main.dart';
 import '../../../presentation/colors.dart';
-import '../../login/login_page.dart';
+import '../../login/screen/login_screen.dart';
 import 'account.dart';
 
 
@@ -144,10 +144,22 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         ],
                       ),
                       IconButton(
-                        icon: Icon(Icons.settings,
-                            color: isDarkTheme ? Colors.white : Colors.white),
+                        icon: Icon(
+                          Icons.logout,
+                          color: isDarkTheme ? Colors.white : Colors.black,
+                        ),
                         iconSize: 38,
-                        onPressed: (){},),
+                        onPressed: () async {
+                          await FirebaseAuth.instance.signOut();
+                          await Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute<Widget>(
+                              builder: (context) => LoginPage(toggleTheme: () {}),
+                            ),
+                                (route) => false,
+                          );
+
+                        },
+                      ),
                     ],
                   ),
                 ],

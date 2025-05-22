@@ -41,5 +41,7 @@
   "number": "Номер",
   "enterNumber": "Enter number",
   "enterYourPassword": "Введите пароль",
-  "ategories": "Категории"
+  "ategories": "Категории",
+  "openEmail": "Open Email",
+  "appleSignInError": "Apple Sign In Error"
 }

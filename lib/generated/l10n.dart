@@ -419,6 +419,46 @@ class S {
       args: [],
     );
   }
+
+  /// `Email Adderss`
+  String get emailAdderss {
+    return Intl.message(
+      'Email Adderss',
+      name: 'emailAdderss',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `NEXT`
+  String get next {
+    return Intl.message(
+      'NEXT',
+      name: 'next',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Open Email`
+  String get openEmail {
+    return Intl.message(
+      'Open Email',
+      name: 'openEmail',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Apple Sign In Error`
+  String get appleSignInError {
+    return Intl.message(
+      'Apple Sign In Error',
+      name: 'appleSignInError',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -5,7 +5,10 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../../generated/l10n.dart';
 import '../../home/my_home_page.dart';
+import '../../home/widget/custom_divider.dart';
 import 'button_basic.dart';
+import 'custom_divider.dart';
+import 'custom_text.dart';
 import 'text_filed.dart';
 
 class RegistrationFormWidget extends StatefulWidget {
@@ -37,168 +40,129 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
 
     return Expanded(
       child: SingleChildScrollView(
-        child: Column(
-          children: [
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: Text(S.of(context).mail,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: isDarkMode ? Colors.white : Colors.black,
-                  ),
-                  textAlign: TextAlign.left),
-            ),
-            const SizedBox(
-              height: 4,
-            ),
-            CustomTextField(
-              controller: _emailController,
-              labelText: 'Email',
-            ),
-            const SizedBox(height: 16),
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: Text(S.of(context).password,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: isDarkMode ? Colors.white : Colors.black,
-                  ),
-                  textAlign: TextAlign.left),
-            ),
-            const SizedBox(
-              height: 4,
-            ),
-            CustomTextField(
-              controller: _passwordController,
-              labelText: 'Password',
-              isPasswordField: true,
-            ),
-            const SizedBox(height: 16),
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: Text(S.of(context).dateOfBirth,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: isDarkMode ? Colors.white : Colors.black,
-                  ),
-                  textAlign: TextAlign.left),
-            ),
-            const SizedBox(
-              height: 4,
-            ),
-            CustomTextField(
-              controller: _birthdayController,
-              labelText: 'Date of birth',
-            ),
-            const SizedBox(height: 18),
-            ReusableButton(
-              text: 'Register',
-              onPressed: () async {
-                try {
-                  final UserCredential userCredential = await FirebaseAuth
-                      .instance
-                      .createUserWithEmailAndPassword(
-                    email: _emailController.text.trim(),
-                    password: _passwordController.text.trim(),
-                  );
-                  await addUserToFirestore(userCredential.user);
-                  await Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute<dynamic>(
-                        builder: (_) => MyHomePage(toggleTheme: () {})),
-                  );
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Error: $e")),
-                  );
-                }
-              },
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                const Expanded(
-                    child: Divider(thickness: 1, color: Colors.grey)),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Text(S.of(context).or,
-                      style: const TextStyle(color: Colors.grey)),
-                ),
-                const Expanded(
-                    child: Divider(thickness: 1, color: Colors.grey)),
-              ],
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: () async {
-                final User? user = await signInWithGoogle();
-                if (user != null) {
-                  await addUserToFirestore(user);
-
-                  await Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute<dynamic>(
-                        builder: (_) => MyHomePage(toggleTheme: () {})),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Ошибка входа через Google')),
-                  );
-                }
-              },
-              icon: const Icon(Icons.login, color: Colors.red),
-              label: Text(S.of(context).continueWithGoogle),
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50),
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-                side: const BorderSide(color: Colors.grey),
-                shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(10), // Added border radius
-                ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            children: [
+              const SizedBox(height: 64,),
+              const CustomText(text: 'Create a profile'),
+              const SizedBox(height: 40,),
+               Align(
+                alignment: Alignment.bottomLeft,
+                child: CustomText3(text:S.of(context).emailAdderss,
+                    ),
               ),
-            ),
-            const SizedBox(height: 15),
-            ElevatedButton.icon(
-              onPressed: () async {
-                try {
-                  User? user = await signInWithApple();
-                  if (user != null) {
-                    await addUserToFirestore(user);
-                    if (context.mounted) {
-                      await Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute<dynamic>(
-                          builder: (_) => MyHomePage(toggleTheme: () {}),
-                        ),
-                      );
-                    }
-                  } else {
+              const SizedBox(
+                height: 4,
+              ),
+              CustomTextField(
+                controller: _emailController,
+                hintText: CustomText4(text: 'Email'),
+              ),
+              const SizedBox(height: 16),
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: CustomText3(text: S.of(context).password),
+              ),
+              const SizedBox(height: 4),
+              CustomTextField(
+                controller: _passwordController,
+                // hintText: CustomText4(text: 'Password'),
+                isPasswordField: true,
+              ),
+              const SizedBox(height: 16),
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: CustomText3(text: S.of(context).dateOfBirth),
+              ),
+              const SizedBox(
+                height: 4,
+              ),
+              CustomTextField(
+                controller: _birthdayController,
+                // hintText: const CustomText4(text: 'Date of birth'),
+              ),
+              const SizedBox(height: 18),
+              ReusableButton(
+                text: S.of(context).next,
+                onPressed: () async {
+                  try {
+                    final UserCredential userCredential = await FirebaseAuth
+                        .instance
+                        .createUserWithEmailAndPassword(
+                      email: _emailController.text.trim(),
+                      password: _passwordController.text.trim(),
+                    );
+                    await addUserToFirestore(userCredential.user);
+                    await Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute<dynamic>(
+                          builder: (_) => MyHomePage(toggleTheme: () {})),
+                    );
+                  } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Ошибка входа через Apple")),
+                      SnackBar(content: Text("Error: $e")),
                     );
                   }
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Ошибка: $e")),
-                  );
-                }
-              },
-              icon: const Icon(Icons.apple, color: Colors.black),
-              label: Text(S.of(context).continueWithApple),
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50),
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-                side: const BorderSide(color: Colors.grey),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                },
               ),
-            ),
+              const SizedBox(height: 16),
+              DividerWithText(text: S.of(context).or),
+              const SizedBox(height: 16),
+              CustomButtonRegist(
+                text: S.of(context).continueWithGoogle,
+                icon: Icons.login,
+                onPressed: () async {
+                  final User? user = await signInWithGoogle();
+                  if (user != null) {
+                    await addUserToFirestore(user);
 
-          ],
+                    await Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute<dynamic>(
+                          builder: (_) => MyHomePage(toggleTheme: () {})),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Google login error')),
+                    );
+                  }
+                },
+
+              ),
+               const SizedBox(height: 15),
+              CustomButtonRegist(
+                text: S.of(context).continueWithApple,
+                icon: Icons.apple,
+                onPressed: () async {
+                  try {
+                    User? user = await signInWithApple();
+                    if (user != null) {
+                      await addUserToFirestore(user);
+                      if (context.mounted) {
+                        await Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute<dynamic>(
+                            builder: (_) => MyHomePage(toggleTheme: () {}),
+                          ),
+                        );
+                      }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Ошибка входа через Apple")),
+                      );
+                    }
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Ошибка: $e")),
+                    );
+                  }
+                },
+
+              ),
+
+            ],
+          ),
         ),
       ),
     );
