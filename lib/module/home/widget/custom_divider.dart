@@ -9,7 +9,7 @@ class CustomDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
     return Divider(
-      color: isDarkTheme ? Colors.blue : AppColors.silverColor,
+      color: isDarkTheme ? Colors.black : Colors.black,
       height: 2,
     );
   }

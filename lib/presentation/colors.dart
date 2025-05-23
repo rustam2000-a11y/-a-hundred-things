@@ -6,8 +6,7 @@ class AppColors {
   const AppColors();
   static const Color whiteColor = Colors.white;
   static const Color silverColor = Color(0xFF7984FF);
-  static const Color royalBlue = Color(0xFF7984FF);
-  static const Color silverSand = Color(0xFFC7C8C9);
+
   static const Color orangeSand = Color(0xFFFF7648);
     static const Color violetSand = Color(0xFF5C65CD);
   static const Color greySand = Color(0xFFA9A9A9);

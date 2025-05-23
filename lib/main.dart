@@ -1,16 +1,13 @@
-  import 'dart:async';
-
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'core/di/service_locator.dart';
 import 'generated/l10n.dart';
 import 'module/home/my_home_page.dart';
 import 'module/login/screen/login_screen.dart';
-import 'presentation/colors.dart';
 import 'presentation/them/dark_theme.dart';
 
   void main() async {
@@ -72,7 +69,7 @@ import 'presentation/them/dark_theme.dart';
           scaffoldBackgroundColor: Colors.white,
           appBarTheme: const AppBarTheme(color:  Colors.white,),
           elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.silverColor),
+            style: ElevatedButton.styleFrom(backgroundColor:  Colors.white),
           ),
         ),
         darkTheme: darkTheme,

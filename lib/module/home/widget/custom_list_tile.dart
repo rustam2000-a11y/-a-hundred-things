@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class CustomListTile extends StatelessWidget {
+class CustomListTile extends StatefulWidget {
   const CustomListTile({
     Key? key,
     required this.icon,
@@ -17,25 +17,56 @@ class CustomListTile extends StatelessWidget {
   final Color? darkThemeColor;
 
   @override
+  State<CustomListTile> createState() => _CustomListTileState();
+}
+
+class _CustomListTileState extends State<CustomListTile> {
+  bool isPressed = false;
+
+  void _handleTapDown(TapDownDetails details) {
+    setState(() => isPressed = true);
+  }
+
+  void _handleTapUp(TapUpDetails details) {
+    setState(() => isPressed = false);
+  }
+
+  void _handleTapCancel() {
+    setState(() => isPressed = false);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final Color defaultBackground = isDarkMode
+        ? (widget.darkThemeColor ?? Colors.black)
+        : (widget.lightThemeColor ?? Colors.white);
 
-
-    final Color backgroundColor = isDarkMode
-        ? (darkThemeColor ?? Colors.black)
-        : (lightThemeColor ?? Colors.white);
-
-
-    final Color iconTextColor = isDarkMode ? Colors.white : const Color(0xFF757575);
-
-    return ListTile(
-      leading: Icon(
-        icon,
-        color: iconTextColor,
+    return Container(
+      decoration: BoxDecoration(
+        color: isPressed ? Colors.black : defaultBackground,
+        border: const Border(
+          top: BorderSide(),
+          bottom: BorderSide(),
+        ),
       ),
-      title: Text(
-        text,
-        style: TextStyle(color: iconTextColor),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        onTapDown: _handleTapDown,
+        onTapUp: _handleTapUp,
+        onTapCancel: _handleTapCancel,
+        child: ListTile(
+          leading: Icon(
+            widget.icon,
+            color: isPressed ? Colors.white : Colors.black,
+          ),
+          title: Text(
+            widget.text,
+            style: TextStyle(
+              color: isPressed ? Colors.white : Colors.black,
+            ),
+          ),
+        ),
       ),
     );
   }
