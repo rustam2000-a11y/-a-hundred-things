@@ -12,9 +12,10 @@ import 'widget/category_card_widget.dart';
 import 'widget/drawer.dart';
 import 'widget/list_of_things_widget.dart';
 import 'widget/navigation_bar_widget.dart';
-import 'widget/new_custom_app_bar.dart';
+import 'widget/appBar/new_custom_app_bar.dart';
 import 'widget/new_list_of_types_widget.dart';
 import 'widget/show_add_item_bottom_sheet.dart';
+import 'widget/things_title_list_widget.dart';
 
 export 'my_home_page.dart';
 
@@ -148,38 +149,68 @@ class MyHomePageState extends State<MyHomePage> {
                       child: ListView(
                         scrollDirection: Axis.horizontal,
                         padding: const EdgeInsets.only(left: 16),
-                        children: state.typesWithColors.entries.map((entry) {
-                          final type = entry.key;
-                          final color = entry.value.isEmpty
-                              ? PresentationUtils.getRandomColor()
-                              : entry.value;
-                          return CategoryCardWidget(
-                            selectedCategoryType: _selectedCategoryType,
-                            onChangeCategory: (String? category) {
-                              setState(() {
-                                if (_selectedCategoryType == category) {
-                                  _selectedCategoryType = null;
-                                } else {
-                                  _selectedCategoryType = category;
-                                }
-                                _bloc.add(HomeSelectTypeThingsEvent(
-                                    selectedTypeThings: _selectedCategoryType));
-                              });
-                            },
-                            onDeleteThings: () {
-                              _bloc.add(DeleteThingsByTypeEvent(type: type));
-                            },
+                        children: [
 
-                            type: type,
-                          );
-                        }).toList(),
+                          Container(
+                            margin: const EdgeInsets.only(right: 8),
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                            alignment: Alignment.center,
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Add',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Icon(Icons.add, color: Colors.white, size: 20),
+
+                              ],
+                            ),
+                          ),
+
+                          ...state.typesWithColors.entries.map((entry) {
+                            final type = entry.key;
+                            final color = entry.value.isEmpty
+                                ? PresentationUtils.getRandomColor()
+                                : entry.value;
+
+                            return CategoryCardWidget(
+                              selectedCategoryType: _selectedCategoryType,
+                              onChangeCategory: (String? category) {
+                                setState(() {
+                                  if (_selectedCategoryType == category) {
+                                    _selectedCategoryType = null;
+                                  } else {
+                                    _selectedCategoryType = category;
+                                  }
+                                  _bloc.add(HomeSelectTypeThingsEvent(
+                                    selectedTypeThings: _selectedCategoryType,
+                                  ));
+                                });
+                              },
+                              onDeleteThings: () {
+                                _bloc.add(DeleteThingsByTypeEvent(type: type));
+                              },
+                              type: type,
+                            );
+                          }).toList(),
+                        ],
                       ),
                     ),
+
 
                   const SizedBox(height: 12),
                   Expanded(
                     child: _isListMode
-                        ? ThingsListWidget(
+                        ? ThingsTypeListWidget(
                       things: state.things,
                       selectedCategoryType: _selectedCategoryType,
                       selectedItemsNotifier: selectedItemsNotifier,
@@ -187,9 +218,13 @@ class MyHomePageState extends State<MyHomePage> {
                       onDeleteItem: (uid) =>
                           _bloc.add(DeleteItemByUidEvent(uid: uid)),
                     )
-                        : NewListOfTypes(
+                        : (_showCategoryList
+                        ? NewListOfTypes(
                       types: state.typesWithColors.keys.toList(),
-                    ),
+                    )
+                        : NewListOfTitles(
+                      title: state.things.map((e) => e.title).toList(),
+                    )),
                   ),
 
 
@@ -239,7 +274,7 @@ Future<void> loadTypeColorsFromFirestore() async {
     final color = doc['typeColor'];
 
     if (type != null && color != null) {
-      typeColorsCache[type] = color;
+
     }
   }
 }

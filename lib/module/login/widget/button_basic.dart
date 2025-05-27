@@ -94,3 +94,52 @@ class CustomButtonRegist extends StatelessWidget {
   }
 }
 
+
+
+
+
+
+class CustomMainButton extends StatelessWidget {
+  const CustomMainButton({
+    super.key,
+    required this.text,
+    required this.onPressed,
+    this.textColor = Colors.black,
+    this.borderColor = Colors.black,
+    this.backgroundColor = Colors.white,
+  });
+
+  final String text;
+  final VoidCallback onPressed;
+  final Color textColor;
+  final Color borderColor;
+  final Color backgroundColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton(
+        onPressed: onPressed,
+        style: OutlinedButton.styleFrom(
+          backgroundColor: backgroundColor,
+          foregroundColor: textColor,
+          side: BorderSide(color: borderColor),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(),
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: textColor,
+            fontWeight: FontWeight.w500,
+            fontSize: 14,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+

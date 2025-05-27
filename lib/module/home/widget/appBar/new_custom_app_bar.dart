@@ -5,10 +5,12 @@ class NewCustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     Key? key,
     this.showBackButton = true,
     this.showSearchIcon = true,
+    this.logo,
   }) : super(key: key);
 
   final bool showBackButton;
   final bool showSearchIcon;
+  final Widget? logo;
 
   @override
   Widget build(BuildContext context) {
@@ -25,44 +27,41 @@ class NewCustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       )
           : null,
       centerTitle: true,
-      title: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Image.asset(
-              'assets/images/house2.png',
-              width: screenWidth * 0.09,
-              height: screenWidth * 0.09,
-              fit: BoxFit.cover,
-            ),
+      title: logo ??
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.asset(
+                  'assets/images/house2.png',
+                  width: screenWidth * 0.09,
+                  height: screenWidth * 0.09,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(width: 2),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.asset(
+                  'assets/images/inscription2.png',
+                  width: screenWidth * 0.22,
+                  height: screenWidth * 0.04,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 2),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Image.asset(
-              'assets/images/inscription2.png',
-              width: screenWidth * 0.22,
-              height: screenWidth * 0.04,
-              fit: BoxFit.cover,
-            ),
-          ),
-        ],
-      ),
       actions: [
         if (showSearchIcon)
           IconButton(
             icon: Icon(Icons.search, color: theme.iconTheme.color),
-
             onPressed: () {},
           ),
       ],
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(1.0),
-        child: Container(
-          color: Colors.black,
-          height: 1.0,
-        ),
+      bottom: const PreferredSize(
+        preferredSize: Size.fromHeight(1.0),
+        child: Divider(height: 1, color: Colors.black),
       ),
     );
   }
@@ -70,3 +69,4 @@ class NewCustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
+

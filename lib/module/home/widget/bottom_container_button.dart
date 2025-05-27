@@ -17,22 +17,27 @@ abstract class AbstractButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
 
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        minimumSize: Size(screenWidth * 0.45 , 46), // 30% ширины экрана
-        backgroundColor: color, // Цвет кнопки
-        elevation: 6,
-        shadowColor: Colors.black,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10), // Закругленные углы
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          minimumSize: const Size.fromHeight(30),
+          backgroundColor: color,
+
+          shadowColor: Colors.black,
+          shape: RoundedRectangleBorder(
+
+          ),
         ),
-      ),
-      child: Text(
+
+
+    child: Text(
         textAlign: TextAlign.center,
         text,
-        style: const TextStyle(fontSize: 18,color: Colors.white),
+        style: const TextStyle(fontSize: 18,color: Colors.black),
 
+      ),
       ),
     );
   }
@@ -42,7 +47,7 @@ class AddButton extends AbstractButton {
   AddButton({required VoidCallback onPressed})
       : super(
     text: "Добавить",
-    color: AppColors.orangeSand,
+    color: Colors.white,
     onPressed: onPressed,
   );
 }

@@ -49,7 +49,14 @@ class NavigationBarWidget extends StatelessWidget {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      showAddItemBottomSheet(context);
+                      Navigator.push<void>(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (context) => AddItemPage(type: 'ExampleType'),
+                        ),
+                      );
+
+
                     },
                     child: const Row(
                       children: [
@@ -62,6 +69,7 @@ class NavigationBarWidget extends StatelessWidget {
                       ],
                     ),
                   ),
+
 
                   Text(
                     '$totalQuantity / 100',

@@ -1,7 +1,9 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:injectable/injectable.dart';
 
 import '../model/things_model.dart';
@@ -54,7 +56,27 @@ class BaseDataApi implements BaseDataApiI {
     });
   }
 
-
+  @override
+  Future<List<String>> uploadImages(List<File> images) async {
+    final List<String> urls = [];
+    for (final image in images) {
+      try {
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child('item_images/${DateTime
+            .now()
+            .millisecondsSinceEpoch}_${image.path
+            .split('/')
+            .last}');
+        final uploadTask = await storageRef.putFile(image);
+        final downloadUrl = await uploadTask.ref.getDownloadURL();
+        urls.add(downloadUrl);
+      } catch (e) {
+        throw Exception('Ошибка загрузки изображения: $e');
+      }
+    }
+    return urls;
+  }
   @override
   Future<void> deleteThingsByType(String type) async {
     final items = await databaseReference
@@ -88,4 +110,5 @@ abstract class BaseDataApiI {
   Future<void> deleteItemByUid(String uid);
 
   Stream<List<ThingsModel>> searchThingsByTitle(String searchQuery);
+  Future<List<String>> uploadImages(List<File> images);
 }

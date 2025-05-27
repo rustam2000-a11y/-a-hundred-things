@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../presentation/colors.dart';
-import '../../home/widget/new_custom_app_bar.dart';
+import '../../home/widget/appBar/new_custom_app_bar.dart';
 import '../widget/registration_form_widget.dart';
 
 class RegistrationScreen extends StatefulWidget {

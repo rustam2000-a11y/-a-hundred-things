@@ -12,12 +12,9 @@ import 'show_modal_buttom_sheet.dart';
 final Map<String, int> itemCounts = {};
 final Map<String, String> typeColors = {};
 
-Color getColorForType(String type) {
-  if (!typeColorsCache.containsKey(type)) {
-    typeColorsCache[type] = getRandomColor();
-  }
-  return getColorFromHex(typeColorsCache[type]) ?? Colors.grey;
-}
+
+
+
 
 class ThingsCardWidget extends StatelessWidget {
   const ThingsCardWidget({
@@ -53,9 +50,8 @@ class ThingsCardWidget extends StatelessWidget {
       valueListenable: selectedItemsNotifier ?? ValueNotifier([]),
       builder: (context, selectedItems, child) {
         final isSelected = selectedItems.contains(itemId);
-        final backgroundColor = isDarkTheme
-            ? (isSelected ? Colors.blueGrey : Colors.black54)
-            : getColorForType(type);
+
+
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 4.0),

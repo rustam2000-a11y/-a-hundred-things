@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'things_card_item.dart';
 
-class ThingsListWidget extends StatelessWidget {
+class ThingsTypeListWidget extends StatelessWidget {
 
-  const ThingsListWidget({
+  const ThingsTypeListWidget({
     super.key,
     required this.things,
     required this.selectedCategoryType,

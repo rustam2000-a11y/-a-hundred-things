@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../generated/l10n.dart';
-import '../../home/widget/new_custom_app_bar.dart';
+import '../../home/widget/appBar/new_custom_app_bar.dart';
 import '../widget/button_basic.dart';
 import '../widget/custom_text.dart';
 import 'forgot_screen.dart';

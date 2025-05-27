@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:injectable/injectable.dart';
 import 'package:rxdart/rxdart.dart';
 import '../model/things_model.dart';
@@ -24,7 +26,10 @@ class ThingsRepository implements ThingsRepositoryI {
   Future<void> deleteThingsByType(String type) async {
     return _baseDataApi.deleteThingsByType(type);
   }
-
+  @override
+  Future<List<String>> uploadImages(List<File> images) async {
+    return _baseDataApi.uploadImages(images);
+  }
   @override
   Future<void> deleteItemByUid(String uid) async {
     return _baseDataApi.deleteItemByUid(uid);
@@ -57,4 +62,6 @@ abstract class ThingsRepositoryI {
   Future<void> deleteItemByUid(String uid);
 
   Stream<List<ThingsModel>> searchThingsByTitle(String searchQuery);
+
+  Future<List<String>> uploadImages(List<File> images);
 }
