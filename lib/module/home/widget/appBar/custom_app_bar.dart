@@ -76,29 +76,29 @@ class CustomAppBar extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Row(
+                    const Row(
                       children: [
-                        const SizedBox(width: 10),
-                        ReusableIconButton(
-                          icon: Icons.search_rounded,
-                          onPressed: () {
-                            // Получение экземпляра ThingsRepositoryI через DI
-                            showSearchBottomSheet(context, repository);
-                          },
-                          screenWidth: screenWidth,
-                          borderRadius: 10,
-                        ),
+                        SizedBox(width: 10),
+                        // ReusableIconButton(
+                        //   icon: Icons.search_rounded,
+                        //   onPressed: () {
+                        //
+                        //     showSearchBottomSheet(context, repository);
+                        //   },
+                        //   screenWidth: screenWidth,
+                        //   borderRadius: 10,
+                        // ),
 
-                        const SizedBox(width: 4),
-                        const SizedBox(width: 10),
-                        ReusableIconButton(
-                          icon: Icons.more_vert,
-                          onPressed: () {
-                            Scaffold.of(context).openDrawer();
-                          },
-                          screenWidth: screenWidth,
-                          borderRadius: 10,
-                        ),
+                        SizedBox(width: 4),
+                        SizedBox(width: 10),
+                        // ReusableIconButton(
+                        //   icon: Icons.more_vert,
+                        //   onPressed: () {
+                        //     Scaffold.of(context).openDrawer();
+                        //   },
+                        //   screenWidth: screenWidth,
+                        //   borderRadius: 10,
+                        // ),
                       ],
                     ),
                   ],

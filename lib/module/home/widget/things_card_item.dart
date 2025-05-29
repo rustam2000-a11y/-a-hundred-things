@@ -5,7 +5,7 @@ import 'action_icons.dart';
 import 'counter_controls.dart';
 import 'edit_item_bottom_sheet.dart';
 import 'item_image.dart';
-import 'new_card_widget.dart';
+import 'card_widget/new_card_widget.dart';
 import 'show_add_item_bottom_sheet.dart';
 import 'show_modal_buttom_sheet.dart';
 

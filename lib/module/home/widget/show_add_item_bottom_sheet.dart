@@ -1,13 +1,11 @@
 import 'dart:io';
 import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cropperx/cropperx.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
-
 import '../../../generated/l10n.dart';
 import '../../../presentation/colors.dart';
 import '../../../repository/things_repository.dart';
@@ -19,11 +17,18 @@ import 'appBar/new_custom_app_bar.dart';
 
 
 class AddItemPage extends StatefulWidget {
-  const AddItemPage({super.key,this.type});
-  final String? type;
+  const AddItemPage({
+    super.key,
+    required this.allTypes,
+  });
+
+
+  final List<String> allTypes;
+
   @override
   State<AddItemPage> createState() => _AddItemPageState();
 }
+
 
 class _AddItemPageState extends State<AddItemPage> {
   final TextEditingController _titleController = TextEditingController();
@@ -34,16 +39,19 @@ class _AddItemPageState extends State<AddItemPage> {
   final List<File> _selectedImages = [];
   final Map<String, String> typeColorsCache = {};
   List<String> _imageUrls = [];
+  String? selectedType;
 
-  bool _showDrawer = false;
+  final bool _showDrawer = false;
   final Set<String> _typeSet = {};
+  @override
   @override
   void initState() {
     super.initState();
-    if (widget.type != null) {
-      _typeController.text = widget.type!;
-    }
+
+    _typeSet.addAll(widget.allTypes);
   }
+
+
   Future<void> _pickAndCropImage() async {
     try {
       final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -108,23 +116,34 @@ class _AddItemPageState extends State<AddItemPage> {
         showSearchIcon: false,
         showBackButton: false,
         logo: WidgetDrawerContainer(
-            onTap: () {
-              if (_typeController.text.isNotEmpty) {
-                setState(() {
-                  _typeSet.add(_typeController.text.trim());
-                });
-              }
-
-              showDialog(
-                context: context,
-                builder: (context) => Dialog(
-                  backgroundColor: Colors.transparent,
-                  child: WidgetDrawer(types: _typeSet.toList()),
-                ),
-              );
+          typ: selectedType,
+          onTap: () {
+            if (_typeController.text.isNotEmpty) {
+              setState(() {
+                _typeSet.add(_typeController.text.trim());
+              });
             }
 
 
+
+            showDialog(
+              context: context,
+              builder: (context) => Dialog(
+                backgroundColor: Colors.transparent,
+                child: WidgetDrawer(
+                  types: _typeSet.toList(),
+                    onTypeSelected: (selected) {
+                      setState(() {
+
+                        selectedType = selected;
+                      });
+                    }
+
+                ),
+              ),
+            );
+
+          },
         ),
       ),
       body: SafeArea(
@@ -132,7 +151,15 @@ class _AddItemPageState extends State<AddItemPage> {
           clipBehavior: Clip.none,
           children: [
             if (_showDrawer && _typeSet.isNotEmpty)
-              WidgetDrawer(types: _typeSet.toList()),
+              WidgetDrawer(
+                types: _typeSet.toList(),
+                onTypeSelected: (selectedType) {
+                  setState(() {
+                    _typeController.text = selectedType;
+
+                  });
+                },
+              ),
 
             GestureDetector(
               onTap: _pickAndCropImage,

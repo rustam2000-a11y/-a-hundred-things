@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class WidgetDrawerContainer extends StatelessWidget {
-  const WidgetDrawerContainer({super.key, required this.onTap});
-
+  const WidgetDrawerContainer({super.key, required this.onTap, this.typ});
+  final String? typ;
   final VoidCallback onTap;
 
   @override
@@ -11,20 +11,20 @@ class WidgetDrawerContainer extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.black12),
-        ),
-        child: const Row(
+        decoration: const BoxDecoration(color: Colors.white),
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text("Closing", style: TextStyle(fontSize: 16)),
-            SizedBox(width: 6),
-            Icon(Icons.keyboard_arrow_down),
+            Text(
+              typ ?? 'Categories',
+              style: const TextStyle(fontSize: 24),
+            ),
+            const SizedBox(width: 6),
+            const Icon(Icons.keyboard_arrow_down),
           ],
         ),
       ),
     );
   }
 }
+

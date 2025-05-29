@@ -6,6 +6,7 @@ class ThingsModel extends Equatable{
     required this.title,
     required this.description,
     required this.type,
+    required this.typDescription,
     required this.color,
     required this.imageUrl,
     required this.quantity,
@@ -19,7 +20,7 @@ class ThingsModel extends Equatable{
       type: json['type'] as String? ?? '',
       color: json['color'] as String? ?? '',
       imageUrl: json['imageUrl'] as String? ?? '',
-      quantity: json['quantity'] as int? ?? 0,
+      quantity: json['quantity'] as int? ?? 0, typDescription: json['typDescription'] as String? ?? ''
     );
   }
 
@@ -30,6 +31,7 @@ class ThingsModel extends Equatable{
   final String color;
   final String? imageUrl;
   final int quantity;
+  final String typDescription;
 
   @override
   List<Object?> get props => [
@@ -40,7 +42,10 @@ class ThingsModel extends Equatable{
     color,
     imageUrl,
     quantity,
+    typDescription
   ];
+
+
 
   ThingsModel copyWith({
     String? id,
@@ -50,6 +55,7 @@ class ThingsModel extends Equatable{
     String? color,
     String? imageUrl,
     int? quantity,
+    String? typDescription,
   }) {
     return ThingsModel(
       id: id ?? this.id,
@@ -59,6 +65,7 @@ class ThingsModel extends Equatable{
       color: color ?? this.color,
       imageUrl: imageUrl ?? this.imageUrl,
       quantity: quantity ?? this.quantity,
+      typDescription: typDescription ?? this.typDescription,
     );
   }
 
@@ -71,6 +78,7 @@ class ThingsModel extends Equatable{
       'color': color,
       'imageUrl': imageUrl,
       'quantity': quantity,
+      'typDescription': typDescription,
     };
   }
 }

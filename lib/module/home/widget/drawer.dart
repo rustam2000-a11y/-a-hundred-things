@@ -3,13 +3,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../login/screen/login_screen.dart';
 import '../../settings/widget/user_profile_screen.dart';
+import '../my_home_page.dart';
+import 'category_page.dart';
 import 'custom_divider.dart';
 import 'custom_list_tile.dart';
 
 class CustomDrawer extends StatefulWidget {
 
-  const CustomDrawer({super.key, required this.onToggleCategoryList});
+  const CustomDrawer({super.key, required this.onToggleCategoryList, this.toggleTheme});
   final void Function(bool show) onToggleCategoryList;
+  final VoidCallback? toggleTheme;
 
   @override
   State<CustomDrawer> createState() => _CustomDrawerState();
@@ -125,15 +128,27 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 text: 'Main',
                 onTap: () {
                   Navigator.pop(context);
-                  widget.onToggleCategoryList(false);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (context) => MyHomePage(toggleTheme: widget.toggleTheme),
+                    ),
+                  );
                 },
               ),
+
+
               CustomListTile(
                 icon: Icons.folder_copy,
                 text: 'My categories ',
                 onTap: () {
                   Navigator.pop(context);
-                  widget.onToggleCategoryList(true);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (context) => const CategoriePage(),
+                    ),
+                  );
                 },
               ),
               CustomListTile(

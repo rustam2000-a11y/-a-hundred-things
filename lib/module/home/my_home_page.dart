@@ -1,28 +1,31 @@
 import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import '../../core/utils/presentation.utils.dart';
 
+import '../../core/utils/presentation.utils.dart';
 import '../../presentation/colors.dart';
 import '../login/widget/custom_text.dart';
 import 'home_bloc.dart';
+import 'widget/appBar/new_custom_app_bar.dart';
 import 'widget/category_card_widget.dart';
+import 'widget/category_page.dart';
 import 'widget/drawer.dart';
 import 'widget/list_of_things_widget.dart';
 import 'widget/navigation_bar_widget.dart';
-import 'widget/appBar/new_custom_app_bar.dart';
 import 'widget/new_list_of_types_widget.dart';
-import 'widget/show_add_item_bottom_sheet.dart';
 import 'widget/things_title_list_widget.dart';
+import 'widget/type_widget/type_add_screen.dart';
+import 'widget/type_widget/type_card_widget.dart';
 
 export 'my_home_page.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.toggleTheme});
 
-  final VoidCallback toggleTheme;
+  final VoidCallback? toggleTheme;
 
   @override
   MyHomePageState createState() => MyHomePageState();
@@ -56,7 +59,10 @@ class MyHomePageState extends State<MyHomePage> {
       bloc: _bloc,
       builder: (context, state) {
         return Scaffold(
-          drawer: CustomDrawer(onToggleCategoryList: _toggleCategoryList),
+          drawer: CustomDrawer(
+            onToggleCategoryList: _toggleCategoryList,
+
+          ),
           backgroundColor: isDarkMode ? AppColors.blackSand : Colors.white,
           appBar: const NewCustomAppBar(
             showBackButton: false,
@@ -65,15 +71,27 @@ class MyHomePageState extends State<MyHomePage> {
             children: [
               Column(
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        CustomText5(
-                          text: 'All Your Things',
-                          fontSize: 20,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute<void>(builder: (context) => CategoriePage()),
+                            );
+                          },
+                          child: CustomText5(
+                            text: 'All Your Things',
+                            fontSize: 20,
+                          ),
                         ),
+
+
+
+
                       ],
                     ),
                   ),
@@ -151,30 +169,41 @@ class MyHomePageState extends State<MyHomePage> {
                         padding: const EdgeInsets.only(left: 16),
                         children: [
 
-                          Container(
-                            margin: const EdgeInsets.only(right: 8),
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.black,
-                              borderRadius: BorderRadius.circular(3),
-                            ),
-                            alignment: Alignment.center,
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'Add',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute<void>(
+                                  builder: (context) => const AddTypePage(),
                                 ),
-                                Icon(Icons.add, color: Colors.white, size: 20),
-
-                              ],
+                              );
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.only(right: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              decoration: BoxDecoration(
+                                color: Colors.black,
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                              alignment: Alignment.center,
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'Add',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Icon(Icons.add, color: Colors.white, size: 20),
+                                ],
+                              ),
                             ),
                           ),
+
+
 
                           ...state.typesWithColors.entries.map((entry) {
                             final type = entry.key;
@@ -218,14 +247,15 @@ class MyHomePageState extends State<MyHomePage> {
                       onDeleteItem: (uid) =>
                           _bloc.add(DeleteItemByUidEvent(uid: uid)),
                     )
-                        : (_showCategoryList
-                        ? NewListOfTypes(
-                      types: state.typesWithColors.keys.toList(),
-                    )
                         : NewListOfTitles(
                       title: state.things.map((e) => e.title).toList(),
-                    )),
+                    )
                   ),
+
+
+
+
+
 
 
                 ],
@@ -236,8 +266,10 @@ class MyHomePageState extends State<MyHomePage> {
                 bottom: 0,
                 child: NavigationBarWidget(
                   isDarkMode: isDarkMode,
+                  types: state.typesWithColors.keys.toList(),
                 ),
               ),
+
             ],
           ),
         );

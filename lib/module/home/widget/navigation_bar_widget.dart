@@ -8,8 +8,14 @@ import 'show_add_item_bottom_sheet.dart';
 
 class NavigationBarWidget extends StatelessWidget {
 
-  const NavigationBarWidget({Key? key, required this.isDarkMode}) : super(key: key);
+  const NavigationBarWidget({
+    Key? key,
+    required this.isDarkMode,
+    required this.types,
+  }) : super(key: key);
+
   final bool isDarkMode;
+  final List<String> types;
 
   @override
   Widget build(BuildContext context) {
@@ -49,15 +55,20 @@ class NavigationBarWidget extends StatelessWidget {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      Navigator.push<void>(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (context) => AddItemPage(type: 'ExampleType'),
-                        ),
-                      );
+
+                        Navigator.push<void>(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (context) => AddItemPage(
+                              allTypes: types,
+                            ),
+                          ),
+                        );
+
 
 
                     },
+
                     child: const Row(
                       children: [
                         Icon(Icons.add, size: 24, color: Colors.black),

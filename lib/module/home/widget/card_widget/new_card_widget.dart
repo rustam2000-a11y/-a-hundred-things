@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'action_icons.dart';
-import 'counter_controls.dart';
-import 'item_image.dart';
+import '../action_icons.dart';
+import '../counter_controls.dart';
+import '../item_image.dart';
 
 class ThingCardContainer extends StatelessWidget {
   const ThingCardContainer({
