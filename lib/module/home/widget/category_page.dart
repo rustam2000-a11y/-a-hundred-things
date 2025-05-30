@@ -208,24 +208,32 @@ class CategoriePageState extends State<CategoriePage> {
                   const SizedBox(height: 12),
                   Expanded(
                     child: _isListMode
-                        ? ListView.builder(
-                      itemCount: state.things.length,
-                      itemBuilder: (context, index) {
-                        final thing = state.things[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
-                          child: TypeCardWidget(
-                            isSelected: selectedItemsNotifier.value.contains(thing.id),
-                            isDarkTheme: isDarkMode,
-                            typDescription: thing.typDescription ?? '',
-                            imageUrl: thing.imageUrl,
-                            itemId: thing.id,
-                            type: thing.type,
-                            onDeleteItem: () =>
-                                _bloc.add(DeleteItemByUidEvent(uid: thing.id)),
-                            selectedCategoryType: _selectedCategoryType,
-                            onStateUpdate: () => setState(() {}),
-                          ),
+                        ? Builder(
+                      builder: (context) {
+                        final filteredThings = state.things
+                            .where((thing) => thing.typDescription.trim().isNotEmpty)
+                            .toList();
+
+                        return ListView.builder(
+                          itemCount: filteredThings.length,
+                          itemBuilder: (context, index) {
+                            final thing = filteredThings[index];
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
+                              child: TypeCardWidget(
+                                isSelected: selectedItemsNotifier.value.contains(thing.id),
+                                isDarkTheme: isDarkMode,
+                                typDescription: thing.typDescription ?? '',
+                                imageUrl: thing.imageUrl,
+                                itemId: thing.id,
+                                type: thing.type,
+                                onDeleteItem: () =>
+                                    _bloc.add(DeleteItemByUidEvent(uid: thing.id)),
+                                selectedCategoryType: _selectedCategoryType,
+                                onStateUpdate: () => setState(() {}),
+                              ),
+                            );
+                          },
                         );
                       },
                     )

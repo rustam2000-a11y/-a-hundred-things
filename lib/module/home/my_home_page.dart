@@ -4,22 +4,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-
 import '../../core/utils/presentation.utils.dart';
 import '../../presentation/colors.dart';
 import '../login/widget/custom_text.dart';
 import 'home_bloc.dart';
 import 'widget/appBar/new_custom_app_bar.dart';
 import 'widget/category_card_widget.dart';
-import 'widget/category_page.dart';
 import 'widget/drawer.dart';
 import 'widget/list_of_things_widget.dart';
 import 'widget/navigation_bar_widget.dart';
-import 'widget/new_list_of_types_widget.dart';
 import 'widget/things_title_list_widget.dart';
 import 'widget/type_widget/type_add_screen.dart';
-import 'widget/type_widget/type_card_widget.dart';
-
 export 'my_home_page.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -35,6 +30,7 @@ class MyHomePageState extends State<MyHomePage> {
   String? _selectedCategoryType;
   late HomeBloc _bloc;
   ValueNotifier<List<String>> selectedItemsNotifier = ValueNotifier([]);
+
 
   bool _isListMode = true;
   bool _showCategoryList = false;
@@ -55,62 +51,47 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return BlocBuilder<HomeBloc, HomeState>(
       bloc: _bloc,
       builder: (context, state) {
+        final filteredThings = state.things
+            .where((e) => e.title.trim().isNotEmpty)
+            .toList();
+
         return Scaffold(
           drawer: CustomDrawer(
             onToggleCategoryList: _toggleCategoryList,
-
           ),
           backgroundColor: isDarkMode ? AppColors.blackSand : Colors.white,
-          appBar: const NewCustomAppBar(
-            showBackButton: false,
-          ),
+          appBar: const NewCustomAppBar(showBackButton: false),
           body: Stack(
             children: [
               Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute<void>(builder: (context) => CategoriePage()),
-                            );
-                          },
-                          child: CustomText5(
-                            text: 'All Your Things',
-                            fontSize: 20,
-                          ),
+                        CustomText5(
+                          text: 'All Your Things',
+                          fontSize: 20,
                         ),
-
-
-
-
                       ],
                     ),
                   ),
-                  const Divider(
-                    thickness: 1,
-                    height: 1,
-                    color: Colors.black,
-                  ),
+                  const Divider(thickness: 1, height: 1, color: Colors.black),
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(Icons.import_export, size: 24),
                             SizedBox(width: 4),
-                            CustomText5(text: 'FILTER',fontSize:20,),
+                            CustomText5(text: 'FILTER', fontSize: 20),
                           ],
                         ),
                         Container(
@@ -156,11 +137,9 @@ class MyHomePageState extends State<MyHomePage> {
                             ],
                           ),
                         ),
-
                       ],
                     ),
                   ),
-
                   if (_showCategoryList)
                     SizedBox(
                       height: 50,
@@ -168,7 +147,6 @@ class MyHomePageState extends State<MyHomePage> {
                         scrollDirection: Axis.horizontal,
                         padding: const EdgeInsets.only(left: 16),
                         children: [
-
                           GestureDetector(
                             onTap: () {
                               Navigator.push(
@@ -202,9 +180,6 @@ class MyHomePageState extends State<MyHomePage> {
                               ),
                             ),
                           ),
-
-
-
                           ...state.typesWithColors.entries.map((entry) {
                             final type = entry.key;
                             final color = entry.value.isEmpty
@@ -234,13 +209,13 @@ class MyHomePageState extends State<MyHomePage> {
                         ],
                       ),
                     ),
-
-
                   const SizedBox(height: 12),
+
+
                   Expanded(
                     child: _isListMode
                         ? ThingsTypeListWidget(
-                      things: state.things,
+                      things: filteredThings,
                       selectedCategoryType: _selectedCategoryType,
                       selectedItemsNotifier: selectedItemsNotifier,
                       onStateUpdate: () => setState(() {}),
@@ -248,16 +223,9 @@ class MyHomePageState extends State<MyHomePage> {
                           _bloc.add(DeleteItemByUidEvent(uid: uid)),
                     )
                         : NewListOfTitles(
-                      title: state.things.map((e) => e.title).toList(),
-                    )
+                      title: filteredThings.map((e) => e.title!).toList(),
+                    ),
                   ),
-
-
-
-
-
-
-
                 ],
               ),
               Positioned(
@@ -269,13 +237,13 @@ class MyHomePageState extends State<MyHomePage> {
                   types: state.typesWithColors.keys.toList(),
                 ),
               ),
-
             ],
           ),
         );
       },
     );
   }
+
 
   Future<void> deleteSelectedItems(BuildContext context) async {
     try {
