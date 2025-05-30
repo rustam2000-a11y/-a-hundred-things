@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -56,6 +59,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
       );
     }
   }
+  bool _rememberMe = false;
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +82,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                   height: 64,
                 ),
                 CustomText3(
-                  text: S.of(context).mail,
+                  text:  S.of(context).emailAdderss,
                 ),
                 const SizedBox(height: 5),
                 CustomTextField(
@@ -101,13 +105,21 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                     Row(
                       children: [
                         Checkbox(
-                          value: false,
+                          value: _rememberMe,
                           onChanged: (value) {
-                            // setState(() {
-                            //   _rememberMe = value!;
-                            // });
+                            setState(() {
+                              _rememberMe = value!;
+                            });
                           },
+                          fillColor: MaterialStateProperty.resolveWith<Color>((states) {
+                            if (states.contains(MaterialState.selected)) {
+                              return Colors.black;
+                            }
+                            return Colors.transparent;
+                          }),
+                          checkColor: Colors.white,
                         ),
+
                         CustomText2(
                           text: S.of(context).remember,
                           color: AppColors.grey,
@@ -160,30 +172,25 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                   text: S.of(context).continueWithApple,
                   icon: Icons.apple,
                   onPressed: () async {
-                    try {
-                      final User? user = await signInWithApple();
-                      if (user != null) {
-                        await addUserToFirestore(user);
-                        if (context.mounted) {
-                          await Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute<dynamic>(
-                              builder: (_) => MyHomePage(toggleTheme: () {}),
-                            ),
-                          );
-                        }
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                           SnackBar(content: Text(S.of(context).appleSignInError)),
-                        );
-                      }
-                    } catch (e) {
+                    final User? user = await signInWithApple();
+                    if (!context.mounted) return;
+
+                    if (user != null) {
+                      await addUserToFirestore(user);
+                      await Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) => MyHomePage(toggleTheme: () {}),
+                        ),
+                      );
+                    } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('error: $e')),
+                        SnackBar(content: Text(S.of(context).appleSignInError)),
                       );
                     }
                   },
                 ),
+
                 const SizedBox(height: 40),
                 GestureDetector(
                   onTap: () {
@@ -233,17 +240,33 @@ Future<User?> signInWithGoogle() async {
 }
 
 Future<User?> signInWithApple() async {
-  final appleCredential = await SignInWithApple.getAppleIDCredential(
-    scopes: [
-      AppleIDAuthorizationScopes.email,
-      AppleIDAuthorizationScopes.email
-    ],
-  );
-  final oauthCredential = OAuthProvider('apple.com').credential(
-    idToken: appleCredential.identityToken,
-    accessToken: appleCredential.authorizationCode,
-  );
-  final userCredential =
-      await FirebaseAuth.instance.signInWithCredential(oauthCredential);
-  return userCredential.user;
+  if (!Platform.isIOS && !kIsWeb) {
+    print('Apple Sign-In is only available on iOS or web');
+    return null;
+  }
+
+  try {
+    final credential = await SignInWithApple.getAppleIDCredential(
+      scopes: [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName,
+      ],
+    );
+
+    final oauthCredential = OAuthProvider('apple.com').credential(
+      idToken: credential.identityToken,
+      accessToken: credential.authorizationCode,
+    );
+
+    final userCredential = await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+    if (credential.givenName != null && credential.familyName != null) {
+      final displayName = '${credential.givenName} ${credential.familyName}';
+      await userCredential.user?.updateDisplayName(displayName);
+    }
+
+    return userCredential.user;
+  } catch (e) {
+    print('Apple sign-in error: $e');
+    return null;
+  }
 }
