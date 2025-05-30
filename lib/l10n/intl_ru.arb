@@ -43,5 +43,6 @@
   "enterYourPassword": "Введите пароль",
   "ategories": "Категории",
   "openEmail": "Open Email",
-  "appleSignInError": "Apple Sign In Error"
+  "appleSignInError": "Apple Sign In Error",
+  "emailAdderss": "Email Adderss"
 }

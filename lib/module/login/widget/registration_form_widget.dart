@@ -5,7 +5,6 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../../generated/l10n.dart';
 import '../../home/my_home_page.dart';
-import '../../home/widget/custom_divider.dart';
 import 'button_basic.dart';
 import 'custom_divider.dart';
 import 'custom_text.dart';
@@ -44,20 +43,24 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(
             children: [
-              const SizedBox(height: 64,),
+              const SizedBox(
+                height: 64,
+              ),
               const CustomText(text: 'Create a profile'),
-              const SizedBox(height: 40,),
-               Align(
+              const SizedBox(
+                height: 40,
+              ),
+              Align(
                 alignment: Alignment.bottomLeft,
-                child: CustomText3(text:S.of(context).emailAdderss,
-                    ),
+                child: CustomText3(
+                  text: S.of(context).emailAdderss,
+                ),
               ),
               const SizedBox(
                 height: 4,
               ),
               CustomTextField(
                 controller: _emailController,
-                hintText: CustomText4(text: 'Email'),
               ),
               const SizedBox(height: 16),
               Align(
@@ -101,7 +104,7 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
                     );
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Error: $e")),
+                      SnackBar(content: Text('Error: $e')),
                     );
                   }
                 },
@@ -128,15 +131,14 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
                     );
                   }
                 },
-
               ),
-               const SizedBox(height: 15),
+              const SizedBox(height: 15),
               CustomButtonRegist(
                 text: S.of(context).continueWithApple,
                 icon: Icons.apple,
                 onPressed: () async {
                   try {
-                    User? user = await signInWithApple();
+                    final User? user = await signInWithApple();
                     if (user != null) {
                       await addUserToFirestore(user);
                       if (context.mounted) {
@@ -149,18 +151,16 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
                       }
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Ошибка входа через Apple")),
+                        const SnackBar(content: Text('Apple Sign In Error')),
                       );
                     }
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Ошибка: $e")),
+                      SnackBar(content: Text('Error: $e')),
                     );
                   }
                 },
-
               ),
-
             ],
           ),
         ),
@@ -212,7 +212,7 @@ Future<User?> signInWithApple() async {
       AppleIDAuthorizationScopes.email
     ],
   );
-  final oauthCredential = OAuthProvider("apple.com").credential(
+  final oauthCredential = OAuthProvider('apple.com').credential(
     idToken: appleCredential.identityToken,
     accessToken: appleCredential.authorizationCode,
   );

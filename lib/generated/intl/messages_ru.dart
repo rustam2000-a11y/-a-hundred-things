@@ -45,6 +45,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "editProfile":
             MessageLookupByLibrary.simpleMessage("Редактирование профиля"),
         "email": MessageLookupByLibrary.simpleMessage("Email"),
+        "emailAdderss": MessageLookupByLibrary.simpleMessage("Email Adderss"),
         "enterAName": MessageLookupByLibrary.simpleMessage("Введите названиe"),
         "enterName": MessageLookupByLibrary.simpleMessage("Введите имя"),
         "enterNumber": MessageLookupByLibrary.simpleMessage("Enter number"),
