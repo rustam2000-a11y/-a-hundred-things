@@ -1,10 +1,16 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../generated/l10n.dart';
 import '../../../presentation/colors.dart';
+import '../../home/widget/appBar/new_custom_app_bar.dart';
 import '../../login/widget/custom_text.dart';
 import '../../login/widget/text_filed.dart';
+import 'custom_bottom_navbar.dart';
 
 class Account extends StatefulWidget {
   const Account({super.key});
@@ -18,6 +24,9 @@ class _AccountState extends State<Account> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  File? _imageFile;
+  String? _imageUrl;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -38,8 +47,40 @@ class _AccountState extends State<Account> {
         emailController.text = userData['email'] ?? '';
         phoneController.text = userData['phone'] ?? '';
         passwordController.text = userData['password'] ?? '';
+        _imageUrl = userData['avatarUrl'] ?? '';
+
       }
     }
+  }
+  Future<void> _pickAndUploadImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile == null) return;
+    setState(() {
+      _imageFile = File(pickedFile.path);
+    });
+
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return;
+
+    final storageRef = FirebaseStorage.instance
+        .ref()
+        .child('user_avatars')
+        .child('$userId.jpg');
+
+    await storageRef.putFile(_imageFile!);
+    final downloadUrl = await storageRef.getDownloadURL();
+
+    await FirebaseFirestore.instance.collection('user').doc(userId).update({
+      'avatarUrl': downloadUrl,
+    });
+
+    setState(() {
+      _imageUrl = downloadUrl;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Photo updated successfully')),
+    );
   }
 
   Future<void> _updateUserData() async {
@@ -53,11 +94,11 @@ class _AccountState extends State<Account> {
         'password': passwordController.text,
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Данные успешно обновлены')),
+        const SnackBar(content: Text('Data updated successfully')),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Не удалось обновить данные')),
+        const SnackBar(content: Text('Failed to update data')),
       );
     }
   }
@@ -70,80 +111,59 @@ class _AccountState extends State<Account> {
     final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      appBar: const NewCustomAppBar(
+          showBackButton: false,
+          showSearchIcon: false,
+          logo: Text('Edit Profile'),
+      ),
+      bottomNavigationBar:CustomBottomNavbar(buttonText: 'SAVE', onPressed: _updateUserData,),
       backgroundColor: isDarkTheme ? AppColors.blackSand : Colors.white,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              height: screenHeight * 0.25,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                gradient: isDarkTheme ? AppColors.tealGradient : null,
-                color: !isDarkTheme ? AppColors.silverColor : null,
-              ),
+            const SizedBox(height:24 ),
+            Center(
               child: Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.bottomCenter,
                 children: [
-                  Positioned(
-                    bottom: -screenHeight * 0.07,
-                    child: CircleAvatar(
-                      radius: screenHeight * 0.08,
-                      backgroundImage: const AssetImage('assets/avatar.png'),
-                      backgroundColor: Colors.grey[300],
+
+                  Container(
+                    height: 150,
+                    width: 150,
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      image: _imageUrl != null
+                          ? DecorationImage(
+                        image: NetworkImage(_imageUrl!),
+                        fit: BoxFit.cover,
+                      )
+                          : null,
                     ),
+                    child: _imageUrl == null
+                        ? const Icon(Icons.person, size: 80, color: Colors.white)
+                        : null,
                   ),
-                  Positioned.fill(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.arrow_back_ios_new,
-                                color: Colors.white,
-                              ),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ),
-                          Center(
-                            child: Text(
-                              S.of(context).editProfile,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: GestureDetector(
+                      onTap: _pickAndUploadImage,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.blue,
+                        ),
+                        padding: const EdgeInsets.all(8),
+                        child: const Icon(Icons.edit, color: Colors.white, size: 20),
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            SizedBox(height: screenHeight * 0.08),
-            Center(
-              child: Text(
-                S.of(context).change,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.blue,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
             SizedBox(height: screenHeight * 0.02),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -160,7 +180,7 @@ class _AccountState extends State<Account> {
                     hintText: CustomText4(text: S.of(context).enterName),
                     height: 40,
                   ),
-                  SizedBox(height: screenHeight * 0.02),
+                  const SizedBox(height: 16),
                   const Text(
                     'Email',
                     style: TextStyle(
@@ -174,7 +194,7 @@ class _AccountState extends State<Account> {
                     hintText: CustomText4(text: S.of(context).enterYourEmail),
                     height: 40,
                   ),
-                  SizedBox(height: screenHeight * 0.02),
+                  const SizedBox(height: 16),
                   Text(
                     S.of(context).number,
                     style: const TextStyle(
@@ -188,7 +208,7 @@ class _AccountState extends State<Account> {
                     hintText: CustomText4(text: S.of(context).enterNumber),
                     height: 40,
                   ),
-                  SizedBox(height: screenHeight * 0.02),
+                  const SizedBox(height: 16),
                   Text(
                     S.of(context).password,
                     style: const TextStyle(
@@ -203,32 +223,8 @@ class _AccountState extends State<Account> {
                         CustomText4(text: S.of(context).enterYourPassword),
                     height: 40,
                   ),
-                  SizedBox(
-                    height: screenHeight * 0.02,
-                  ),
-                  Center(
-                    child: SafeArea(
-                      child: ElevatedButton(
-                        onPressed: _updateUserData,
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: screenWidth * 0.3,
-                            vertical: 15.0,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          backgroundColor: isDarkTheme
-                              ? AppColors.blueGradient.colors.first
-                              : AppColors.silverColor,
-                        ),
-                        child: const Text(
-                          'Обновить',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ),
+                  const SizedBox(height: 16),
+
                 ],
               ),
             ),
