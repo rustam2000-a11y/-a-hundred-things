@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../login/screen/login_screen.dart';
-import '../../settings/widget/user_profile_screen.dart';
+import '../../settings/screen/user_profile_screen.dart';
 import '../my_home_page.dart';
 import 'category_page.dart';
 import 'custom_divider.dart';
