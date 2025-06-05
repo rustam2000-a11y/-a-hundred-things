@@ -148,14 +148,7 @@ class _AccountState extends State<Account> {
                     bottom: 0,
                     child: GestureDetector(
                       onTap: _pickAndUploadImage,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.blue,
-                        ),
-                        padding: const EdgeInsets.all(8),
-                        child: const Icon(Icons.edit, color: Colors.white, size: 20),
-                      ),
+                      child: const Icon(Icons.edit, color: Colors.white, size: 20),
                     ),
                   ),
                 ],
@@ -167,22 +160,8 @@ class _AccountState extends State<Account> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    S.of(context).name,
-                    style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.grey),
-                  ),
-                  SizedBox(height: screenHeight * 0.01),
-                  CustomTextField(
-                    controller: nameController,
-                    hintText: CustomText4(text: S.of(context).enterName),
-                    height: 40,
-                  ),
-                  const SizedBox(height: 16),
                   const Text(
-                    'Email',
+                    "Username",
                     style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -190,23 +169,7 @@ class _AccountState extends State<Account> {
                   ),
                   SizedBox(height: screenHeight * 0.01),
                   CustomTextField(
-                    controller: emailController,
-                    hintText: CustomText4(text: S.of(context).enterYourEmail),
-                    height: 40,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    S.of(context).number,
-                    style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.grey),
-                  ),
-                  SizedBox(height: screenHeight * 0.01),
-                  CustomTextField(
-                    controller: phoneController,
-                    hintText: CustomText4(text: S.of(context).enterNumber),
-                    height: 40,
+                    controller: nameController,
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -219,12 +182,32 @@ class _AccountState extends State<Account> {
                   SizedBox(height: screenHeight * 0.01),
                   CustomTextField(
                     controller: passwordController,
-                    hintText:
-                        CustomText4(text: S.of(context).enterYourPassword),
-                    height: 40,
                   ),
                   const SizedBox(height: 16),
-
+                  const Text(
+                    'Email Adderss',
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.grey),
+                  ),
+                  SizedBox(height: screenHeight * 0.01),
+                  CustomTextField(
+                    controller: emailController,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    S.of(context).number,
+                    style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.grey),
+                  ),
+                  SizedBox(height: screenHeight * 0.01),
+                  CustomTextField(
+                    controller: phoneController,
+                  ),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
