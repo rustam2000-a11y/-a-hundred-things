@@ -13,8 +13,7 @@ import '../../login/widget/button_basic.dart';
 import 'appBar/dropdown_container.dart';
 import 'appBar/dropdown_title_widget.dart';
 import 'appBar/new_custom_app_bar.dart';
-
-
+import 'type_dropdown_list.dart';
 
 class AddItemPage extends StatefulWidget {
   const AddItemPage({
@@ -22,18 +21,16 @@ class AddItemPage extends StatefulWidget {
     required this.allTypes,
   });
 
-
   final List<String> allTypes;
 
   @override
   State<AddItemPage> createState() => _AddItemPageState();
 }
 
-
 class _AddItemPageState extends State<AddItemPage> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _typeController = TextEditingController();
+
   final ImagePicker _picker = ImagePicker();
   final ThingsRepositoryI thingsRepository = GetIt.I<ThingsRepositoryI>();
   final List<File> _selectedImages = [];
@@ -43,6 +40,7 @@ class _AddItemPageState extends State<AddItemPage> {
 
   final bool _showDrawer = false;
   final Set<String> _typeSet = {};
+
   @override
   @override
   void initState() {
@@ -51,7 +49,6 @@ class _AddItemPageState extends State<AddItemPage> {
     _typeSet.addAll(widget.allTypes);
   }
 
-
   Future<void> _pickAndCropImage() async {
     try {
       final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -59,7 +56,7 @@ class _AddItemPageState extends State<AddItemPage> {
         final cropperKey = GlobalKey(debugLabel: 'cropperKey');
         final File imageFile = File(pickedFile.path);
 
-        await showDialog(
+        await showDialog<void>(
           context: context,
           builder: (context) {
             return Dialog(
@@ -73,10 +70,12 @@ class _AddItemPageState extends State<AddItemPage> {
                   ),
                   TextButton(
                     onPressed: () async {
-                      final imageBytes = await Cropper.crop(cropperKey: cropperKey);
+                      final imageBytes =
+                          await Cropper.crop(cropperKey: cropperKey);
                       if (imageBytes != null) {
                         final tempDir = Directory.systemTemp;
-                        final tempFile = File('${tempDir.path}/cropped_${DateTime.now().millisecondsSinceEpoch}.png');
+                        final tempFile = File(
+                            '${tempDir.path}/cropped_${DateTime.now().millisecondsSinceEpoch}.png');
                         await tempFile.writeAsBytes(imageBytes);
                         setState(() {
                           _selectedImages.add(tempFile);
@@ -104,6 +103,8 @@ class _AddItemPageState extends State<AddItemPage> {
     return '#${random.nextInt(0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
   }
 
+  bool _isExpanded = false;
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -118,31 +119,19 @@ class _AddItemPageState extends State<AddItemPage> {
         logo: WidgetDrawerContainer(
           typ: selectedType,
           onTap: () {
-            if (_typeController.text.isNotEmpty) {
-              setState(() {
-                _typeSet.add(_typeController.text.trim());
-              });
-            }
-
-
-
-            showDialog(
+            showDialog<void>(
               context: context,
               builder: (context) => Dialog(
                 backgroundColor: Colors.transparent,
                 child: WidgetDrawer(
-                  types: _typeSet.toList(),
+                    types: _typeSet.toList(),
                     onTypeSelected: (selected) {
                       setState(() {
-
                         selectedType = selected;
                       });
-                    }
-
-                ),
+                    }),
               ),
             );
-
           },
         ),
       ),
@@ -153,14 +142,12 @@ class _AddItemPageState extends State<AddItemPage> {
             if (_showDrawer && _typeSet.isNotEmpty)
               WidgetDrawer(
                 types: _typeSet.toList(),
-                onTypeSelected: (selectedType) {
+                onTypeSelected: (selected) {
                   setState(() {
-                    _typeController.text = selectedType;
-
+                    selectedType = selected;
                   });
                 },
               ),
-
             GestureDetector(
               onTap: _pickAndCropImage,
               child: Container(
@@ -172,88 +159,44 @@ class _AddItemPageState extends State<AddItemPage> {
                 child: Center(
                   child: _selectedImages.isNotEmpty
                       ? PageView.builder(
-                    itemCount: _selectedImages.length,
-                    itemBuilder: (context, index) {
-                      return Image.file(
-                        _selectedImages[index],
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: double.infinity,
-                      );
-                    },
-                  )
+                          itemCount: _selectedImages.length,
+                          itemBuilder: (context, index) {
+                            return Image.file(
+                              _selectedImages[index],
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                            );
+                          },
+                        )
                       : Container(
-                    width: screenWidth * 0.5,
-                    height: screenWidth * 0.5,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Icon(
-                      Icons.add_a_photo_rounded,
-                      color: AppColors.grey,
-                      size: screenWidth * 0.18,
-                    ),
-                  ),
+                          width: screenWidth * 0.5,
+                          height: screenWidth * 0.5,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Icon(
+                            Icons.add_a_photo_rounded,
+                            color: AppColors.grey,
+                            size: screenWidth * 0.18,
+                          ),
+                        ),
                 ),
               ),
             ),
-
-            Positioned(
-              top: screenHeight * 0.45,
-              left: 0,
-              right: 0,
-              child: Container(
-                height: screenHeight * 0.6,
-                padding: EdgeInsets.all(screenWidth * 0.05),
-                decoration: BoxDecoration(
-                  gradient: isDarkMode ? AppColors.darkBlueGradient : null,
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      spreadRadius: 3,
-                      blurRadius: 5,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                  border: const Border(top: BorderSide()),
-                ),
-                child: Column(
-                  children: [
-                    TextField(
-                      controller: _typeController,
-                      decoration: InputDecoration(
-                        hintText: S.of(context).type,
-                        border: InputBorder.none,
-                      ),
-                      style: TextStyle(
-                        color: isDarkMode ? Colors.white : Colors.black,
-                        fontSize: screenWidth * 0.05,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextField(
-                      controller: _titleController,
-                      decoration: InputDecoration(
-                        labelText: S.of(context).enterAName,
-                        border: InputBorder.none,
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.02),
-                    TextField(
-                      controller: _descriptionController,
-                      decoration: InputDecoration(
-                        labelText: S.of(context).description,
-                        border: InputBorder.none,
-                      ),
-                      style: TextStyle(fontSize: screenWidth * 0.045),
-                      maxLines: 4,
-                      minLines: 1,
-                    ),
-                  ],
-                ),
-              ),
+            ExpandableFormCard(
+              isExpanded: _isExpanded,
+              titleController: _titleController,
+              descriptionController: _descriptionController,
+              isDarkMode: isDarkMode,
+              screenHeight: screenHeight,
+              screenWidth: screenWidth,
+              onExpandChanged: (value) {
+                setState(() {
+                  _isExpanded = value;
+                });
+              },
             ),
 
             Align(
@@ -261,7 +204,8 @@ class _AddItemPageState extends State<AddItemPage> {
               child: Container(
                 height: screenHeight * 0.15,
                 decoration: BoxDecoration(
-                  color: isDarkMode ? AppColors.blackSand : AppColors.whiteColor,
+                  color:
+                      isDarkMode ? AppColors.blackSand : AppColors.whiteColor,
                   border: const Border(top: BorderSide()),
                 ),
                 child: Padding(
@@ -276,24 +220,29 @@ class _AddItemPageState extends State<AddItemPage> {
                         onPressed: () async {
                           if (_titleController.text.isNotEmpty &&
                               _descriptionController.text.isNotEmpty &&
-                              _typeController.text.isNotEmpty) {
+                              (selectedType?.isNotEmpty ?? false)) {
                             try {
                               if (_selectedImages.isNotEmpty) {
-                                _imageUrls = await thingsRepository.uploadImages(_selectedImages);
+                                _imageUrls = await thingsRepository
+                                    .uploadImages(_selectedImages);
                               }
 
-                              final type = _typeController.text.trim();
+                              final type = selectedType!.trim();
                               if (!typeColorsCache.containsKey(type)) {
                                 typeColorsCache[type] = getRandomColor();
                               }
 
                               final randomColor = typeColorsCache[type]!;
 
-                              await FirebaseFirestore.instance.collection('item').add({
+                              await FirebaseFirestore.instance
+                                  .collection('item')
+                                  .add({
                                 'title': _titleController.text.trim(),
-                                'description': _descriptionController.text.trim(),
+                                'description':
+                                    _descriptionController.text.trim(),
                                 'type': type,
-                                'userId': FirebaseAuth.instance.currentUser?.uid,
+                                'userId':
+                                    FirebaseAuth.instance.currentUser?.uid,
                                 'color': randomColor,
                                 'typeColor': randomColor,
                                 'timestamp': Timestamp.now(),
@@ -309,7 +258,8 @@ class _AddItemPageState extends State<AddItemPage> {
                             }
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Please fill all fields')),
+                              const SnackBar(
+                                  content: Text('Please fill all fields')),
                             );
                           }
                         },
