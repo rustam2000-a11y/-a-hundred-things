@@ -21,8 +21,8 @@ void showEditItemBottomSheet(
   final TextEditingController _typeController =
   TextEditingController(text: initialType);
 
-  List<File> _newImages = []; // Новые изображения для замены
-  List<String> _existingImageUrls = []; // Существующие изображения
+  List<File> _newImages = [];
+  List<String> _existingImageUrls = [];
   final ImagePicker _picker = ImagePicker();
 
   Future<void> _pickNewImages(StateSetter setState) async {

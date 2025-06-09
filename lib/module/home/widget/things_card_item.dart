@@ -6,7 +6,7 @@ import 'counter_controls.dart';
 import 'edit_item_bottom_sheet.dart';
 import 'item_image.dart';
 import 'card_widget/new_card_widget.dart';
-import 'show_add_item_bottom_sheet.dart';
+import '../../things/new_things/create_new_thing_screen.dart';
 import 'show_modal_buttom_sheet.dart';
 
 final Map<String, int> itemCounts = {};

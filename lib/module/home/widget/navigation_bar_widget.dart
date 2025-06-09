@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../login/widget/custom_text.dart';
 import 'item_progress_bar_widget.dart';
-import 'show_add_item_bottom_sheet.dart';
+import '../../things/new_things/create_new_thing_screen.dart';
 
 
 class NavigationBarWidget extends StatelessWidget {
@@ -28,7 +28,12 @@ class NavigationBarWidget extends StatelessWidget {
         int totalQuantity = 0;
 
         if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
-          totalQuantity = snapshot.data!.docs.fold<int>(
+          final docsWithTitle = snapshot.data!.docs.where((doc) {
+            final title = doc['title'];
+            return title != null && title.toString().trim().isNotEmpty;
+          });
+
+          totalQuantity = docsWithTitle.fold<int>(
             0,
                 (accumulator, doc) {
               final quantity = doc['quantity'] as int? ?? 1;
@@ -36,6 +41,7 @@ class NavigationBarWidget extends StatelessWidget {
             },
           );
         }
+
 
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -59,7 +65,7 @@ class NavigationBarWidget extends StatelessWidget {
                         Navigator.push<void>(
                           context,
                           MaterialPageRoute<void>(
-                            builder: (context) => AddItemPage(
+                            builder: (context) => CreateNewThingScreen(
                               allTypes: types,
                             ),
                           ),

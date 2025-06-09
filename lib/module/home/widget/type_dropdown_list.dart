@@ -3,7 +3,6 @@ import '../../../generated/l10n.dart';
 import '../../../presentation/colors.dart';
 
 class ExpandableFormCard extends StatefulWidget {
-
   const ExpandableFormCard({
     super.key,
     required this.isExpanded,
@@ -13,7 +12,14 @@ class ExpandableFormCard extends StatefulWidget {
     required this.screenHeight,
     required this.screenWidth,
     required this.onExpandChanged,
+    required this.locationController,
+    this.priceController,
+    this.weightController,
+    this.colorController,
+    this.importanceController,
+    this.quantityController,
   });
+
   final bool isExpanded;
   final TextEditingController titleController;
   final TextEditingController descriptionController;
@@ -21,6 +27,12 @@ class ExpandableFormCard extends StatefulWidget {
   final double screenHeight;
   final double screenWidth;
   final ValueChanged<bool> onExpandChanged;
+  final TextEditingController? locationController;
+  final TextEditingController? priceController;
+  final TextEditingController? weightController;
+  final TextEditingController? colorController;
+  final TextEditingController? importanceController;
+  final TextEditingController? quantityController;
 
   @override
   State<ExpandableFormCard> createState() => _ExpandableFormCardState();
@@ -32,13 +44,14 @@ class _ExpandableFormCardState extends State<ExpandableFormCard> {
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
-      top: widget.isExpanded ? widget.screenHeight * 0.25 : widget.screenHeight * 0.45,
+      top: widget.isExpanded
+          ? widget.screenHeight * 0.12
+          : widget.screenHeight * 0.40,
       left: 0,
       right: 0,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
-        padding: EdgeInsets.all(widget.screenWidth * 0.05),
         decoration: BoxDecoration(
           gradient: widget.isDarkMode ? AppColors.darkBlueGradient : null,
           color: Colors.white,
@@ -51,11 +64,12 @@ class _ExpandableFormCardState extends State<ExpandableFormCard> {
             ),
           ],
           border: const Border(top: BorderSide()),
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
         ),
         constraints: BoxConstraints(
           minHeight: widget.screenHeight * 0.3,
-          maxHeight: widget.isExpanded ? widget.screenHeight * 0.6 : widget.screenHeight * 0.3,
+          maxHeight: widget.isExpanded
+              ? widget.screenHeight * 0.85
+              : widget.screenHeight * 0.4,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,65 +80,62 @@ class _ExpandableFormCardState extends State<ExpandableFormCard> {
               margin: EdgeInsets.only(bottom: widget.isExpanded ? 0 : 20),
               child: Column(
                 children: [
-                  TextField(
-                    controller: widget.titleController,
-                    decoration: InputDecoration(
-                      labelText: S.of(context).enterAName,
-                      labelStyle: const TextStyle(fontSize: 24),
-                      border: InputBorder.none,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: TextField(
+                      controller: widget.titleController,
+                      decoration: InputDecoration(
+                        labelText: S.of(context).enterAName,
+                        labelStyle: const TextStyle(fontSize: 24),
+                        border: InputBorder.none,
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.edit),
+                          onPressed: () {
+
+
+                          },
+                        ),
+                      ),
                     ),
                   ),
                   SizedBox(height: widget.screenHeight * 0.02),
-                  TextField(
-                    controller: widget.descriptionController,
-                    decoration: InputDecoration(
-                      labelText: S.of(context).description,
-                      labelStyle: const TextStyle(fontSize: 14),
-                      border: InputBorder.none,
-                    ),
-                    style: const TextStyle(fontSize: 15),
-                    maxLines: 4,
-                    minLines: 1,
-                  ),
-                  const SizedBox(height: 10),
-                  AnimatedCrossFade(
-                    firstChild: const SizedBox.shrink(),
-                    secondChild: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black26,
-                            blurRadius: 5,
-                            offset: Offset(0, 3),
-                          )
-                        ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: TextField(
+                      controller: widget.descriptionController,
+                      decoration: InputDecoration(
+                        labelText: S.of(context).description,
+                        labelStyle: const TextStyle(fontSize: 14),
+                        border: InputBorder.none,
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: List.generate(5, (index) {
-                          final option = index + 1;
-                          return InkWell(
-                            onTap: () {
-                              print('Выбрана опция $option');
-                              widget.onExpandChanged(false);
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Text('Опция $option',
-                                  style: const TextStyle(fontSize: 16)),
-                            ),
-                          );
-                        }),
+                      style: const TextStyle(fontSize: 15),
+                      maxLines: 4,
+                      minLines: 1,
+                    ),
+                  ),
+                  if (widget.isExpanded)
+                    SizedBox(
+                      height: widget.screenHeight * 0.35,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            _buildFieldRow(label: 'Location', controller: widget.locationController),
+                            const Divider(),
+                            _buildFieldRow(label: 'Price', controller: widget.priceController),
+                            const Divider(),
+                            _buildFieldRow(label: 'Weight', controller: widget.weightController),
+                            const Divider(),
+                            _buildFieldRow(label: 'Color', controller: widget.colorController),
+                            const Divider(),
+                            _buildFieldRow(label: 'Importance', controller: widget.importanceController),
+                            const Divider(),
+                            _buildFieldRow(label: 'Quantity', controller: widget.quantityController),
+                            const SizedBox(height: 12),
+                          ],
+                        ),
                       ),
                     ),
-                    crossFadeState: widget.isExpanded
-                        ? CrossFadeState.showSecond
-                        : CrossFadeState.showFirst,
-                    duration: const Duration(milliseconds: 300),
-                  ),
+
                 ],
               ),
             ),
@@ -132,15 +143,15 @@ class _ExpandableFormCardState extends State<ExpandableFormCard> {
               onTap: () {
                 widget.onExpandChanged(!widget.isExpanded);
               },
-              child: Container(
-                color: Colors.transparent,
-                padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Выбрать тип',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      'More options',
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600),
                     ),
                     AnimatedRotation(
                       turns: widget.isExpanded ? 0.5 : 0.0,
@@ -158,4 +169,37 @@ class _ExpandableFormCardState extends State<ExpandableFormCard> {
   }
 }
 
+Widget _buildFieldRow({
+  required String label,
+  TextEditingController? controller,
+}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16),
+    child: Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              hintText: label,
+              hintStyle: const TextStyle(fontSize: 16),
+              border: InputBorder.none,
+              isDense: true,
+              contentPadding: EdgeInsets.zero,
+            ),
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.edit,size: 24,),
 
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+          onPressed: () {
+
+          },
+        ),
+
+      ],
+    ),
+  );
+}
