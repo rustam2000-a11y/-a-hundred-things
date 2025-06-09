@@ -28,15 +28,15 @@ class BaseDataApi implements BaseDataApiI {
   @override
   Stream<List<ThingsModel>> fetchAllThings() {
     return Stream.fromFuture(getCurrentUserUid()).asyncExpand(
-      (userUid) => databaseReference
+          (userUid) => databaseReference
           .collection('item')
           .where('userId', isEqualTo: userUid)
           .snapshots()
           .map(
             (event) => event.docs
-                .map((e) => ThingsModel.fromJson(e.data()).copyWith(id: e.id))
-                .toList(),
-          ),
+            .map((e) => ThingsModel.fromJson(e.data()).copyWith(id: e.id))
+            .toList(),
+      ),
     );
   }
   @override
