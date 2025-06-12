@@ -9,7 +9,7 @@ class ItemImage extends StatelessWidget {
     required this.isSelected,
   }) : super(key: key);
 
-  final String? imageUrl;
+  final List <String>? imageUrl;
   final String itemId;
   final bool isSelected;
 

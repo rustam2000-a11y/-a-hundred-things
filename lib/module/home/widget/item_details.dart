@@ -22,7 +22,7 @@ class ItemDetails extends StatelessWidget {
   final bool isSelected;
   final VoidCallback? onDeleteItem;
   final String itemId;
-  final String? imageUrl;
+  final List <String>? imageUrl;
 
   @override
   Widget build(BuildContext context) {

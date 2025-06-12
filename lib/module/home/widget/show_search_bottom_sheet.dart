@@ -51,7 +51,6 @@ class _SearchPageState extends State<SearchPage> {
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
         child: Container(
-
           decoration: const BoxDecoration(
             color: Colors.white,
           ),
@@ -77,7 +76,6 @@ class _SearchPageState extends State<SearchPage> {
                           color:
                               isDarkMode ? Colors.grey[400] : Colors.grey[700],
                         ),
-
                         filled: true,
                         fillColor: isDarkMode ? Colors.grey[900] : Colors.white,
                         border: const OutlineInputBorder(
@@ -115,7 +113,10 @@ class _SearchPageState extends State<SearchPage> {
                               child: Text('No items match your search.'));
                         }
 
-                        final items = snapshot.data!;
+                        final items = snapshot.data!
+                            .where((item) => item.title.trim().isNotEmpty)
+                            .toList();
+
 
                         return ListView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -127,12 +128,20 @@ class _SearchPageState extends State<SearchPage> {
                               title: item.title,
                               description: item.description,
                               type: item.type,
-                              imageUrl: item.imageUrl,
+                              imageUrl:  item.imageUrl,
                               onStateUpdate: () {},
                               quantity: item.quantity,
+                              allTypes: const [],
+                              location: item.location ?? '',
+                              weight: item.weight ?? 0.0,
+                              colorText: item.colorText ?? '',
+                              importance: item.importance ?? 0,
+
+
                             );
                           },
                         );
+
                       },
                     );
                   },

@@ -12,7 +12,7 @@ void showEditItemBottomSheet(
       required String initialTitle,
       required String initialDescription,
       required String initialType,
-      required String? imageUrl,
+      required List <String>? imageUrl,
     }) {
   final TextEditingController _titleController =
   TextEditingController(text: initialTitle);

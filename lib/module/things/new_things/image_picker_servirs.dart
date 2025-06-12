@@ -11,6 +11,7 @@ class ImagePickerService {
     try {
       final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
       if (pickedFile == null) return null;
+
       final cropperKey = GlobalKey(debugLabel: 'cropperKey');
       final File imageFile = File(pickedFile.path);
       File? resultFile;
@@ -29,6 +30,15 @@ class ImagePickerService {
                       final tempDir = Directory.systemTemp;
                       final tempFile = File('${tempDir.path}/cropped_${DateTime.now().millisecondsSinceEpoch}.png');
                       await tempFile.writeAsBytes(imageBytes);
+
+
+                      int retryCount = 0;
+                      while ((!tempFile.existsSync() || await tempFile.length() == 0) && retryCount < 5) {
+                        await Future<void>.delayed(const Duration(milliseconds: 200));
+                        retryCount++;
+                      }
+
+
                       resultFile = tempFile;
                     }
                     Navigator.of(context).pop();
@@ -47,4 +57,5 @@ class ImagePickerService {
       return null;
     }
   }
+
 }

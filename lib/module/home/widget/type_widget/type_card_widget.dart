@@ -20,7 +20,7 @@ class TypeCardWidget extends StatelessWidget {
   final bool isSelected;
   final bool isDarkTheme;
   final String typDescription;
-  final String? imageUrl;
+  final List <String>? imageUrl;
   final String itemId;
   final String type;
   final VoidCallback? onDeleteItem;

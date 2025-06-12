@@ -12,10 +12,6 @@ import 'show_modal_buttom_sheet.dart';
 final Map<String, int> itemCounts = {};
 final Map<String, String> typeColors = {};
 
-
-
-
-
 class ThingsCardWidget extends StatelessWidget {
   const ThingsCardWidget({
     super.key,
@@ -29,6 +25,12 @@ class ThingsCardWidget extends StatelessWidget {
     this.selectedCategoryType,
     required this.quantity,
     this.selectedItemsNotifier,
+    required this.allTypes,
+    required this.location,
+    required this.weight,
+    required this.colorText,
+    required this.importance,
+
   });
 
   final String itemId;
@@ -37,10 +39,16 @@ class ThingsCardWidget extends StatelessWidget {
   final String type;
   final VoidCallback onStateUpdate;
   final VoidCallback? onDeleteItem;
-  final String? imageUrl;
+  final List <String>? imageUrl;
   final String? selectedCategoryType;
   final int quantity;
   final ValueNotifier<List<String>>? selectedItemsNotifier;
+  final List<String> allTypes;
+  final String location;
+  final double weight;
+  final String colorText;
+  final int importance;
+
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +59,6 @@ class ThingsCardWidget extends StatelessWidget {
       builder: (context, selectedItems, child) {
         final isSelected = selectedItems.contains(itemId);
 
-
-
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 4.0),
           child: GestureDetector(
@@ -60,14 +66,29 @@ class ThingsCardWidget extends StatelessWidget {
               if (selectedItemsNotifier != null && selectedItems.isNotEmpty) {
                 _toggleSelection(selectedItemsNotifier!, itemId);
               } else {
-                showItemDetailsBottomSheet(
-                  context: context,
-                  title: title,
-                  description: description,
-                  type: type,
-                  itemId: itemId,
-                  imageUrl: imageUrl,
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<Widget>(
+                    builder: (context) => CreateNewThingScreen(
+                      allTypes: allTypes,
+                      isReadOnly: true,
+                      existingThing: {
+                        'id': itemId,
+                        'title': title,
+                        'description': description,
+                        'type': type,
+                        'imageUrls': imageUrl ?? [],
+                        'quantity': quantity,
+                        'location': location,
+                        'weight': weight,
+                        'colorText': colorText,
+                        'importance': importance,
+                      },
+                    ),
+                  ),
                 );
+
+
               }
             },
             onLongPress: () {
@@ -76,17 +97,17 @@ class ThingsCardWidget extends StatelessWidget {
               }
             },
             child: ThingCardContainer(
-        isSelected: isSelected,
-        isDarkTheme: isDarkTheme,
-        title: title,
-        description: description,
-        imageUrl: imageUrl,
-        itemId: itemId,
-        type: type,
-        onDeleteItem: onDeleteItem,
-        selectedCategoryType: selectedCategoryType,
-        onStateUpdate: onStateUpdate,
-          ),
+              isSelected: isSelected,
+              isDarkTheme: isDarkTheme,
+              title: title,
+              description: description,
+              imageUrl: imageUrl,
+              itemId: itemId,
+              type: type,
+              onDeleteItem: onDeleteItem,
+              selectedCategoryType: selectedCategoryType,
+              onStateUpdate: onStateUpdate,
+            ),
           ),
         );
       },
@@ -103,11 +124,3 @@ class ThingsCardWidget extends StatelessWidget {
     notifier.value = currentItems;
   }
 }
-
-
-
-
-
-
-
-

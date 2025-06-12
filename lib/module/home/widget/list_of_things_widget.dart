@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'things_card_item.dart';
 
 class ThingsTypeListWidget extends StatelessWidget {
-
   const ThingsTypeListWidget({
     super.key,
     required this.things,
@@ -11,6 +10,7 @@ class ThingsTypeListWidget extends StatelessWidget {
     required this.onDeleteItem,
     required this.onStateUpdate,
   });
+
   final List<dynamic> things;
   final String? selectedCategoryType;
   final ValueNotifier<List<String>> selectedItemsNotifier;
@@ -39,6 +39,12 @@ class ThingsTypeListWidget extends StatelessWidget {
               quantity: item.quantity,
               onDeleteItem: () => onDeleteItem(item.id),
               selectedItemsNotifier: selectedItemsNotifier,
+              allTypes: [],
+              location: item.location,
+              weight: item.weight,
+              colorText: item.colorText,
+              importance: item.importance,
+
             ),
           );
         },

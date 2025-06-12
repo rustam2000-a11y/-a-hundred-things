@@ -48,14 +48,18 @@ class WidgetDrawer extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           GestureDetector(
-                            onTap: () {
-                              Navigator.push<Widget>(
+                            onTap: () async {
+                              final newType = await Navigator.push<String>(
                                 context,
-                                MaterialPageRoute<Widget>(
-                                  builder: (context) => const AddTypePage(),
-                                ),
+                                MaterialPageRoute(builder: (context) => const AddTypePage()),
                               );
+
+                              if (newType != null && !types.contains(newType)) {
+                                onTypeSelected(newType);
+                                Navigator.pop(context);
+                              }
                             },
+
                             child: const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [

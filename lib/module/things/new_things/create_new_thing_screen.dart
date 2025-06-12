@@ -21,9 +21,13 @@ class CreateNewThingScreen extends StatefulWidget {
   const CreateNewThingScreen({
     super.key,
     required this.allTypes,
+    this.isReadOnly = false,
+    this.existingThing,
   });
 
   final List<String> allTypes;
+  final bool isReadOnly;
+  final Map<String, dynamic>? existingThing;
 
   @override
   State<CreateNewThingScreen> createState() => _CreateNewThingScreenState();
@@ -39,14 +43,15 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
   final TextEditingController _importanceController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
 
-
   final ThingsRepositoryI thingsRepository = GetIt.I<ThingsRepositoryI>();
   final Map<String, String> typeColorsCache = {};
   List<String> _imageUrls = [];
   String? selectedType;
+  String? existingDocId;
 
   final bool _showDrawer = false;
   final Set<String> _typeSet = {};
+  bool isEditMode = false;
 
   late final CreateNewThingBloc _bloc;
 
@@ -54,8 +59,33 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
   void initState() {
     _bloc = GetIt.I<CreateNewThingBloc>();
     _typeSet.addAll(widget.allTypes);
+
+    isEditMode = widget.existingThing != null;
+
+    if (isEditMode) {
+      final data = widget.existingThing!;
+      existingDocId = data['id'];
+      _titleController.text = data['title'] ?? '';
+      _descriptionController.text = data['description'] ?? '';
+      _locationController.text = data['location'] ?? '';
+      _priceController.text = (data['price'] ?? '').toString();
+      _weightController.text = (data['weight'] ?? '').toString();
+      _colorController.text = data['colorText'] ?? '';
+      _importanceController.text = (data['importance'] ?? '').toString();
+      _quantityController.text = (data['quantity'] ?? '1').toString();
+      selectedType = data['type'];
+
+      final imageUrlRaw = data['imageUrls'];
+      if (imageUrlRaw is List<String>) {
+        _imageUrls = imageUrlRaw;
+      } else if (imageUrlRaw is List) {
+        _imageUrls = List<String>.from(imageUrlRaw.whereType<String>());
+      }
+    }
+
     super.initState();
   }
+
 
   String getRandomColor() {
     final random = Random();
@@ -121,29 +151,28 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                     decoration: BoxDecoration(
                       color: isDarkMode ? Colors.white : Colors.white,
                     ),
-                    child: Center(
+
                       child: state.file != null
                           ? Image.file(
-                        state.file!,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: double.infinity,
-                      )
-                          : Container(
-                        width: screenWidth * 0.5,
-                        height: screenWidth * 0.5,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Icon(
-                          Icons.add_a_photo_rounded,
-                          color: AppColors.grey,
-                          size: screenWidth * 0.18,
-                        ),
-                      ),
-                    ),
-                  ),
+                              state.file!,
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                            )
+
+                          : _imageUrls.isNotEmpty
+                              ? Image.network(
+                                  _imageUrls.first,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: double.infinity,
+
+                                )
+                              : _buildPlaceholder(screenWidth),
+
+
+
+        ),
                 ),
                 ExpandableFormCard(
                   isExpanded: _isExpanded,
@@ -183,54 +212,63 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                             text: 'SAVE',
                             textColor: Colors.white,
                             backgroundColor: Colors.black,
-                            onPressed: () async {
-                              if (_titleController.text.isNotEmpty &&
-                                  _descriptionController.text.isNotEmpty &&
-                                  (selectedType?.isNotEmpty ?? false)) {
-                                try {
-                                  if (state.file != null) {
-                                    _imageUrls =
-                                    await thingsRepository.uploadImages([state.file!]);
+                              onPressed: () async {
+                                if (_titleController.text.isNotEmpty &&
+                                    _descriptionController.text.isNotEmpty &&
+                                    (selectedType?.isNotEmpty ?? false)) {
+                                  try {
+                                    if (state.file != null) {
+                                      _imageUrls = await thingsRepository.uploadImages([state.file!]);
+                                    }
+
+                                    final type = selectedType!.trim();
+                                    if (!typeColorsCache.containsKey(type)) {
+                                      typeColorsCache[type] = getRandomColor();
+                                    }
+
+                                    final randomColor = typeColorsCache[type]!;
+
+                                    final Map<String, dynamic> itemData = {
+                                      'title': _titleController.text.trim(),
+                                      'description': _descriptionController.text.trim(),
+                                      'type': type,
+                                      'userId': FirebaseAuth.instance.currentUser?.uid,
+                                      'color': randomColor,
+                                      'typeColor': randomColor,
+                                      'timestamp': Timestamp.now(),
+                                      'imageUrls': _imageUrls,
+                                      'location': _locationController.text.trim(),
+                                      'price': int.tryParse(_priceController.text.trim()) ?? 0,
+                                      'weight': double.tryParse(_weightController.text.trim()) ?? 0,
+                                      'colorText': _colorController.text.trim(),
+                                      'importance': int.tryParse(_importanceController.text.trim()) ?? 0,
+                                      'quantity': int.tryParse(_quantityController.text.trim()) ?? 1,
+                                    };
+
+                                    if (existingDocId != null) {
+
+                                      await FirebaseFirestore.instance
+                                          .collection('item')
+                                          .doc(existingDocId)
+                                          .update(itemData);
+                                    } else {
+                                      await FirebaseFirestore.instance.collection('item').add(itemData);
+                                    }
+
+                                    Navigator.pop(context);
+                                  } catch (e) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Error: $e')),
+                                    );
                                   }
-
-                                  final type = selectedType!.trim();
-                                  if (!typeColorsCache.containsKey(type)) {
-                                    typeColorsCache[type] = getRandomColor();
-                                  }
-
-                                  final randomColor = typeColorsCache[type]!;
-
-                                  await FirebaseFirestore.instance.collection('item').add({
-                                    'title': _titleController.text.trim(),
-                                    'description': _descriptionController.text.trim(),
-                                    'type': type,
-                                    'userId': FirebaseAuth.instance.currentUser?.uid,
-                                    'color': randomColor,
-                                    'typeColor': randomColor,
-                                    'timestamp': Timestamp.now(),
-                                    'imageUrls': _imageUrls,
-                                    'location': _locationController.text.trim(),
-                                    'price': int.tryParse(_priceController.text.trim()) ?? 0,
-                                    'weight': double.tryParse(_weightController.text.trim()) ?? 0,
-                                    'colorText': _colorController.text.trim(),
-                                    'importance': int.tryParse(_importanceController.text.trim()) ?? 0,
-                                    'quantity': int.tryParse(_quantityController.text.trim()) ?? 1,
-                                  });
-
-                                  Navigator.pop(context);
-                                } catch (e) {
+                                } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Error: $e')),
+                                    const SnackBar(content: Text('Please fill all fields')),
                                   );
                                 }
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Please fill all fields')),
-                                );
                               }
-                            },
-                          ),
 
+                          ),
                           CustomMainButton(
                             text: 'DELETE',
                             onPressed: () {
@@ -250,3 +288,20 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
     );
   }
 }
+
+Widget _buildPlaceholder(double screenWidth) {
+  return Container(
+    width: screenWidth * 0.5,
+    height: screenWidth * 0.5,
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(20),
+    ),
+    child: Icon(
+      Icons.add_a_photo_rounded,
+      color: AppColors.grey,
+      size: screenWidth * 0.18,
+    ),
+  );
+}
+

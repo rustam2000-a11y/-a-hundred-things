@@ -260,7 +260,7 @@ class _AddItemPageState extends State<AddTypePage> {
                                 'quantity': 1,
                               });
 
-                              Navigator.pop(context);
+                              Navigator.pop(context, _typeController.text);
                             } catch (e) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text('Error: $e')),

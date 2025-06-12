@@ -22,7 +22,7 @@ class ThingCardContainer extends StatelessWidget {
   final bool isDarkTheme;
   final String title;
   final String description;
-  final String? imageUrl;
+  final List <String>? imageUrl;
   final String itemId;
   final String type;
   final VoidCallback? onDeleteItem;
