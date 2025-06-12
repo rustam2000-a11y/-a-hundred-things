@@ -36,56 +36,67 @@ class _AccountState extends State<Account> {
 
   Future<void> _loadUserData() async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
-
     if (userId != null) {
       final userDoc =
           await FirebaseFirestore.instance.collection('user').doc(userId).get();
-
       if (userDoc.exists) {
-        final userData = userDoc.data()!;
-        nameController.text = userData['name'] ?? '';
-        emailController.text = userData['email'] ?? '';
-        phoneController.text = userData['phone'] ?? '';
-        passwordController.text = userData['password'] ?? '';
-        _imageUrl = userData['avatarUrl'] ?? '';
-
+        final data = userDoc.data()!;
+        setState(() {
+          nameController.text = data['name'] ?? '';
+          emailController.text = data['email'] ?? '';
+          phoneController.text = data['phone'] ?? '';
+          passwordController.text = data['password'] ?? '';
+          _imageUrl = data['avatarUrl'] ?? '';
+        });
       }
     }
   }
+
   Future<void> _pickAndUploadImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile == null) return;
-    setState(() {
-      _imageFile = File(pickedFile.path);
-    });
 
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) return;
 
-    final storageRef = FirebaseStorage.instance
-        .ref()
-        .child('user_avatars')
-        .child('$userId.jpg');
+    try {
+      final file = File(pickedFile.path);
 
-    await storageRef.putFile(_imageFile!);
-    final downloadUrl = await storageRef.getDownloadURL();
+      final bytes = await file.readAsBytes();
+      final filename = '$userId.jpg';
+      final ref =
+          FirebaseStorage.instance.ref().child('user_avatars/$filename');
 
-    await FirebaseFirestore.instance.collection('user').doc(userId).update({
-      'avatarUrl': downloadUrl,
-    });
+      print('Uploading avatar BYTES: ${file.path}');
+      final uploadTask = await ref.putData(bytes);
 
-    setState(() {
-      _imageUrl = downloadUrl;
-    });
+      final downloadUrl = await uploadTask.ref.getDownloadURL();
+      await FirebaseFirestore.instance.collection('user').doc(userId).update({
+        'avatarUrl': downloadUrl,
+      });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Photo updated successfully')),
-    );
+      setState(() {
+        _imageUrl = downloadUrl;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Photo updated successfully')),
+      );
+    } on FirebaseException catch (e) {
+      print('🔥 Firebase error: ${e.code} | ${e.message}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Firebase error: ${e.message}')),
+      );
+    } catch (e) {
+      print('❌ Upload error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to upload photo')),
+      );
+    }
   }
 
   Future<void> _updateUserData() async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
-
     if (userId != null) {
       await FirebaseFirestore.instance.collection('user').doc(userId).update({
         'name': nameController.text,
@@ -96,51 +107,48 @@ class _AccountState extends State<Account> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Data updated successfully')),
       );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to update data')),
-      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final double screenWidth = MediaQuery.of(context).size.width;
-
+    final screenHeight = MediaQuery.of(context).size.height;
     final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: const NewCustomAppBar(
-          showBackButton: false,
-          showSearchIcon: false,
-          logo: Text('Edit Profile'),
+        showBackButton: false,
+        showSearchIcon: false,
+        logo: Text('Edit Profile'),
       ),
-      bottomNavigationBar:CustomBottomNavbar(buttonText: 'SAVE', onPressed: _updateUserData,),
+      bottomNavigationBar: CustomBottomNavbar(
+        buttonText: 'SAVE',
+        onPressed: _updateUserData,
+      ),
       backgroundColor: isDarkTheme ? AppColors.blackSand : Colors.white,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height:24 ),
+            const SizedBox(height: 24),
             Center(
               child: Stack(
                 children: [
-
                   Container(
                     height: 150,
                     width: 150,
                     decoration: BoxDecoration(
                       color: Colors.grey,
-                      image: _imageUrl != null
+                      image: (_imageUrl != null && _imageUrl!.isNotEmpty)
                           ? DecorationImage(
-                        image: NetworkImage(_imageUrl!),
-                        fit: BoxFit.cover,
-                      )
+                              image: NetworkImage(_imageUrl!),
+                              fit: BoxFit.cover,
+                            )
                           : null,
                     ),
-                    child: _imageUrl == null
-                        ? const Icon(Icons.person, size: 80, color: Colors.white)
+                    child: (_imageUrl == null || _imageUrl!.isEmpty)
+                        ? const Icon(Icons.person,
+                            size: 80, color: Colors.white)
                         : null,
                   ),
                   Positioned(
@@ -148,7 +156,8 @@ class _AccountState extends State<Account> {
                     bottom: 0,
                     child: GestureDetector(
                       onTap: _pickAndUploadImage,
-                      child: const Icon(Icons.edit, color: Colors.white, size: 20),
+                      child:
+                          const Icon(Icons.edit, color: Colors.white, size: 20),
                     ),
                   ),
                 ],
@@ -168,9 +177,7 @@ class _AccountState extends State<Account> {
                         color: AppColors.grey),
                   ),
                   SizedBox(height: screenHeight * 0.01),
-                  CustomTextField(
-                    controller: nameController,
-                  ),
+                  CustomTextField(controller: nameController),
                   const SizedBox(height: 16),
                   Text(
                     S.of(context).password,
@@ -180,9 +187,7 @@ class _AccountState extends State<Account> {
                         color: AppColors.grey),
                   ),
                   SizedBox(height: screenHeight * 0.01),
-                  CustomTextField(
-                    controller: passwordController,
-                  ),
+                  CustomTextField(controller: passwordController),
                   const SizedBox(height: 16),
                   const Text(
                     'Email Adderss',
@@ -192,9 +197,7 @@ class _AccountState extends State<Account> {
                         color: AppColors.grey),
                   ),
                   SizedBox(height: screenHeight * 0.01),
-                  CustomTextField(
-                    controller: emailController,
-                  ),
+                  CustomTextField(controller: emailController),
                   const SizedBox(height: 16),
                   Text(
                     S.of(context).number,
@@ -204,9 +207,7 @@ class _AccountState extends State<Account> {
                         color: AppColors.grey),
                   ),
                   SizedBox(height: screenHeight * 0.01),
-                  CustomTextField(
-                    controller: phoneController,
-                  ),
+                  CustomTextField(controller: phoneController),
                   const SizedBox(height: 16),
                 ],
               ),

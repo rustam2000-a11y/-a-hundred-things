@@ -20,7 +20,7 @@ class ActionIcons extends StatelessWidget {
   final String title;
   final String description;
   final String type;
-  final String? imageUrl;
+  final List <String>? imageUrl;
   final VoidCallback? onDeleteItem;
 
   @override

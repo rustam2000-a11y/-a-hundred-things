@@ -59,24 +59,42 @@ class BaseDataApi implements BaseDataApiI {
   @override
   Future<List<String>> uploadImages(List<File> images) async {
     final List<String> urls = [];
+
     for (final image in images) {
       try {
-        final storageRef = FirebaseStorage.instance
-            .ref()
-            .child('item_images/${DateTime
-            .now()
-            .millisecondsSinceEpoch}_${image.path
-            .split('/')
-            .last}');
-        final uploadTask = await storageRef.putFile(image);
-        final downloadUrl = await uploadTask.ref.getDownloadURL();
+        if (!image.existsSync()) {
+          throw Exception('Файл не существует: ${image.path}');
+        }
+
+        final fileLength = await image.length();
+        if (fileLength == 0) {
+          throw Exception('Файл пустой: ${image.path}');
+        }
+
+        final bytes = await image.readAsBytes();
+        final filename = '${DateTime.now().millisecondsSinceEpoch}_${image.path.split('/').last}';
+        final ref = FirebaseStorage.instance.ref().child('item_images/$filename');
+
+        print('Uploading BYTES from file: ${image.path}');
+        final taskSnapshot = await ref.putData(bytes);
+        final downloadUrl = await taskSnapshot.ref.getDownloadURL();
+        print('Uploaded file: $downloadUrl');
+
         urls.add(downloadUrl);
+      } on FirebaseException catch (e) {
+        print('🔥 Firebase Storage error: code=${e.code}, message=${e.message}');
+        throw Exception('Ошибка Firebase: ${e.message}');
       } catch (e) {
-        throw Exception('Ошибка загрузки изображения: $e');
+        print('❌ Unknown error: $e');
+        throw Exception('Ошибка при загрузке: $e');
       }
     }
+
     return urls;
   }
+
+
+
   @override
   Future<void> deleteThingsByType(String type) async {
     final items = await databaseReference
