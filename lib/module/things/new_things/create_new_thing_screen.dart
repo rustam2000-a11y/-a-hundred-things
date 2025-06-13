@@ -196,7 +196,7 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: Container(
-                    height: screenHeight * 0.18,
+                    height: screenHeight * 0.16,
                     decoration: BoxDecoration(
                       color: isDarkMode
                           ? AppColors.blackSand

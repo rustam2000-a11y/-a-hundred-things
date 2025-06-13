@@ -46,7 +46,9 @@ class _ExpandableFormCardState extends State<ExpandableFormCard> {
       curve: Curves.easeInOut,
       top: widget.isExpanded
           ? widget.screenHeight * 0.12
-          : widget.screenHeight * 0.40,
+          : widget.screenHeight * 0.40 ,
+        bottom: widget.screenHeight * 0.14,
+
       left: 0,
       right: 0,
       child: AnimatedContainer(
@@ -72,98 +74,94 @@ class _ExpandableFormCardState extends State<ExpandableFormCard> {
               : widget.screenHeight * 0.4,
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              margin: EdgeInsets.only(bottom: widget.isExpanded ? 0 : 20),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: TextField(
-                      controller: widget.titleController,
-                      decoration: InputDecoration(
-                        labelText: S.of(context).enterAName,
-                        labelStyle: const TextStyle(fontSize: 24),
-                        border: InputBorder.none,
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.edit),
-                          onPressed: () {
-
-
-                          },
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: TextField(
+                        controller: widget.titleController,
+                        decoration: InputDecoration(
+                          labelText: S.of(context).enterAName,
+                          labelStyle: const TextStyle(fontSize: 24),
+                          border: InputBorder.none,
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () {},
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: widget.screenHeight * 0.02),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: TextField(
-                      controller: widget.descriptionController,
-                      decoration: InputDecoration(
-                        labelText: S.of(context).description,
-                        labelStyle: const TextStyle(fontSize: 14),
-                        border: InputBorder.none,
+                    SizedBox(height: widget.screenHeight * 0.02),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: TextField(
+                        controller: widget.descriptionController,
+                        decoration: InputDecoration(
+                          labelText: S.of(context).description,
+                          labelStyle: const TextStyle(fontSize: 14),
+                          border: InputBorder.none,
+                        ),
+                        style: const TextStyle(fontSize: 15),
+                        maxLines: 4,
+                        minLines: 1,
                       ),
-                      style: const TextStyle(fontSize: 15),
-                      maxLines: 4,
-                      minLines: 1,
                     ),
-                  ),
-                  if (widget.isExpanded)
-                    SizedBox(
-                      height: widget.screenHeight * 0.35,
-                      child: SingleChildScrollView(
-                        child: Column(
+                    if (widget.isExpanded) ...[
+                      const SizedBox(height: 16),
+                      _buildFieldRow(label: 'Location', controller: widget.locationController),
+                      const Divider(),
+                      _buildFieldRow(label: 'Price', controller: widget.priceController),
+                      const Divider(),
+                      _buildFieldRow(label: 'Weight', controller: widget.weightController),
+                      const Divider(),
+                      _buildFieldRow(label: 'Color', controller: widget.colorController),
+                      const Divider(),
+                      _buildFieldRow(label: 'Importance', controller: widget.importanceController),
+                      const Divider(),
+                      _buildFieldRow(label: 'Quantity', controller: widget.quantityController),
+                      const SizedBox(height: 12),
+                    ],
+                    const SizedBox(height: 16),
+                    GestureDetector(
+                      onTap: () {
+                        widget.onExpandChanged(!widget.isExpanded);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        width: double.infinity,
+                        color: Colors.transparent,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            _buildFieldRow(label: 'Location', controller: widget.locationController),
-                            const Divider(),
-                            _buildFieldRow(label: 'Price', controller: widget.priceController),
-                            const Divider(),
-                            _buildFieldRow(label: 'Weight', controller: widget.weightController),
-                            const Divider(),
-                            _buildFieldRow(label: 'Color', controller: widget.colorController),
-                            const Divider(),
-                            _buildFieldRow(label: 'Importance', controller: widget.importanceController),
-                            const Divider(),
-                            _buildFieldRow(label: 'Quantity', controller: widget.quantityController),
-                            const SizedBox(height: 12),
+                            const Text(
+                              'More options',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            AnimatedRotation(
+                              turns: widget.isExpanded ? 0.5 : 0.0,
+                              duration: const Duration(milliseconds: 300),
+                              child: const Icon(Icons.keyboard_arrow_up, size: 24),
+                            ),
                           ],
                         ),
                       ),
                     ),
 
-                ],
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                widget.onExpandChanged(!widget.isExpanded);
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'More options',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600),
-                    ),
-                    AnimatedRotation(
-                      turns: widget.isExpanded ? 0.5 : 0.0,
-                      duration: const Duration(milliseconds: 300),
-                      child: const Icon(Icons.keyboard_arrow_up, size: 24),
-                    ),
+                    const SizedBox(height: 10),
                   ],
                 ),
               ),
             ),
           ],
         ),
+
       ),
     );
   }

@@ -22,6 +22,7 @@ class CustomDrawer extends StatefulWidget {
 class _CustomDrawerState extends State<CustomDrawer> {
   String name = 'Загрузка...';
   String email = 'Загрузка...';
+  String? avatarUrl;
 
   @override
   void initState() {
@@ -35,13 +36,16 @@ class _CustomDrawerState extends State<CustomDrawer> {
       final docSnapshot = await FirebaseFirestore.instance.collection('user').doc(userId).get();
 
       if (docSnapshot.exists) {
+        final data = docSnapshot.data();
         setState(() {
-          name = docSnapshot.data()?['name'] ?? "Неизвестное имя";
-          email = docSnapshot.data()?['email'] ?? "Нет email";
+          name = data?['name'] ?? "Неизвестное имя";
+          email = data?['email'] ?? "Нет email";
+          avatarUrl = data?['avatarUrl'];
         });
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context)  {
@@ -95,30 +99,44 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     Container(
                       width: 44,
                       height: 44,
-                      decoration: const BoxDecoration(
-                        color: Colors.black,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+
+                        image: avatarUrl != null
+                            ? DecorationImage(
+                          image: NetworkImage(avatarUrl!),
+                          fit: BoxFit.cover,
+                        )
+                            : null,
                       ),
+                      child: avatarUrl == null
+                          ? const Icon(Icons.person, color: Colors.white)
+                          : null,
                     ),
                     const SizedBox(width: 16),
                     Column(
-
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           name,
                           style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         Text(
                           email,
                           style: const TextStyle(
-                              fontSize: 14, color: Colors.grey),
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
                         ),
                       ],
                     ),
                   ],
                 ),
               ),
+
               const CustomDivider(),
               const SizedBox(height: 10),
 
