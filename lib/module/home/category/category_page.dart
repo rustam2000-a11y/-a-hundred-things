@@ -9,15 +9,13 @@ import '../../../core/utils/presentation.utils.dart';
 import '../../../presentation/colors.dart';
 import '../../login/widget/custom_text.dart';
 import '../home_bloc.dart';
-import 'appBar/new_custom_app_bar.dart';
+import '../widget/appBar/new_custom_app_bar.dart';
 import 'category_card_widget.dart';
-import 'drawer.dart';
-import 'list_of_things_widget.dart';
-import 'navigation_bar_widget.dart';
+import '../widget/drawer.dart';
+import '../widget/navigation_bar_widget.dart';
 import 'new_list_of_types_widget.dart';
-import 'things_title_list_widget.dart';
-import 'type_widget/type_add_screen.dart';
-import 'type_widget/type_card_widget.dart';
+import '../widget/type_widget/type_add_screen.dart';
+import '../widget/type_widget/type_card_widget.dart';
 
 class CategoriePage extends StatefulWidget {
   const CategoriePage({
@@ -187,13 +185,18 @@ class CategoriePageState extends State<CategoriePage> {
                             onChangeCategory: (String? category) {
                               setState(() {
                                 if (_selectedCategoryType == category) {
+
                                   _selectedCategoryType = null;
+                                  _bloc.add(
+                                    const HomeSelectTypeThingsEvent(field: 'type', value: ''),
+                                  );
                                 } else {
+
                                   _selectedCategoryType = category;
+                                  _bloc.add(
+                                    HomeSelectTypeThingsEvent(field: 'type', value: _selectedCategoryType!),
+                                  );
                                 }
-                                _bloc.add(HomeSelectTypeThingsEvent(
-                                  selectedTypeThings: _selectedCategoryType,
-                                ));
                               });
                             },
                             onDeleteThings: () {
@@ -201,6 +204,7 @@ class CategoriePageState extends State<CategoriePage> {
                             },
                             type: type,
                           );
+
                         }).toList(),
                       ],
                     ),

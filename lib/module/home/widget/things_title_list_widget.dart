@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 
+import '../../../model/things_model.dart';
+import '../../things/new_things/create_new_thing_screen.dart';
+
 class NewListOfTitles extends StatelessWidget {
   const NewListOfTitles({
     super.key,
-    required this.title,
+    required this.things,
+    required this.allTypes,
   });
 
-  final List<String> title;
+  final List<ThingsModel> things;
+  final List<String> allTypes;
 
   @override
   Widget build(BuildContext context) {
@@ -20,31 +25,57 @@ class NewListOfTitles extends StatelessWidget {
       child: ListView.separated(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: title.length,
+        itemCount: things.length,
         separatorBuilder: (context, index) => const Divider(
           height: 1,
           color: Colors.black,
         ),
         itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 17),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    title[index],
-                    style: const TextStyle(fontSize: 16),
+          final item = things[index];
+
+          return InkWell(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => CreateNewThingScreen(
+                    allTypes: allTypes,
+                    isReadOnly: true,
+                    existingThing: {
+                      'id': item.id,
+                      'title': item.title,
+                      'description': item.description,
+                      'type': item.type,
+                      'imageUrls': item.imageUrl ?? [],
+                      'quantity': item.quantity,
+                      'location': item.location,
+                      'weight': item.weight,
+                      'colorText': item.colorText,
+                      'importance': item.importance,
+                    },
                   ),
                 ),
-                const Row(
-                  children: [
-                    Icon(Icons.edit, size: 20),
-                    SizedBox(width: 12),
-                    Icon(Icons.close, size: 20),
-                  ],
-                ),
-              ],
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 17),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      item.title,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  const Row(
+                    children: [
+                      Icon(Icons.edit, size: 20),
+                      SizedBox(width: 12),
+                      Icon(Icons.close, size: 20),
+                    ],
+                  ),
+                ],
+              ),
             ),
           );
         },

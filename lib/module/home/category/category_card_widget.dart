@@ -17,7 +17,6 @@ class CategoryCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isSelected = selectedCategoryType == type;
-
     final Color backgroundColor = isSelected ? Colors.black : Colors.transparent;
     const Color borderColor = Colors.black;
     final Color contentColor = isSelected ? Colors.white : Colors.black;
