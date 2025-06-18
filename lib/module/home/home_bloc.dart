@@ -30,8 +30,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       emit(state.copyWith(typesWithColors: event.typesWithColors));
     });
     on<HomeSelectTypeThingsEvent>((event, emit) {
-      changeTypeThings(event.selectedTypeThings);
+      filterThingsByField(event.field, event.value);
     });
+
     on<DeleteThingsByTypeEvent>((event, emit) {
       deleteThingsByType(event.type);
     });
@@ -59,14 +60,34 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     });
   }
 
-  void changeTypeThings(String? selectedType) {
+  void filterThingsByField(String field, String value) {
+    print('⚙️ filterThingsByField: value="$value"');
+    categorySub?.cancel();
+
+    if (value.trim().isEmpty) {
+      init();
+      return;
+    }
+
     categorySub = _thingsRepository.fetchMyThings().listen((list) {
-      final filteredList = selectedType != null
-          ? list.where((element) => element.type == selectedType).toList()
-          : list;
+      final filteredList = list.where((element) {
+        final map = element.toJson();
+        final fieldValue = map[field];
+
+        if (fieldValue == null) return false;
+
+        final normalizedFieldValue = fieldValue.toString().trim().toLowerCase();
+        final normalizedTargetValue = value.trim().toLowerCase();
+
+        return normalizedFieldValue == normalizedTargetValue;
+      }).toList();
+
       add(HomeThingsEvent(things: filteredList));
     });
   }
+
+
+
 
   Future<void> deleteThingsByType(String type) async {
     await _thingsRepository.deleteThingsByType(type);

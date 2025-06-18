@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../login/screen/login_screen.dart';
 import '../../settings/screen/user_profile_screen.dart';
 import '../my_home_page.dart';
-import 'category_page.dart';
+import '../category/category_page.dart';
 import 'custom_divider.dart';
 import 'custom_list_tile.dart';
 

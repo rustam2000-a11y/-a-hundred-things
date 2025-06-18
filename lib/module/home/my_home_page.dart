@@ -7,9 +7,10 @@ import 'package:get_it/get_it.dart';
 import '../../core/utils/presentation.utils.dart';
 import '../../presentation/colors.dart';
 import '../login/widget/custom_text.dart';
+import 'container_with_filters.dart';
 import 'home_bloc.dart';
 import 'widget/appBar/new_custom_app_bar.dart';
-import 'widget/category_card_widget.dart';
+import 'category/category_card_widget.dart';
 import 'widget/drawer.dart';
 import 'widget/list_of_things_widget.dart';
 import 'widget/navigation_bar_widget.dart';
@@ -34,6 +35,7 @@ class MyHomePageState extends State<MyHomePage> {
 
   bool _isListMode = true;
   bool _showCategoryList = false;
+  bool _showFilters = false;
 
   @override
   void initState() {
@@ -87,13 +89,22 @@ class MyHomePageState extends State<MyHomePage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Row(
-                          children: [
-                            Icon(Icons.import_export, size: 24),
-                            SizedBox(width: 4),
-                            CustomText5(text: 'FILTER', fontSize: 20),
-                          ],
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _showFilters = true;
+                            });
+                          },
+                          child: const Row(
+                            children: [
+                              Icon(Icons.import_export, size: 24),
+                              SizedBox(width: 4),
+                              CustomText5(text: 'FILTER', fontSize: 20),
+                            ],
+                          ),
                         ),
+
+
                         Container(
                           width: 74,
                           height: 32,
@@ -192,19 +203,30 @@ class MyHomePageState extends State<MyHomePage> {
                                 setState(() {
                                   if (_selectedCategoryType == category) {
                                     _selectedCategoryType = null;
+                                    _bloc.add(
+                                      const HomeSelectTypeThingsEvent(
+                                        field: 'type',
+                                        value: '', // передаём пустую строку — сигнал сброса
+                                      ),
+                                    );
                                   } else {
                                     _selectedCategoryType = category;
+                                    _bloc.add(
+                                      HomeSelectTypeThingsEvent(
+                                        field: 'type',
+                                        value: _selectedCategoryType!,
+                                      ),
+                                    );
                                   }
-                                  _bloc.add(HomeSelectTypeThingsEvent(
-                                    selectedTypeThings: _selectedCategoryType,
-                                  ));
                                 });
                               },
+
                               onDeleteThings: () {
                                 _bloc.add(DeleteThingsByTypeEvent(type: type));
                               },
                               type: type,
                             );
+
                           }).toList(),
                         ],
                       ),
@@ -223,8 +245,10 @@ class MyHomePageState extends State<MyHomePage> {
                           _bloc.add(DeleteItemByUidEvent(uid: uid)),
                     )
                         : NewListOfTitles(
-                      title: filteredThings.map((e) => e.title!).toList(),
+                      things: filteredThings,
+                      allTypes: state.typesWithColors.keys.toList(),
                     ),
+
                   ),
                 ],
               ),
@@ -237,6 +261,24 @@ class MyHomePageState extends State<MyHomePage> {
                   types: state.typesWithColors.keys.toList(),
                 ),
               ),
+              if (_showFilters)
+                ContainerWithFilters(
+                  onClose: () {
+                    setState(() {
+                      _showFilters = false;
+                    });
+                  },
+                  selectedType: _selectedCategoryType,
+                  onTypeSelected: (String field, String value) {
+                    setState(() {
+                      _selectedCategoryType = value;
+                      _showFilters = false;
+                    });
+                    _bloc.add(HomeSelectTypeThingsEvent(field: field, value: value));
+                  },
+                ),
+
+
             ],
           ),
         );
