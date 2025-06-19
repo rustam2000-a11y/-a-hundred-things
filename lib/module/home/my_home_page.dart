@@ -206,7 +206,7 @@ class MyHomePageState extends State<MyHomePage> {
                                     _bloc.add(
                                       const HomeSelectTypeThingsEvent(
                                         field: 'type',
-                                        value: '', // передаём пустую строку — сигнал сброса
+                                        value: '',
                                       ),
                                     );
                                   } else {

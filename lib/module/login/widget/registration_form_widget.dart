@@ -37,132 +37,130 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    return Expanded(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column(
-            children: [
-              const SizedBox(
-                height: 64,
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 64,
+            ),
+            const CustomText(text: 'Create a profile'),
+            const SizedBox(
+              height: 40,
+            ),
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: CustomText3(
+                text: S.of(context).emailAdderss,
               ),
-              const CustomText(text: 'Create a profile'),
-              const SizedBox(
-                height: 40,
-              ),
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: CustomText3(
-                  text: S.of(context).emailAdderss,
-                ),
-              ),
-              const SizedBox(
-                height: 4,
-              ),
-              CustomTextField(
-                controller: _emailController,
-              ),
-              const SizedBox(height: 16),
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: CustomText3(text: S.of(context).password),
-              ),
-              const SizedBox(height: 4),
-              CustomTextField(
-                controller: _passwordController,
-                // hintText: CustomText4(text: 'Password'),
-                isPasswordField: true,
-              ),
-              const SizedBox(height: 16),
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: CustomText3(text: S.of(context).dateOfBirth),
-              ),
-              const SizedBox(
-                height: 4,
-              ),
-              CustomTextField(
-                controller: _birthdayController,
-                // hintText: const CustomText4(text: 'Date of birth'),
-              ),
-              const SizedBox(height: 18),
-              ReusableButton(
-                text: S.of(context).next,
-                onPressed: () async {
-                  try {
-                    final UserCredential userCredential = await FirebaseAuth
-                        .instance
-                        .createUserWithEmailAndPassword(
-                      email: _emailController.text.trim(),
-                      password: _passwordController.text.trim(),
-                    );
-                    await addUserToFirestore(userCredential.user);
-                    await Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute<dynamic>(
-                          builder: (_) => MyHomePage(toggleTheme: () {})),
-                    );
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error: $e')),
-                    );
-                  }
-                },
-              ),
-              const SizedBox(height: 16),
-              DividerWithText(text: S.of(context).or),
-              const SizedBox(height: 16),
-              CustomButtonRegist(
-                text: S.of(context).continueWithGoogle,
-                icon: Icons.login,
-                onPressed: () async {
-                  final User? user = await signInWithGoogle();
+            ),
+            const SizedBox(
+              height: 4,
+            ),
+            CustomTextField(
+              controller: _emailController,
+            ),
+            const SizedBox(height: 16),
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: CustomText3(text: S.of(context).password),
+            ),
+            const SizedBox(height: 4),
+            CustomTextField(
+              controller: _passwordController,
+              // hintText: CustomText4(text: 'Password'),
+              isPasswordField: true,
+            ),
+            const SizedBox(height: 16),
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: CustomText3(text: S.of(context).dateOfBirth),
+            ),
+            const SizedBox(
+              height: 4,
+            ),
+            CustomTextField(
+              controller: _birthdayController,
+              // hintText: const CustomText4(text: 'Date of birth'),
+            ),
+            const SizedBox(height: 18),
+            ReusableButton(
+              text: S.of(context).next,
+              onPressed: () async {
+                try {
+                  final UserCredential userCredential = await FirebaseAuth
+                      .instance
+                      .createUserWithEmailAndPassword(
+                    email: _emailController.text.trim(),
+                    password: _passwordController.text.trim(),
+                  );
+                  await addUserToFirestore(userCredential.user);
+                  await Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute<dynamic>(
+                        builder: (_) => MyHomePage(toggleTheme: () {})),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error: $e')),
+                  );
+                }
+              },
+            ),
+            const SizedBox(height: 16),
+            DividerWithText(text: S.of(context).or),
+            const SizedBox(height: 16),
+            CustomButtonRegist(
+              text: S.of(context).continueWithGoogle,
+              icon: Icons.login,
+              onPressed: () async {
+                final User? user = await signInWithGoogle();
+                if (user != null) {
+                  await addUserToFirestore(user);
+
+                  await Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute<dynamic>(
+                        builder: (_) => MyHomePage(toggleTheme: () {})),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Google login error')),
+                  );
+                }
+              },
+            ),
+            const SizedBox(height: 15),
+            CustomButtonRegist(
+              text: S.of(context).continueWithApple,
+              icon: Icons.apple,
+              onPressed: () async {
+                try {
+                  final User? user = await signInWithApple();
                   if (user != null) {
                     await addUserToFirestore(user);
-
-                    await Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute<dynamic>(
-                          builder: (_) => MyHomePage(toggleTheme: () {})),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Google login error')),
-                    );
-                  }
-                },
-              ),
-              const SizedBox(height: 15),
-              CustomButtonRegist(
-                text: S.of(context).continueWithApple,
-                icon: Icons.apple,
-                onPressed: () async {
-                  try {
-                    final User? user = await signInWithApple();
-                    if (user != null) {
-                      await addUserToFirestore(user);
-                      if (context.mounted) {
-                        await Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute<dynamic>(
-                            builder: (_) => MyHomePage(toggleTheme: () {}),
-                          ),
-                        );
-                      }
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Apple Sign In Error')),
+                    if (context.mounted) {
+                      await Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute<dynamic>(
+                          builder: (_) => MyHomePage(toggleTheme: () {}),
+                        ),
                       );
                     }
-                  } catch (e) {
+                  } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error: $e')),
+                      const SnackBar(content: Text('Apple Sign In Error')),
                     );
                   }
-                },
-              ),
-            ],
-          ),
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error: $e')),
+                  );
+                }
+              },
+            ),
+          ],
         ),
       ),
     );

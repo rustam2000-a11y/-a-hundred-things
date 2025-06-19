@@ -63,151 +63,149 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(
-                  height: 64,
-                ),
-                const CustomText(text: 'LOGIN'),
-                const SizedBox(
-                  height: 64,
-                ),
-                CustomText3(
-                  text:  S.of(context).emailAdderss,
-                ),
-                const SizedBox(height: 5),
-                CustomTextField(
-                  controller: _loginEmailController,
-                ),
-                const SizedBox(height: 16),
-                CustomText3(
-                  text: S.of(context).password,
-                ),
-                const SizedBox(height: 5),
-                CustomTextField(
-                  controller: _loginPasswordController,
-                  // ),
-                  isPasswordField: true,
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: _rememberMe,
-                          onChanged: (value) {
-                            setState(() {
-                              _rememberMe = value!;
-                            });
-                          },
-                          fillColor: MaterialStateProperty.resolveWith<Color>((states) {
-                            if (states.contains(MaterialState.selected)) {
-                              return Colors.black;
-                            }
-                            return Colors.transparent;
-                          }),
-                          checkColor: Colors.white,
-                        ),
+    return SingleChildScrollView(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: MediaQuery.of(context).size.height,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(
+                height: 64,
+              ),
+              const CustomText(text: 'LOGIN'),
+              const SizedBox(
+                height: 64,
+              ),
+              CustomText3(
+                text:  S.of(context).emailAdderss,
+              ),
+              const SizedBox(height: 5),
+              CustomTextField(
+                controller: _loginEmailController,
+              ),
+              const SizedBox(height: 16),
+              CustomText3(
+                text: S.of(context).password,
+              ),
+              const SizedBox(height: 5),
+              CustomTextField(
+                controller: _loginPasswordController,
+                // ),
+                isPasswordField: true,
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: _rememberMe,
+                        onChanged: (value) {
+                          setState(() {
+                            _rememberMe = value!;
+                          });
+                        },
+                        fillColor: MaterialStateProperty.resolveWith<Color>((states) {
+                          if (states.contains(MaterialState.selected)) {
+                            return Colors.black;
+                          }
+                          return Colors.transparent;
+                        }),
+                        checkColor: Colors.white,
+                      ),
 
-                        CustomText2(
-                          text: S.of(context).remember,
-                          color: AppColors.grey,
-                        ),
-                      ],
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute<dynamic>(
-                              builder: (context) => const ForgotInfoScreen()),
-                        );
-                      },
-                      child: CustomText2(
-                          text: S.of(context).forgotYourPassword,
-                          underline: true),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                ReusableButton(
-                  text: S.of(context).login,
-                  onPressed: () => _login(context),
-                ),
-                const SizedBox(height: 16),
-                DividerWithText(text: S.of(context).or),
-                const SizedBox(height: 30),
-                CustomButtonRegist(
-                  text: S.of(context).continueWithGoogle,
-                  icon: Icons.login,
-                  onPressed: () async {
-                    final User? user = await signInWithGoogle();
-                    if (user != null) {
-                      await addUserToFirestore(user);
-                      await Navigator.of(context).pushReplacement(
-                        MaterialPageRoute<dynamic>(
-                            builder: (_) => MyHomePage(toggleTheme: () {})),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('Ошибка входа через Google')),
-                      );
-                    }
-                  },
-                ),
-                const SizedBox(height: 20),
-                CustomButtonRegist(
-                  text: S.of(context).continueWithApple,
-                  icon: Icons.apple,
-                  onPressed: () async {
-                    final User? user = await signInWithApple();
-                    if (!context.mounted) return;
-
-                    if (user != null) {
-                      await addUserToFirestore(user);
-                      await Navigator.pushReplacement(
+                      CustomText2(
+                        text: S.of(context).remember,
+                        color: AppColors.grey,
+                      ),
+                    ],
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
                         context,
-                        MaterialPageRoute<void>(
-                          builder: (_) => MyHomePage(toggleTheme: () {}),
-                        ),
+                        MaterialPageRoute<dynamic>(
+                            builder: (context) => const ForgotInfoScreen()),
                       );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(S.of(context).appleSignInError)),
-                      );
-                    }
-                  },
-                ),
+                    },
+                    child: CustomText2(
+                        text: S.of(context).forgotYourPassword,
+                        underline: true),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              ReusableButton(
+                text: S.of(context).login,
+                onPressed: () => _login(context),
+              ),
+              const SizedBox(height: 16),
+              DividerWithText(text: S.of(context).or),
+              const SizedBox(height: 30),
+              CustomButtonRegist(
+                text: S.of(context).continueWithGoogle,
+                icon: Icons.login,
+                onPressed: () async {
+                  final User? user = await signInWithGoogle();
+                  if (user != null) {
+                    await addUserToFirestore(user);
+                    await Navigator.of(context).pushReplacement(
+                      MaterialPageRoute<dynamic>(
+                          builder: (_) => MyHomePage(toggleTheme: () {})),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Ошибка входа через Google')),
+                    );
+                  }
+                },
+              ),
+              const SizedBox(height: 20),
+              CustomButtonRegist(
+                text: S.of(context).continueWithApple,
+                icon: Icons.apple,
+                onPressed: () async {
+                  final User? user = await signInWithApple();
+                  if (!context.mounted) return;
 
-                const SizedBox(height: 40),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push<void>(
+                  if (user != null) {
+                    await addUserToFirestore(user);
+                    await Navigator.pushReplacement(
                       context,
                       MaterialPageRoute<void>(
-                        builder: (context) => const RegistrationScreen(),
+                        builder: (_) => MyHomePage(toggleTheme: () {}),
                       ),
                     );
-                  },
-                  child: const CustomText2(
-                    text: 'Create My Profile',
-                    underline: true,
-                  ),
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(S.of(context).appleSignInError)),
+                    );
+                  }
+                },
+              ),
+
+              const SizedBox(height: 40),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push<void>(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (context) => const RegistrationScreen(),
+                    ),
+                  );
+                },
+                child: const CustomText2(
+                  text: 'Create My Profile',
+                  underline: true,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

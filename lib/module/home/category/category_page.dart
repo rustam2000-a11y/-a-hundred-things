@@ -10,12 +10,13 @@ import '../../../presentation/colors.dart';
 import '../../login/widget/custom_text.dart';
 import '../home_bloc.dart';
 import '../widget/appBar/new_custom_app_bar.dart';
-import 'category_card_widget.dart';
 import '../widget/drawer.dart';
 import '../widget/navigation_bar_widget.dart';
-import 'new_list_of_types_widget.dart';
 import '../widget/type_widget/type_add_screen.dart';
 import '../widget/type_widget/type_card_widget.dart';
+import 'category_card_widget.dart';
+import 'detailing_types_page.dart';
+import 'new_list_of_types_widget.dart';
 
 class CategoriePage extends StatefulWidget {
   const CategoriePage({
@@ -50,9 +51,15 @@ class CategoriePageState extends State<CategoriePage> {
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return BlocBuilder<HomeBloc, HomeState>(
       bloc: _bloc,
       builder: (context, state) {
+        final existingTypes = state.things
+            .map((e) => e.type.trim().toLowerCase())
+            .toSet();
+
+
         return Scaffold(
           drawer: CustomDrawer(onToggleCategoryList: _toggleCategoryList),
           backgroundColor: isDarkMode ? AppColors.blackSand : Colors.white,
@@ -71,6 +78,7 @@ class CategoriePageState extends State<CategoriePage> {
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Row(
+                      //
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Row(
@@ -135,6 +143,7 @@ class CategoriePageState extends State<CategoriePage> {
                       ],
                     ),
                   ),
+
                   SizedBox(
                     height: 50,
                     child: ListView(
@@ -174,7 +183,10 @@ class CategoriePageState extends State<CategoriePage> {
                             ),
                           ),
                         ),
-                        ...state.typesWithColors.entries.map((entry) {
+
+                        ...state.typesWithColors.entries
+                            .where((entry) => existingTypes.contains(entry.key.trim().toLowerCase()))
+                            .map((entry) {
                           final type = entry.key;
                           final color = entry.value.isEmpty
                               ? PresentationUtils.getRandomColor()
@@ -185,17 +197,12 @@ class CategoriePageState extends State<CategoriePage> {
                             onChangeCategory: (String? category) {
                               setState(() {
                                 if (_selectedCategoryType == category) {
-
                                   _selectedCategoryType = null;
-                                  _bloc.add(
-                                    const HomeSelectTypeThingsEvent(field: 'type', value: ''),
-                                  );
+                                  _bloc.add(const HomeSelectTypeThingsEvent(field: 'type', value: ''));
                                 } else {
-
                                   _selectedCategoryType = category;
-                                  _bloc.add(
-                                    HomeSelectTypeThingsEvent(field: 'type', value: _selectedCategoryType!),
-                                  );
+                                  _bloc.add(HomeSelectTypeThingsEvent(
+                                      field: 'type', value: _selectedCategoryType!));
                                 }
                               });
                             },
@@ -204,48 +211,70 @@ class CategoriePageState extends State<CategoriePage> {
                             },
                             type: type,
                           );
-
                         }).toList(),
-                      ],
+
+                      ]
                     ),
                   ),
                   const SizedBox(height: 12),
                   Expanded(
                     child: _isListMode
                         ? Builder(
-                      builder: (context) {
-                        final filteredThings = state.things
-                            .where((thing) => thing.typDescription.trim().isNotEmpty)
-                            .toList();
+                            builder: (context) {
+                              final filteredThingsByUniqueType = <String, dynamic>{};
 
-                        return ListView.builder(
-                          itemCount: filteredThings.length,
-                          itemBuilder: (context, index) {
-                            final thing = filteredThings[index];
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
-                              child: TypeCardWidget(
-                                isSelected: selectedItemsNotifier.value.contains(thing.id),
-                                isDarkTheme: isDarkMode,
-                                typDescription: thing.typDescription ?? '',
-                                imageUrl: thing.imageUrl,
-                                itemId: thing.id,
-                                type: thing.type,
-                                onDeleteItem: () =>
-                                    _bloc.add(DeleteItemByUidEvent(uid: thing.id)),
-                                selectedCategoryType: _selectedCategoryType,
-                                onStateUpdate: () => setState(() {}),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    )
+                              for (final thing in state.things) {
+                                final isTypeMatching = _selectedCategoryType == null || thing.type == _selectedCategoryType;
+                                final hasTypDescription = thing.typDescription.trim().isNotEmpty;
+
+                                if (isTypeMatching && hasTypDescription) {
+                                  filteredThingsByUniqueType[thing.type] ??= thing;
+                                }
+                              }
+
+                              final uniqueThings = filteredThingsByUniqueType.values.toList();
+
+                              return ListView.builder(
+                                itemCount: uniqueThings.length,
+                                itemBuilder: (context, index) {
+                                  final thing = uniqueThings[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0, vertical: 6.0),
+                                    child: TypeCardWidget(
+                                      isSelected: selectedItemsNotifier.value
+                                          .contains(thing.id),
+                                      isDarkTheme: isDarkMode,
+                                      typDescription:
+                                          thing.typDescription ?? '',
+                                      imageUrl: thing.imageUrl,
+                                      itemId: thing.id,
+                                      type: thing.type,
+                                      onDeleteItem: () => _bloc.add(
+                                          DeleteItemByUidEvent(uid: thing.id)),
+                                      selectedCategoryType:
+                                          _selectedCategoryType,
+                                      onStateUpdate: () => setState(() {}),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          )
                         : NewListOfTypes(
-                      types: state.typesWithColors.keys.toList(),
-                    ),
+                            types: state.typesWithColors.keys.toList(),
+                            onTypeTap: (String tappedType) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute<void>(
+                                  builder: (_) => DetailingTypesPage(
+                                    initialSelectedType: tappedType,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                   ),
-
                 ],
               ),
               Positioned(

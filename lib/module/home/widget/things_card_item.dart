@@ -1,13 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
-import 'action_icons.dart';
-import 'counter_controls.dart';
-import 'edit_item_bottom_sheet.dart';
-import 'item_image.dart';
-import 'card_widget/new_card_widget.dart';
 import '../../things/new_things/create_new_thing_screen.dart';
-import 'show_modal_buttom_sheet.dart';
+import 'card_widget/new_card_widget.dart';
 
 final Map<String, int> itemCounts = {};
 final Map<String, String> typeColors = {};
@@ -30,7 +23,7 @@ class ThingsCardWidget extends StatelessWidget {
     required this.weight,
     required this.colorText,
     required this.importance,
-
+    required this.favorites,
   });
 
   final String itemId;
@@ -39,7 +32,7 @@ class ThingsCardWidget extends StatelessWidget {
   final String type;
   final VoidCallback onStateUpdate;
   final VoidCallback? onDeleteItem;
-  final List <String>? imageUrl;
+  final List<String>? imageUrl;
   final String? selectedCategoryType;
   final int quantity;
   final ValueNotifier<List<String>>? selectedItemsNotifier;
@@ -48,7 +41,7 @@ class ThingsCardWidget extends StatelessWidget {
   final double weight;
   final String colorText;
   final int importance;
-
+  final bool favorites;
 
   @override
   Widget build(BuildContext context) {
@@ -83,12 +76,11 @@ class ThingsCardWidget extends StatelessWidget {
                         'weight': weight,
                         'colorText': colorText,
                         'importance': importance,
+
                       },
                     ),
                   ),
                 );
-
-
               }
             },
             onLongPress: () {
@@ -107,6 +99,7 @@ class ThingsCardWidget extends StatelessWidget {
               onDeleteItem: onDeleteItem,
               selectedCategoryType: selectedCategoryType,
               onStateUpdate: onStateUpdate,
+
             ),
           ),
         );

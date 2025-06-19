@@ -13,7 +13,7 @@ import 'presentation/them/dark_theme.dart';
   void main() async {
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp();
-    await loadTypeColorsFromFirestore();
+
     configureDependencies();
     runApp(
       const MyApp(),

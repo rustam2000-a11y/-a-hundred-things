@@ -15,6 +15,7 @@ class ThingsModel extends Equatable {
     required this.location,
     required this.importance,
     required this.weight,
+    this.favorites = false,
   });
 
   factory ThingsModel.fromJson(Map<String, dynamic> json) {
@@ -32,6 +33,7 @@ class ThingsModel extends Equatable {
       location: json['location'] as String? ?? '',
       importance: json['importance'] as int? ?? 0,
       weight: json['weight'] != null ? (json['weight'] as num).toDouble() : 0.0,
+      favorites: json['favorites'] as bool? ?? false,
     );
   }
 
@@ -49,6 +51,7 @@ class ThingsModel extends Equatable {
   final String location;
   final int importance;
   final double weight;
+  final bool favorites;
 
   @override
   List<Object?> get props => [
@@ -81,6 +84,7 @@ class ThingsModel extends Equatable {
     String? location,
     int? importance,
     double? weight,
+    bool? favorites
   }) {
     return ThingsModel(
       id: id ?? this.id,
@@ -96,6 +100,7 @@ class ThingsModel extends Equatable {
       location: location ?? this.location,
       importance: importance ?? this.importance,
       weight: weight ?? this.weight,
+      favorites: favorites ?? this.favorites,
     );
   }
 
@@ -114,6 +119,7 @@ class ThingsModel extends Equatable {
       'location': location,
       'importance': importance,
       'weight': weight,
+      'favorites': favorites,
     };
   }
 }

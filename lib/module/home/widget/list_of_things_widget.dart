@@ -44,6 +44,7 @@ class ThingsTypeListWidget extends StatelessWidget {
               weight: item.weight,
               colorText: item.colorText,
               importance: item.importance,
+              favorites: item.favorites,
 
             ),
           );

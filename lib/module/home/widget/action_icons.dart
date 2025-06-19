@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'edit_item_bottom_sheet.dart';
+
 
 class ActionIcons extends StatelessWidget {
   const ActionIcons({
@@ -49,18 +49,8 @@ class ActionIcons extends StatelessWidget {
           icon: Icon(
             Icons.edit,
             color: isDarkTheme ? Colors.white : Colors.black,
-          ),
+          ), onPressed: () {  },
 
-          onPressed: () {
-            showEditItemBottomSheet(
-              context,
-              itemId: itemId,
-              initialTitle: title,
-              initialDescription: description,
-              initialType: type,
-              imageUrl: imageUrl,
-            );
-          },
         ),
         IconButton(
           padding: EdgeInsets.zero,

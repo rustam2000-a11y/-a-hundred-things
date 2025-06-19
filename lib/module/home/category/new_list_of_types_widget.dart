@@ -4,9 +4,11 @@ class NewListOfTypes extends StatelessWidget {
   const NewListOfTypes({
     super.key,
     required this.types,
+    required this.onTypeTap,
   });
 
   final List<String> types;
+  final void Function(String type) onTypeTap;
 
   @override
   Widget build(BuildContext context) {
@@ -26,25 +28,28 @@ class NewListOfTypes extends StatelessWidget {
           color: Colors.black,
         ),
         itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 17),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    types[index],
-                    style: const TextStyle(fontSize: 16),
+          return GestureDetector(
+            onTap: () => onTypeTap(types[index]),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 17),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      types[index],
+                      style: const TextStyle(fontSize: 16),
+                    ),
                   ),
-                ),
-                const Row(
-                  children: [
-                    Icon(Icons.edit, size: 20),
-                    SizedBox(width: 12),
-                    Icon(Icons.close, size: 20),
-                  ],
-                ),
-              ],
+                  const Row(
+                    children: [
+                      Icon(Icons.edit, size: 20),
+                      SizedBox(width: 12),
+                      Icon(Icons.close, size: 20),
+                    ],
+                  ),
+                ],
+              ),
             ),
           );
         },
@@ -52,3 +57,4 @@ class NewListOfTypes extends StatelessWidget {
     );
   }
 }
+
