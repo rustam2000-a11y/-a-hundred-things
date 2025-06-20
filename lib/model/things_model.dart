@@ -101,6 +101,7 @@ class ThingsModel extends Equatable {
       importance: importance ?? this.importance,
       weight: weight ?? this.weight,
       favorites: favorites ?? this.favorites,
+
     );
   }
 

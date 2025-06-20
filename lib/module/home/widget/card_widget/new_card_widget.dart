@@ -22,7 +22,7 @@ class ThingCardContainer extends StatelessWidget {
   final bool isDarkTheme;
   final String title;
   final String description;
-  final List <String>? imageUrl;
+  final List<String>? imageUrl;
   final String itemId;
   final String type;
   final VoidCallback? onDeleteItem;
@@ -64,7 +64,8 @@ class ThingCardContainer extends StatelessWidget {
                             child: Text(
                               title,
                               style: TextStyle(
-                                color: isDarkTheme ? Colors.white : Colors.black,
+                                color:
+                                    isDarkTheme ? Colors.white : Colors.black,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -82,7 +83,6 @@ class ThingCardContainer extends StatelessWidget {
                           ),
                         ],
                       ),
-
                       const SizedBox(height: 18),
                       Text(
                         description.length > 10

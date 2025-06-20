@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class ActionIcons extends StatelessWidget {
   const ActionIcons({
     Key? key,
@@ -20,7 +19,7 @@ class ActionIcons extends StatelessWidget {
   final String title;
   final String description;
   final String type;
-  final List <String>? imageUrl;
+  final List<String>? imageUrl;
   final VoidCallback? onDeleteItem;
 
   @override
@@ -31,7 +30,6 @@ class ActionIcons extends StatelessWidget {
         height: 20,
         decoration: BoxDecoration(
           color: Colors.black.withOpacity(0.5),
-
         ),
         child: const Icon(
           Icons.check,
@@ -49,8 +47,8 @@ class ActionIcons extends StatelessWidget {
           icon: Icon(
             Icons.edit,
             color: isDarkTheme ? Colors.white : Colors.black,
-          ), onPressed: () {  },
-
+          ),
+          onPressed: () {},
         ),
         IconButton(
           padding: EdgeInsets.zero,

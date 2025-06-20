@@ -52,6 +52,7 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
   final bool _showDrawer = false;
   final Set<String> _typeSet = {};
   bool isEditMode = false;
+  bool _isFavorite = false;
 
   late final CreateNewThingBloc _bloc;
 
@@ -64,6 +65,7 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
 
     if (isEditMode) {
       final data = widget.existingThing!;
+      _isFavorite = data['favorites'] ?? false;
       existingDocId = data['id'];
       _titleController.text = data['title'] ?? '';
       _descriptionController.text = data['description'] ?? '';
@@ -86,12 +88,6 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
     super.initState();
   }
 
-
-  String getRandomColor() {
-    final random = Random();
-    return '#${random.nextInt(0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
-  }
-
   bool _isExpanded = false;
 
   @override
@@ -108,6 +104,29 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
           appBar: NewCustomAppBar(
             showSearchIcon: false,
             showBackButton: false,
+            actionIcon: IconButton(
+                icon: Icon(
+                  _isFavorite ? Icons.favorite : Icons.favorite_border,
+                  color: Colors.black,
+                ),
+                onPressed: () async {
+                  setState(() {
+                    _isFavorite = !_isFavorite;
+                  });
+
+                  print('existingDocId: $existingDocId');
+
+                  if (existingDocId != null) {
+                    await FirebaseFirestore.instance
+                        .collection('item')
+                        .doc(existingDocId)
+                        .update({'favorites': _isFavorite});
+
+                    Navigator.pop(context, true);
+                  } else {
+                    print('ERROR: existingDocId is null');
+                  }
+                }),
             logo: WidgetDrawerContainer(
               typ: selectedType,
               onTap: () {
@@ -151,28 +170,22 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                     decoration: BoxDecoration(
                       color: isDarkMode ? Colors.white : Colors.white,
                     ),
-
-                      child: state.file != null
-                          ? Image.file(
-                              state.file!,
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: double.infinity,
-                            )
-
-                          : _imageUrls.isNotEmpty
-                              ? Image.network(
-                                  _imageUrls.first,
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  height: double.infinity,
-
-                                )
-                              : _buildPlaceholder(screenWidth),
-
-
-
-        ),
+                    child: state.file != null
+                        ? Image.file(
+                            state.file!,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                          )
+                        : _imageUrls.isNotEmpty
+                            ? Image.network(
+                                _imageUrls.first,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: double.infinity,
+                              )
+                            : _buildPlaceholder(screenWidth),
+                  ),
                 ),
                 ExpandableFormCard(
                   isExpanded: _isExpanded,
@@ -209,50 +222,59 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           CustomMainButton(
-                            text: 'SAVE',
-                            textColor: Colors.white,
-                            backgroundColor: Colors.black,
+                              text: 'SAVE',
+                              textColor: Colors.white,
+                              backgroundColor: Colors.black,
                               onPressed: () async {
                                 if (_titleController.text.isNotEmpty &&
                                     _descriptionController.text.isNotEmpty &&
                                     (selectedType?.isNotEmpty ?? false)) {
                                   try {
                                     if (state.file != null) {
-                                      _imageUrls = await thingsRepository.uploadImages([state.file!]);
+                                      _imageUrls = await thingsRepository
+                                          .uploadImages([state.file!]);
                                     }
 
                                     final type = selectedType!.trim();
-                                    if (!typeColorsCache.containsKey(type)) {
-                                      typeColorsCache[type] = getRandomColor();
-                                    }
-
-                                    final randomColor = typeColorsCache[type]!;
-
+                                    if (!typeColorsCache.containsKey(type)) {}
                                     final Map<String, dynamic> itemData = {
                                       'title': _titleController.text.trim(),
-                                      'description': _descriptionController.text.trim(),
+                                      'description':
+                                          _descriptionController.text.trim(),
                                       'type': type,
-                                      'userId': FirebaseAuth.instance.currentUser?.uid,
-                                      'color': randomColor,
-                                      'typeColor': randomColor,
+                                      'userId': FirebaseAuth
+                                          .instance.currentUser?.uid,
                                       'timestamp': Timestamp.now(),
                                       'imageUrls': _imageUrls,
-                                      'location': _locationController.text.trim(),
-                                      'price': int.tryParse(_priceController.text.trim()) ?? 0,
-                                      'weight': double.tryParse(_weightController.text.trim()) ?? 0,
+                                      'location':
+                                          _locationController.text.trim(),
+                                      'price': int.tryParse(
+                                              _priceController.text.trim()) ??
+                                          0,
+                                      'weight': double.tryParse(
+                                              _weightController.text.trim()) ??
+                                          0,
                                       'colorText': _colorController.text.trim(),
-                                      'importance': int.tryParse(_importanceController.text.trim()) ?? 0,
-                                      'quantity': int.tryParse(_quantityController.text.trim()) ?? 1,
+                                      'importance': int.tryParse(
+                                              _importanceController.text
+                                                  .trim()) ??
+                                          0,
+                                      'quantity': int.tryParse(
+                                              _quantityController.text
+                                                  .trim()) ??
+                                          1,
+                                      'favorites': _isFavorite,
                                     };
 
                                     if (existingDocId != null) {
-
                                       await FirebaseFirestore.instance
                                           .collection('item')
                                           .doc(existingDocId)
                                           .update(itemData);
                                     } else {
-                                      await FirebaseFirestore.instance.collection('item').add(itemData);
+                                      await FirebaseFirestore.instance
+                                          .collection('item')
+                                          .add(itemData);
                                     }
 
                                     Navigator.pop(context);
@@ -263,12 +285,12 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                                   }
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Please fill all fields')),
+                                    const SnackBar(
+                                        content:
+                                            Text('Please fill all fields')),
                                   );
                                 }
-                              }
-
-                          ),
+                              }),
                           CustomMainButton(
                             text: 'DELETE',
                             onPressed: () {
@@ -304,4 +326,3 @@ Widget _buildPlaceholder(double screenWidth) {
     ),
   );
 }
-

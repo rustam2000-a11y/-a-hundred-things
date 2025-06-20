@@ -5,34 +5,35 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
-import '../../core/utils/presentation.utils.dart';
-import '../../presentation/colors.dart';
-import '../login/widget/custom_text.dart';
-import 'category/category_card_widget.dart';
-import 'container_with_filters.dart';
-import 'home_bloc.dart';
-import 'widget/appBar/new_custom_app_bar.dart';
-import 'widget/drawer.dart';
-import 'widget/list_of_things_widget.dart';
-import 'widget/navigation_bar_widget.dart';
-import 'widget/things_title_list_widget.dart';
-import 'widget/type_widget/type_add_screen.dart';
+import '../../../core/utils/presentation.utils.dart';
+import '../../../presentation/colors.dart';
+import '../../login/widget/custom_text.dart';
+import '../container_with_filters.dart';
+import '../home_bloc.dart';
+import '../widget/appBar/new_custom_app_bar.dart';
+import '../widget/drawer.dart';
+import '../widget/list_of_things_widget.dart';
+import '../widget/navigation_bar_widget.dart';
+import '../widget/things_title_list_widget.dart';
+import '../widget/type_widget/type_add_screen.dart';
+import 'category_card_widget.dart';
+import 'new_list_of_types_widget.dart';
 
-export 'my_home_page.dart';
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.toggleTheme});
+class DetailingTypesPage extends StatefulWidget {
+  const DetailingTypesPage({super.key,this.initialSelectedType, });
+  final String? initialSelectedType;
 
-  final VoidCallback? toggleTheme;
 
   @override
-  MyHomePageState createState() => MyHomePageState();
+  DetailingTypesPageState createState() => DetailingTypesPageState();
 }
 
-class MyHomePageState extends State<MyHomePage> {
+class DetailingTypesPageState extends State<DetailingTypesPage> {
   String? _selectedCategoryType;
   late HomeBloc _bloc;
   ValueNotifier<List<String>> selectedItemsNotifier = ValueNotifier([]);
+
 
   bool _isListMode = true;
   bool _showCategoryList = false;
@@ -42,6 +43,13 @@ class MyHomePageState extends State<MyHomePage> {
   void initState() {
     _bloc = GetIt.I<HomeBloc>();
     _bloc.add(const HomeInitEvent());
+
+    _selectedCategoryType = widget.initialSelectedType;
+
+    if (_selectedCategoryType != null) {
+      _bloc.add(HomeSelectTypeThingsEvent(field: 'type', value: _selectedCategoryType!));
+    }
+
     super.initState();
   }
 
@@ -51,6 +59,7 @@ class MyHomePageState extends State<MyHomePage> {
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -58,8 +67,12 @@ class MyHomePageState extends State<MyHomePage> {
     return BlocBuilder<HomeBloc, HomeState>(
       bloc: _bloc,
       builder: (context, state) {
-        final filteredThings =
-            state.things.where((e) => e.title.trim().isNotEmpty).toList();
+        final filteredThings = state.things
+            .where((e) =>
+        e.title.trim().isNotEmpty &&
+            (_selectedCategoryType == null || e.type == _selectedCategoryType))
+            .toList();
+
 
         return Scaffold(
           drawer: CustomDrawer(
@@ -86,22 +99,19 @@ class MyHomePageState extends State<MyHomePage> {
                   const Divider(thickness: 1, height: 1, color: Colors.black),
                   Padding(
                     padding: const EdgeInsets.all(16),
-                    child: Row(
+                    child: Row(//
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _showFilters = true;
-                            });
-                          },
-                          child: const Row(
-                            children: [
-                              Icon(Icons.import_export, size: 24),
-                              SizedBox(width: 4),
-                              CustomText5(text: 'FILTER', fontSize: 20),
-                            ],
-                          ),
+                        const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.import_export, size: 24),
+                            SizedBox(width: 4),
+                            CustomText5(
+                              text: 'FILTER',
+                              fontSize: 20,
+                            ),
+                          ],
                         ),
                         Container(
                           width: 74,
@@ -132,7 +142,7 @@ class MyHomePageState extends State<MyHomePage> {
                                 height: 20,
                                 color: Colors.black26,
                                 margin:
-                                    const EdgeInsets.symmetric(horizontal: 8),
+                                const EdgeInsets.symmetric(horizontal: 8),
                               ),
                               GestureDetector(
                                 onTap: () {
@@ -172,8 +182,7 @@ class MyHomePageState extends State<MyHomePage> {
                             },
                             child: Container(
                               margin: const EdgeInsets.only(right: 8),
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
                               decoration: BoxDecoration(
                                 color: Colors.black,
                                 borderRadius: BorderRadius.circular(3),
@@ -190,8 +199,7 @@ class MyHomePageState extends State<MyHomePage> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  Icon(Icons.add,
-                                      color: Colors.white, size: 20),
+                                  Icon(Icons.add, color: Colors.white, size: 20),
                                 ],
                               ),
                             ),
@@ -225,30 +233,47 @@ class MyHomePageState extends State<MyHomePage> {
                                   }
                                 });
                               },
+
                               onDeleteThings: () {
                                 _bloc.add(DeleteThingsByTypeEvent(type: type));
                               },
                               type: type,
                             );
+
                           }).toList(),
                         ],
                       ),
                     ),
                   const SizedBox(height: 12),
+
+
                   Expanded(
                     child: _isListMode
                         ? ThingsTypeListWidget(
-                            things: filteredThings,
-                            selectedCategoryType: _selectedCategoryType,
-                            selectedItemsNotifier: selectedItemsNotifier,
-                            onStateUpdate: () => setState(() {}),
-                            onDeleteItem: (uid) =>
-                                _bloc.add(DeleteItemByUidEvent(uid: uid)),
-                          )
-                        : NewListOfTitles(
-                            things: filteredThings,
-                            allTypes: state.typesWithColors.keys.toList(),
+                      things: filteredThings,
+                      selectedCategoryType: _selectedCategoryType,
+                      selectedItemsNotifier: selectedItemsNotifier,
+                      onStateUpdate: () => setState(() {}),
+                      onDeleteItem: (uid) =>
+                          _bloc.add(DeleteItemByUidEvent(uid: uid)),
+                    )
+                        : NewListOfTypes(
+                      types: state.typesWithColors.keys.toList(),
+                      onTypeTap: (String tappedType) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (_) => DetailingTypesPage(
+
+                              initialSelectedType: tappedType,
+                            ),
                           ),
+                        );
+                      },
+
+                    ),
+
+
                   ),
                 ],
               ),
@@ -274,16 +299,18 @@ class MyHomePageState extends State<MyHomePage> {
                       _selectedCategoryType = value;
                       _showFilters = false;
                     });
-                    _bloc.add(
-                        HomeSelectTypeThingsEvent(field: field, value: value));
+                    _bloc.add(HomeSelectTypeThingsEvent(field: field, value: value));
                   },
                 ),
+
+
             ],
           ),
         );
       },
     );
   }
+
 
   Future<void> deleteSelectedItems(BuildContext context) async {
     try {
@@ -307,12 +334,14 @@ class MyHomePageState extends State<MyHomePage> {
 
 Future<void> loadTypeColorsFromFirestore() async {
   final querySnapshot =
-      await FirebaseFirestore.instance.collection('item').get();
+  await FirebaseFirestore.instance.collection('item').get();
 
   for (final doc in querySnapshot.docs) {
     final type = doc['type'];
     final color = doc['typeColor'];
 
-    if (type != null && color != null) {}
+    if (type != null && color != null) {
+
+    }
   }
 }

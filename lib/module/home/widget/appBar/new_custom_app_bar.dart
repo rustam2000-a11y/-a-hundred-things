@@ -12,6 +12,7 @@ class NewCustomAppBar extends StatefulWidget implements PreferredSizeWidget {
     this.logo,
     this.controller,
     this.focusNode,
+    this.actionIcon,
   }) : super(key: key);
 
   final bool showBackButton;
@@ -19,6 +20,7 @@ class NewCustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final Widget? logo;
   final TextEditingController? controller;
   final FocusNode? focusNode;
+  final Widget? actionIcon;
 
   @override
   State<NewCustomAppBar> createState() => _NewCustomAppBarState();
@@ -71,12 +73,12 @@ class _NewCustomAppBarState extends State<NewCustomAppBar> {
       backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
       leading: widget.showBackButton
           ? IconButton(
-        icon: Icon(
-          _showClearIcon ? Icons.close : Icons.arrow_back,
-          color: theme.iconTheme.color,
-        ),
-        onPressed: _onLeadingPressed,
-      )
+              icon: Icon(
+                _showClearIcon ? Icons.close : Icons.arrow_back,
+                color: theme.iconTheme.color,
+              ),
+              onPressed: _onLeadingPressed,
+            )
           : null,
       centerTitle: true,
       title: widget.logo ??
@@ -105,15 +107,16 @@ class _NewCustomAppBarState extends State<NewCustomAppBar> {
             ],
           ),
       actions: [
-        if (widget.showSearchIcon)
+        if (widget.actionIcon != null)
+          widget.actionIcon!
+        else if (widget.showSearchIcon)
           IconButton(
             icon: Icon(Icons.search, color: theme.iconTheme.color),
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute<void>(
-                  builder: (context) =>
-                      SearchPage(repository: repository),
+                  builder: (context) => SearchPage(repository: repository),
                 ),
               );
             },

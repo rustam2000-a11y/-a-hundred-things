@@ -55,13 +55,13 @@ class ThingsCardWidget extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 4.0),
           child: GestureDetector(
-            onTap: () {
+            onTap: () async {
               if (selectedItemsNotifier != null && selectedItems.isNotEmpty) {
                 _toggleSelection(selectedItemsNotifier!, itemId);
               } else {
-                Navigator.push(
+                final result = await Navigator.push(
                   context,
-                  MaterialPageRoute<Widget>(
+                  MaterialPageRoute<bool>(
                     builder: (context) => CreateNewThingScreen(
                       allTypes: allTypes,
                       isReadOnly: true,
@@ -76,11 +76,15 @@ class ThingsCardWidget extends StatelessWidget {
                         'weight': weight,
                         'colorText': colorText,
                         'importance': importance,
-
+                        'favorites': favorites,
                       },
                     ),
                   ),
                 );
+
+                if (result == true) {
+                  onStateUpdate();
+                }
               }
             },
             onLongPress: () {
@@ -99,7 +103,6 @@ class ThingsCardWidget extends StatelessWidget {
               onDeleteItem: onDeleteItem,
               selectedCategoryType: selectedCategoryType,
               onStateUpdate: onStateUpdate,
-
             ),
           ),
         );

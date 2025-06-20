@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../login/screen/login_screen.dart';
 import '../../settings/screen/user_profile_screen.dart';
+import '../../things/new_things/favorite_screen.dart';
 import '../my_home_page.dart';
 import '../category/category_page.dart';
 import 'custom_divider.dart';
@@ -188,6 +189,15 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 text: 'Favorites',
                 onTap: () {
                   Navigator.pop(context);
+
+                  Future.delayed(const Duration(milliseconds: 250), () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (context) => const FavorieteScreen(),
+                      ),
+                    );
+                  });
                 },
               ),
               CustomListTile(

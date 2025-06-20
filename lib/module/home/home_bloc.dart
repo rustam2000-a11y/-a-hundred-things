@@ -46,8 +46,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   StreamSubscription<dynamic>? categorySub;
 
   void init() {
+    thingsSub?.cancel();
     thingsSub = _thingsRepository.fetchMyThings().listen((list) {
-      add(HomeThingsEvent(things: list));
+      add(HomeThingsEvent(things: List.from(list)));
 
       final typesWithColors = list.fold<Map<String, String>>({}, (map, item) {
         final type = item.type;
@@ -61,7 +62,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   void filterThingsByField(String field, String value) {
-    print('⚙️ filterThingsByField: value="$value"');
+    print(' filterThingsByField: value="$value"');
     categorySub?.cancel();
 
     if (value.trim().isEmpty) {
@@ -85,9 +86,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       add(HomeThingsEvent(things: filteredList));
     });
   }
-
-
-
 
   Future<void> deleteThingsByType(String type) async {
     await _thingsRepository.deleteThingsByType(type);

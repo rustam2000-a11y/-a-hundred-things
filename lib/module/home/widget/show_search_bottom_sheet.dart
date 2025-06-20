@@ -117,7 +117,6 @@ class _SearchPageState extends State<SearchPage> {
                             .where((item) => item.title.trim().isNotEmpty)
                             .toList();
 
-
                         return ListView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           itemCount: items.length,
@@ -128,7 +127,7 @@ class _SearchPageState extends State<SearchPage> {
                               title: item.title,
                               description: item.description,
                               type: item.type,
-                              imageUrl:  item.imageUrl,
+                              imageUrl: item.imageUrl,
                               onStateUpdate: () {},
                               quantity: item.quantity,
                               allTypes: const [],
@@ -137,12 +136,9 @@ class _SearchPageState extends State<SearchPage> {
                               colorText: item.colorText ?? '',
                               importance: item.importance ?? 0,
                               favorites: item.favorites,
-
-
                             );
                           },
                         );
-
                       },
                     );
                   },

@@ -4,32 +4,28 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import '../../../core/utils/presentation.utils.dart';
+import '../../../presentation/colors.dart';
+import '../../home/category/category_card_widget.dart';
+import '../../home/container_with_filters.dart';
+import '../../home/home_bloc.dart';
+import '../../home/widget/appBar/new_custom_app_bar.dart';
+import '../../home/widget/drawer.dart';
+import '../../home/widget/list_of_things_widget.dart';
+import '../../home/widget/navigation_bar_widget.dart';
+import '../../home/widget/type_widget/type_add_screen.dart';
+import '../../login/widget/custom_text.dart';
 
-import '../../core/utils/presentation.utils.dart';
-import '../../presentation/colors.dart';
-import '../login/widget/custom_text.dart';
-import 'category/category_card_widget.dart';
-import 'container_with_filters.dart';
-import 'home_bloc.dart';
-import 'widget/appBar/new_custom_app_bar.dart';
-import 'widget/drawer.dart';
-import 'widget/list_of_things_widget.dart';
-import 'widget/navigation_bar_widget.dart';
-import 'widget/things_title_list_widget.dart';
-import 'widget/type_widget/type_add_screen.dart';
-
-export 'my_home_page.dart';
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.toggleTheme});
-
-  final VoidCallback? toggleTheme;
+class FavorieteScreen extends StatefulWidget {
+  const FavorieteScreen({
+    super.key,
+  });
 
   @override
-  MyHomePageState createState() => MyHomePageState();
+  FavorieteScreenState createState() => FavorieteScreenState();
 }
 
-class MyHomePageState extends State<MyHomePage> {
+class FavorieteScreenState extends State<FavorieteScreen> {
   String? _selectedCategoryType;
   late HomeBloc _bloc;
   ValueNotifier<List<String>> selectedItemsNotifier = ValueNotifier([]);
@@ -58,8 +54,9 @@ class MyHomePageState extends State<MyHomePage> {
     return BlocBuilder<HomeBloc, HomeState>(
       bloc: _bloc,
       builder: (context, state) {
-        final filteredThings =
-            state.things.where((e) => e.title.trim().isNotEmpty).toList();
+        final filteredThings = state.things
+            .where((e) => e.title.trim().isNotEmpty && e.favorites == true)
+            .toList();
 
         return Scaffold(
           drawer: CustomDrawer(
@@ -236,20 +233,16 @@ class MyHomePageState extends State<MyHomePage> {
                     ),
                   const SizedBox(height: 12),
                   Expanded(
-                    child: _isListMode
-                        ? ThingsTypeListWidget(
-                            things: filteredThings,
-                            selectedCategoryType: _selectedCategoryType,
-                            selectedItemsNotifier: selectedItemsNotifier,
-                            onStateUpdate: () => setState(() {}),
-                            onDeleteItem: (uid) =>
-                                _bloc.add(DeleteItemByUidEvent(uid: uid)),
-                          )
-                        : NewListOfTitles(
-                            things: filteredThings,
-                            allTypes: state.typesWithColors.keys.toList(),
-                          ),
-                  ),
+                      child: ThingsTypeListWidget(
+                    things: filteredThings,
+                    selectedCategoryType: _selectedCategoryType,
+                    selectedItemsNotifier: selectedItemsNotifier,
+                    onStateUpdate: () {
+                      _bloc.add(const HomeInitEvent());
+                    },
+                    onDeleteItem: (uid) =>
+                        _bloc.add(DeleteItemByUidEvent(uid: uid)),
+                  )),
                 ],
               ),
               Positioned(

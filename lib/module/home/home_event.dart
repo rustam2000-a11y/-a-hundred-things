@@ -20,7 +20,6 @@ class HomeProgressEvent extends HomeEvent {
   List<Object?> get props => [isProgress];
 }
 
-
 class HomeThingsEvent extends HomeEvent {
   const HomeThingsEvent({required this.things});
 
@@ -32,19 +31,13 @@ class HomeThingsEvent extends HomeEvent {
 
 class HomeTypeThingsEvent extends HomeEvent {
   const HomeTypeThingsEvent({
-
-
     required this.typesWithColors,
   });
-
 
   final Map<String, String> typesWithColors;
 
   @override
-  List<Object?> get props => [
-        typesWithColors
-
-      ];
+  List<Object?> get props => [typesWithColors];
 }
 
 class HomeSelectTypeThingsEvent extends HomeEvent {
@@ -59,7 +52,6 @@ class HomeSelectTypeThingsEvent extends HomeEvent {
   @override
   List<Object?> get props => [field, value];
 }
-
 
 class DeleteThingsByTypeEvent extends HomeEvent {
   const DeleteThingsByTypeEvent({required this.type});
