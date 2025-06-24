@@ -19,9 +19,6 @@ class ThingsCardWidget extends StatelessWidget {
     required this.quantity,
     this.selectedItemsNotifier,
     required this.allTypes,
-    required this.location,
-    required this.weight,
-    required this.colorText,
     required this.importance,
     required this.favorites,
   });
@@ -37,9 +34,6 @@ class ThingsCardWidget extends StatelessWidget {
   final int quantity;
   final ValueNotifier<List<String>>? selectedItemsNotifier;
   final List<String> allTypes;
-  final String location;
-  final double weight;
-  final String colorText;
   final int importance;
   final bool favorites;
 
@@ -72,9 +66,7 @@ class ThingsCardWidget extends StatelessWidget {
                         'type': type,
                         'imageUrls': imageUrl ?? [],
                         'quantity': quantity,
-                        'location': location,
-                        'weight': weight,
-                        'colorText': colorText,
+
                         'importance': importance,
                         'favorites': favorites,
                       },

@@ -36,10 +36,6 @@ class CreateNewThingScreen extends StatefulWidget {
 class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _locationController = TextEditingController();
-  final TextEditingController _priceController = TextEditingController();
-  final TextEditingController _weightController = TextEditingController();
-  final TextEditingController _colorController = TextEditingController();
   final TextEditingController _importanceController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
 
@@ -48,7 +44,7 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
   List<String> _imageUrls = [];
   String? selectedType;
   String? existingDocId;
-
+  bool isFormValid = false;
   final bool _showDrawer = false;
   final Set<String> _typeSet = {};
   bool isEditMode = false;
@@ -56,10 +52,27 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
 
   late final CreateNewThingBloc _bloc;
 
+  void _validateForm() {
+    final valid = _titleController.text.trim().isNotEmpty &&
+        _descriptionController.text.trim().isNotEmpty;
+
+    if (isFormValid != valid) {
+      setState(() {
+        isFormValid = valid;
+      });
+    }
+  }
+
+  @override
   @override
   void initState() {
+    super.initState();
+
     _bloc = GetIt.I<CreateNewThingBloc>();
     _typeSet.addAll(widget.allTypes);
+
+    _titleController.addListener(_validateForm);
+    _descriptionController.addListener(_validateForm);
 
     isEditMode = widget.existingThing != null;
 
@@ -69,14 +82,9 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
       existingDocId = data['id'];
       _titleController.text = data['title'] ?? '';
       _descriptionController.text = data['description'] ?? '';
-      _locationController.text = data['location'] ?? '';
-      _priceController.text = (data['price'] ?? '').toString();
-      _weightController.text = (data['weight'] ?? '').toString();
-      _colorController.text = data['colorText'] ?? '';
       _importanceController.text = (data['importance'] ?? '').toString();
       _quantityController.text = (data['quantity'] ?? '1').toString();
       selectedType = data['type'];
-
       final imageUrlRaw = data['imageUrls'];
       if (imageUrlRaw is List<String>) {
         _imageUrls = imageUrlRaw;
@@ -85,7 +93,7 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
       }
     }
 
-    super.initState();
+    _validateForm();
   }
 
   bool _isExpanded = false;
@@ -134,17 +142,29 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                   context: context,
                   builder: (context) => Dialog(
                     backgroundColor: Colors.transparent,
-                    child: WidgetDrawer(
-                      types: _typeSet.toList(),
-                      onTypeSelected: (selected) {
-                        setState(() {
-                          selectedType = selected;
-                        });
-                      },
+
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Center(
+                        child: GestureDetector(
+                          onTap: () {},
+                          child: WidgetDrawer(
+                            types: _typeSet.toList(),
+                            onTypeSelected: (selected) {
+                              setState(() {
+                                selectedType = selected;
+                              });
+
+                            },
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 );
               },
+
             ),
           ),
           body: SafeArea(
@@ -165,12 +185,12 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                     _bloc.add(ChangeImageEvent(context));
                   },
                   child: Container(
-                    height: screenHeight * 0.5,
+                    height: screenHeight * 0.4,
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: isDarkMode ? Colors.white : Colors.white,
                     ),
-                    child: state.file != null
+                    child: (state.file != null && !isEditMode)
                         ? Image.file(
                             state.file!,
                             fit: BoxFit.cover,
@@ -183,6 +203,11 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                                 fit: BoxFit.cover,
                                 width: double.infinity,
                                 height: double.infinity,
+                                errorBuilder: (context, error, stackTrace) {
+                                  print('Image load error: $error');
+                                  return const Center(
+                                      child: Icon(Icons.broken_image));
+                                },
                               )
                             : _buildPlaceholder(screenWidth),
                   ),
@@ -191,10 +216,6 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                   isExpanded: _isExpanded,
                   titleController: _titleController,
                   descriptionController: _descriptionController,
-                  locationController: _locationController,
-                  priceController: _priceController,
-                  weightController: _weightController,
-                  colorController: _colorController,
                   importanceController: _importanceController,
                   quantityController: _quantityController,
                   isDarkMode: isDarkMode,
@@ -222,75 +243,57 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           CustomMainButton(
-                              text: 'SAVE',
-                              textColor: Colors.white,
-                              backgroundColor: Colors.black,
-                              onPressed: () async {
-                                if (_titleController.text.isNotEmpty &&
-                                    _descriptionController.text.isNotEmpty &&
-                                    (selectedType?.isNotEmpty ?? false)) {
-                                  try {
-                                    if (state.file != null) {
-                                      _imageUrls = await thingsRepository
-                                          .uploadImages([state.file!]);
-                                    }
-
-                                    final type = selectedType!.trim();
-                                    if (!typeColorsCache.containsKey(type)) {}
-                                    final Map<String, dynamic> itemData = {
-                                      'title': _titleController.text.trim(),
-                                      'description':
-                                          _descriptionController.text.trim(),
-                                      'type': type,
-                                      'userId': FirebaseAuth
-                                          .instance.currentUser?.uid,
-                                      'timestamp': Timestamp.now(),
-                                      'imageUrls': _imageUrls,
-                                      'location':
-                                          _locationController.text.trim(),
-                                      'price': int.tryParse(
-                                              _priceController.text.trim()) ??
-                                          0,
-                                      'weight': double.tryParse(
-                                              _weightController.text.trim()) ??
-                                          0,
-                                      'colorText': _colorController.text.trim(),
-                                      'importance': int.tryParse(
-                                              _importanceController.text
-                                                  .trim()) ??
-                                          0,
-                                      'quantity': int.tryParse(
-                                              _quantityController.text
-                                                  .trim()) ??
-                                          1,
-                                      'favorites': _isFavorite,
-                                    };
-
-                                    if (existingDocId != null) {
-                                      await FirebaseFirestore.instance
-                                          .collection('item')
-                                          .doc(existingDocId)
-                                          .update(itemData);
-                                    } else {
-                                      await FirebaseFirestore.instance
-                                          .collection('item')
-                                          .add(itemData);
-                                    }
-
-                                    Navigator.pop(context);
-                                  } catch (e) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Error: $e')),
-                                    );
-                                  }
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content:
-                                            Text('Please fill all fields')),
-                                  );
+                            text: 'SAVE',
+                            textColor: Colors.white,
+                            backgroundColor: Colors.black,
+                            isEnabled: isFormValid,
+                            onPressed: () async {
+                              try {
+                                if (state.file != null) {
+                                  _imageUrls = await thingsRepository
+                                      .uploadImages([state.file!]);
                                 }
-                              }),
+
+                                final type = selectedType!.trim();
+                                if (!typeColorsCache.containsKey(type)) {}
+
+                                final Map<String, dynamic> itemData = {
+                                  'title': _titleController.text.trim(),
+                                  'description':
+                                      _descriptionController.text.trim(),
+                                  'type': type,
+                                  'userId':
+                                      FirebaseAuth.instance.currentUser?.uid,
+                                  'timestamp': Timestamp.now(),
+                                  'imageUrls': _imageUrls,
+                                  'importance': int.tryParse(
+                                          _importanceController.text.trim()) ??
+                                      0,
+                                  'quantity': int.tryParse(
+                                          _quantityController.text.trim()) ??
+                                      1,
+                                  'favorites': _isFavorite,
+                                };
+
+                                if (existingDocId != null) {
+                                  await FirebaseFirestore.instance
+                                      .collection('item')
+                                      .doc(existingDocId)
+                                      .update(itemData);
+                                } else {
+                                  await FirebaseFirestore.instance
+                                      .collection('item')
+                                      .add(itemData);
+                                }
+
+                                Navigator.pop(context);
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Error: $e')),
+                                );
+                              }
+                            },
+                          ),
                           CustomMainButton(
                             text: 'DELETE',
                             onPressed: () {

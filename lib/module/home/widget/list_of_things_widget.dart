@@ -40,9 +40,6 @@ class ThingsTypeListWidget extends StatelessWidget {
               onDeleteItem: () => onDeleteItem(item.id),
               selectedItemsNotifier: selectedItemsNotifier,
               allTypes: [],
-              location: item.location,
-              weight: item.weight,
-              colorText: item.colorText,
               importance: item.importance,
               favorites: item.favorites,
 

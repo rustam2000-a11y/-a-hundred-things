@@ -65,7 +65,7 @@ class MyHomePageState extends State<MyHomePage> {
           drawer: CustomDrawer(
             onToggleCategoryList: _toggleCategoryList,
           ),
-          backgroundColor: isDarkMode ? AppColors.blackSand : Colors.white,
+
           appBar: const NewCustomAppBar(showBackButton: false),
           body: Stack(
             children: [
@@ -121,7 +121,7 @@ class MyHomePageState extends State<MyHomePage> {
                                 },
                                 child: Icon(
                                   Icons.view_list,
-                                  size: 18,
+                                  size: 20,
                                   color: _isListMode
                                       ? Colors.black
                                       : Colors.black26,
@@ -142,7 +142,7 @@ class MyHomePageState extends State<MyHomePage> {
                                 },
                                 child: Icon(
                                   Icons.view_list_outlined,
-                                  size: 18,
+                                  size: 20,
                                   color: !_isListMode
                                       ? Colors.black
                                       : Colors.black26,

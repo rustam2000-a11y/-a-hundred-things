@@ -74,83 +74,14 @@ class FavorieteScreenState extends State<FavorieteScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         CustomText5(
-                          text: 'All Your Things',
+                          text: 'Favorites',
                           fontSize: 20,
                         ),
                       ],
                     ),
                   ),
                   const Divider(thickness: 1, height: 1, color: Colors.black),
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _showFilters = true;
-                            });
-                          },
-                          child: const Row(
-                            children: [
-                              Icon(Icons.import_export, size: 24),
-                              SizedBox(width: 4),
-                              CustomText5(text: 'FILTER', fontSize: 20),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          width: 74,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _isListMode = true;
-                                  });
-                                },
-                                child: Icon(
-                                  Icons.view_list,
-                                  size: 18,
-                                  color: _isListMode
-                                      ? Colors.black
-                                      : Colors.black26,
-                                ),
-                              ),
-                              Container(
-                                width: 1,
-                                height: 20,
-                                color: Colors.black26,
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _isListMode = false;
-                                  });
-                                },
-                                child: Icon(
-                                  Icons.view_list_outlined,
-                                  size: 18,
-                                  color: !_isListMode
-                                      ? Colors.black
-                                      : Colors.black26,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+
                   if (_showCategoryList)
                     SizedBox(
                       height: 50,

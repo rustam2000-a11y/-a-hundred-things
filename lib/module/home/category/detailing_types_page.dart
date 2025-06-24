@@ -1,10 +1,8 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-
 import '../../../core/utils/presentation.utils.dart';
 import '../../../presentation/colors.dart';
 import '../../login/widget/custom_text.dart';
@@ -14,7 +12,6 @@ import '../widget/appBar/new_custom_app_bar.dart';
 import '../widget/drawer.dart';
 import '../widget/list_of_things_widget.dart';
 import '../widget/navigation_bar_widget.dart';
-import '../widget/things_title_list_widget.dart';
 import '../widget/type_widget/type_add_screen.dart';
 import 'category_card_widget.dart';
 import 'new_list_of_types_widget.dart';
@@ -84,13 +81,15 @@ class DetailingTypesPageState extends State<DetailingTypesPage> {
             children: [
               Column(
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20),
+                   Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         CustomText5(
-                          text: 'All Your Things',
+                          text: _selectedCategoryType?.isNotEmpty == true
+                              ? _selectedCategoryType!
+                              : 'All Your Things',
                           fontSize: 20,
                         ),
                       ],

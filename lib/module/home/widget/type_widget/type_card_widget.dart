@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../action_icons.dart';
-import '../counter_controls.dart';
+
 import '../item_image.dart';
 
 class TypeCardWidget extends StatelessWidget {
@@ -104,12 +104,7 @@ class TypeCardWidget extends StatelessWidget {
                 alignment: Alignment.bottomRight,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 8.0),
-                  child: CounterControls(
-                    itemId: itemId,
-                    itemType: type,
-                    onStateUpdate: onStateUpdate,
-                    selectedCategoryType: selectedCategoryType,
-                  ),
+
                 ),
               ),
           ],

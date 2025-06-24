@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../presentation/colors.dart';
+
 abstract class CustomButton {
   String get text;
   VoidCallback get onPressed;
@@ -54,28 +56,50 @@ class ReusableButton extends StatelessWidget implements CustomButton {
 
 
 class CustomButtonRegist extends StatelessWidget {
-
   const CustomButtonRegist({
     super.key,
     required this.text,
-    required this.icon,
     required this.onPressed,
+    this.icon,
+    this.image,
     this.textColor = Colors.black,
     this.backgroundColor = Colors.transparent,
     this.borderRadius = 4,
+    this.iconSize = 24,
   });
+
   final String text;
-  final IconData icon;
   final VoidCallback onPressed;
+  final IconData? icon;
+  final ImageProvider<Object>? image;
   final Color textColor;
   final Color backgroundColor;
   final double borderRadius;
+  final double iconSize;
 
   @override
   Widget build(BuildContext context) {
+    Widget leading;
+
+    if (icon != null) {
+      leading = Icon(
+        icon,
+        color: textColor,
+        size: iconSize,
+      );
+    } else if (image != null) {
+      leading = Image(
+        image: image!,
+        width: iconSize,
+        height: iconSize,
+      );
+    } else {
+      leading = const SizedBox.shrink();
+    }
+
     return ElevatedButton.icon(
       onPressed: onPressed,
-      icon: Icon(icon, color: textColor),
+      icon: leading,
       label: Text(
         text,
         style: TextStyle(color: textColor),
@@ -99,6 +123,8 @@ class CustomButtonRegist extends StatelessWidget {
 
 
 
+
+
 class CustomMainButton extends StatelessWidget {
   const CustomMainButton({
     super.key,
@@ -107,6 +133,7 @@ class CustomMainButton extends StatelessWidget {
     this.textColor = Colors.black,
     this.borderColor = Colors.black,
     this.backgroundColor = Colors.white,
+    this.isEnabled = true,
   });
 
   final String text;
@@ -114,24 +141,29 @@ class CustomMainButton extends StatelessWidget {
   final Color textColor;
   final Color borderColor;
   final Color backgroundColor;
+  final bool isEnabled;
 
   @override
   Widget build(BuildContext context) {
+    final effectiveTextColor = isEnabled ? textColor : Colors.white;
+    final effectiveBackgroundColor = isEnabled ? backgroundColor : AppColors.grey;
+
+
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton(
-        onPressed: onPressed,
+        onPressed: isEnabled ? onPressed : null,
         style: OutlinedButton.styleFrom(
-          backgroundColor: backgroundColor,
-          foregroundColor: textColor,
-          side: BorderSide(color: borderColor),
+          backgroundColor: effectiveBackgroundColor,
+          foregroundColor: effectiveTextColor,
+
           padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(),
+          shape: const RoundedRectangleBorder(),
         ),
         child: Text(
           text,
           style: TextStyle(
-            color: textColor,
+            color: effectiveTextColor,
             fontWeight: FontWeight.w500,
             fontSize: 14,
           ),
@@ -140,6 +172,7 @@ class CustomMainButton extends StatelessWidget {
     );
   }
 }
+
 
 
 

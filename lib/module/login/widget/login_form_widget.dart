@@ -139,17 +139,17 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               ReusableButton(
                 text: S.of(context).login,
                 onPressed: () => _login(context),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               DividerWithText(text: S.of(context).or),
               const SizedBox(height: 30),
               CustomButtonRegist(
                 text: S.of(context).continueWithGoogle,
-                icon: Icons.login,
+                image: const AssetImage('assets/images/google.png'),
                 onPressed: () async {
                   final User? user = await signInWithGoogle();
                   if (user != null) {
@@ -161,7 +161,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                          content: Text('Ошибка входа через Google')),
+                          content: Text('Error signing in with Google')),
                     );
                   }
                 },

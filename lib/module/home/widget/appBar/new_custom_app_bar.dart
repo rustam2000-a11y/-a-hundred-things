@@ -70,7 +70,7 @@ class _NewCustomAppBarState extends State<NewCustomAppBar> {
     final repository = GetIt.instance<ThingsRepositoryI>();
 
     return AppBar(
-      backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+      backgroundColor: Colors.white,
       leading: widget.showBackButton
           ? IconButton(
               icon: Icon(
@@ -111,7 +111,11 @@ class _NewCustomAppBarState extends State<NewCustomAppBar> {
           widget.actionIcon!
         else if (widget.showSearchIcon)
           IconButton(
-            icon: Icon(Icons.search, color: theme.iconTheme.color),
+            icon: ImageIcon(
+              const AssetImage('assets/images/iconamoon_search.png'),
+              size: 22,
+              color: theme.iconTheme.color,
+            ),
             onPressed: () {
               Navigator.push(
                 context,
@@ -121,6 +125,7 @@ class _NewCustomAppBarState extends State<NewCustomAppBar> {
               );
             },
           ),
+
       ],
       bottom: const PreferredSize(
         preferredSize: Size.fromHeight(1.0),

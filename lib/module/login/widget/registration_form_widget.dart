@@ -108,12 +108,12 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
                 }
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             DividerWithText(text: S.of(context).or),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             CustomButtonRegist(
               text: S.of(context).continueWithGoogle,
-              icon: Icons.login,
+              image: const AssetImage('assets/images/google.png'),
               onPressed: () async {
                 final User? user = await signInWithGoogle();
                 if (user != null) {

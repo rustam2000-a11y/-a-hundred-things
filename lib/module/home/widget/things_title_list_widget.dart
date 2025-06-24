@@ -35,6 +35,7 @@ class NewListOfTitles extends StatelessWidget {
 
           return InkWell(
             onTap: () {
+              print('🧪 item.imageUrl: ${item.imageUrl}');
               Navigator.of(context).push(
                 MaterialPageRoute<void>(
                   builder: (_) => CreateNewThingScreen(
@@ -47,9 +48,6 @@ class NewListOfTitles extends StatelessWidget {
                       'type': item.type,
                       'imageUrls': item.imageUrl ?? [],
                       'quantity': item.quantity,
-                      'location': item.location,
-                      'weight': item.weight,
-                      'colorText': item.colorText,
                       'importance': item.importance,
                     },
                   ),

@@ -8,13 +8,9 @@ class ThingsModel extends Equatable {
     required this.type,
     required this.typDescription,
     required this.color,
-    required this.colorText,
     required this.imageUrl,
     required this.quantity,
-    required this.price,
-    required this.location,
     required this.importance,
-    required this.weight,
     this.favorites = false,
   });
 
@@ -26,13 +22,10 @@ class ThingsModel extends Equatable {
       type: json['type'] as String? ?? '',
       typDescription: json['typDescription'] as String? ?? '',
       color: json['color'] as String? ?? '',
-      colorText: json['colorText'] as String? ?? '',
-      imageUrl: (json['imageUrl'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
+
+      imageUrl: (json['imageUrls'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
       quantity: json['quantity'] as int? ?? 0,
-      price: json['price'] != null ? (json['price'] as num).toDouble() : 0.0,
-      location: json['location'] as String? ?? '',
       importance: json['importance'] as int? ?? 0,
-      weight: json['weight'] != null ? (json['weight'] as num).toDouble() : 0.0,
       favorites: json['favorites'] as bool? ?? false,
     );
   }
@@ -44,13 +37,11 @@ class ThingsModel extends Equatable {
   final String type;
   final String typDescription;
   final String color;
-  final String colorText;
   final List<String>? imageUrl;
   final int quantity;
-  final double price;
-  final String location;
+
   final int importance;
-  final double weight;
+
   final bool favorites;
 
   @override
@@ -61,13 +52,12 @@ class ThingsModel extends Equatable {
     type,
     typDescription,
     color,
-    colorText,
+
     imageUrl,
     quantity,
-    price,
-    location,
+
     importance,
-    weight,
+
   ];
 
   ThingsModel copyWith({
@@ -93,13 +83,9 @@ class ThingsModel extends Equatable {
       type: type ?? this.type,
       typDescription: typDescription ?? this.typDescription,
       color: color ?? this.color,
-      colorText: colorText ?? this.colorText,
       imageUrl: imageUrl ?? this.imageUrl,
       quantity: quantity ?? this.quantity,
-      price: price ?? this.price,
-      location: location ?? this.location,
       importance: importance ?? this.importance,
-      weight: weight ?? this.weight,
       favorites: favorites ?? this.favorites,
 
     );
@@ -113,13 +99,12 @@ class ThingsModel extends Equatable {
       'type': type,
       'typDescription': typDescription,
       'color': color,
-      'colorText': colorText,
-      'imageUrl': imageUrl,
+
+      'imageUrls': imageUrl,
       'quantity': quantity,
-      'price': price,
-      'location': location,
+
       'importance': importance,
-      'weight': weight,
+
       'favorites': favorites,
     };
   }

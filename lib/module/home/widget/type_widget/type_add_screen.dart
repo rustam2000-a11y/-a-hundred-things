@@ -32,15 +32,29 @@ class _AddItemPageState extends State<AddTypePage> {
   final Map<String, String> typeColorsCache = {};
   List<String> _imageUrls = [];
   String? selectedType;
-
+  bool isFormFilled = false;
   final bool _showDrawer = false;
   final Set<String> _typeSet = {};
 
   @override
-  @override
   void initState() {
     super.initState();
+
+    _descriptionController.addListener(_checkFormFilled);
+    _typeController.addListener(_checkFormFilled);
   }
+
+  void _checkFormFilled() {
+    final filled = _descriptionController.text.isNotEmpty &&
+        _typeController.text.isNotEmpty;
+
+    if (filled != isFormFilled) {
+      setState(() {
+        isFormFilled = filled;
+      });
+    }
+  }
+
 
   Future<void> _pickAndCropImage() async {
     try {
@@ -76,7 +90,7 @@ class _AddItemPageState extends State<AddTypePage> {
                       }
                       Navigator.pop(context);
                     },
-                    child: const Text('Обрезать'),
+                    child: const Text('Crop photo'),
                   ),
                 ],
               ),
@@ -86,7 +100,7 @@ class _AddItemPageState extends State<AddTypePage> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка обрезки изображения: $e')),
+        SnackBar(content: Text('Image cropping error: $e')),
       );
     }
   }
@@ -165,7 +179,7 @@ class _AddItemPageState extends State<AddTypePage> {
               right: 0,
               child: Container(
                 height: screenHeight * 0.6,
-                padding: EdgeInsets.all(screenWidth * 0.05),
+                padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 8),
                 decoration: BoxDecoration(
                   gradient: isDarkMode ? AppColors.darkBlueGradient : null,
                   color: Colors.white,
@@ -190,13 +204,13 @@ class _AddItemPageState extends State<AddTypePage> {
                       ),
                       style: TextStyle(
                         color: isDarkMode ? Colors.white : Colors.black,
-                        fontSize: screenWidth * 0.05,
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
 
 
-                    SizedBox(height: screenHeight * 0.02),
+                    const SizedBox(height: 8),
                     TextField(
                       controller: _descriptionController,
                       decoration: InputDecoration(
@@ -229,51 +243,41 @@ class _AddItemPageState extends State<AddTypePage> {
                         text: 'SAVE',
                         textColor: Colors.white,
                         backgroundColor: Colors.black,
+                        isEnabled: isFormFilled,
                         onPressed: () async {
-                          if (
-                              _descriptionController.text.isNotEmpty &&
-                              _typeController.text.isNotEmpty) {
-                            try {
-                              if (_selectedImages.isNotEmpty) {
-                                _imageUrls = await thingsRepository
-                                    .uploadImages(_selectedImages);
-                              }
-
-                              final type = _typeController.text.trim();
-                              if (!typeColorsCache.containsKey(type)) {
-                                typeColorsCache[type] = getRandomColor();
-                              }
-
-                              final randomColor = typeColorsCache[type]!;
-
-                              await FirebaseFirestore.instance
-                                  .collection('item')
-                                  .add({
-                                'title': _titleController.text.trim(),
-                                'typDescription': _descriptionController.text.trim(),
-                                'type': type,
-                                'userId': FirebaseAuth.instance.currentUser?.uid,
-                                'color': randomColor,
-                                'typeColor': randomColor,
-                                'timestamp': Timestamp.now(),
-                                'imageUrls': _imageUrls,
-                                'quantity': 1,
-                              });
-
-                              Navigator.pop(context, _typeController.text);
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Error: $e')),
-                              );
+                          try {
+                            if (_selectedImages.isNotEmpty) {
+                              _imageUrls = await thingsRepository.uploadImages(_selectedImages);
                             }
-                          } else {
+
+                            final type = _typeController.text.trim();
+                            if (!typeColorsCache.containsKey(type)) {
+                              typeColorsCache[type] = getRandomColor();
+                            }
+
+                            final randomColor = typeColorsCache[type]!;
+
+                            await FirebaseFirestore.instance.collection('item').add({
+                              'title': _titleController.text.trim(),
+                              'typDescription': _descriptionController.text.trim(),
+                              'type': type,
+                              'userId': FirebaseAuth.instance.currentUser?.uid,
+                              'color': randomColor,
+                              'typeColor': randomColor,
+                              'timestamp': Timestamp.now(),
+                              'imageUrls': _imageUrls,
+                              'quantity': 1,
+                            });
+
+                            Navigator.pop(context, _typeController.text);
+                          } catch (e) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('Please fill all fields')),
+                              SnackBar(content: Text('Error: $e')),
                             );
                           }
                         },
                       ),
+
                       CustomMainButton(
                         text: 'DELETE',
                         onPressed: () {

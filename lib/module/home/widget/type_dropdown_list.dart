@@ -12,10 +12,7 @@ class ExpandableFormCard extends StatefulWidget {
     required this.screenHeight,
     required this.screenWidth,
     required this.onExpandChanged,
-    required this.locationController,
-    this.priceController,
-    this.weightController,
-    this.colorController,
+
     this.importanceController,
     this.quantityController,
   });
@@ -27,10 +24,6 @@ class ExpandableFormCard extends StatefulWidget {
   final double screenHeight;
   final double screenWidth;
   final ValueChanged<bool> onExpandChanged;
-  final TextEditingController? locationController;
-  final TextEditingController? priceController;
-  final TextEditingController? weightController;
-  final TextEditingController? colorController;
   final TextEditingController? importanceController;
   final TextEditingController? quantityController;
 
@@ -45,9 +38,9 @@ class _ExpandableFormCardState extends State<ExpandableFormCard> {
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
       top: widget.isExpanded
-          ? widget.screenHeight * 0.12
-          : widget.screenHeight * 0.40 ,
-        bottom: widget.screenHeight * 0.14,
+          ? widget.screenHeight * 0.24
+          : widget.screenHeight * 0.45 ,
+        bottom: widget.screenHeight * 0.11,
 
       left: 0,
       right: 0,
@@ -70,13 +63,15 @@ class _ExpandableFormCardState extends State<ExpandableFormCard> {
         constraints: BoxConstraints(
           minHeight: widget.screenHeight * 0.3,
           maxHeight: widget.isExpanded
-              ? widget.screenHeight * 0.85
+              ? widget.screenHeight * 0.4
               : widget.screenHeight * 0.4,
         ),
         child: Column(
+         mainAxisSize: MainAxisSize.min,
           children: [
             Expanded(
               child: SingleChildScrollView(
+                padding: EdgeInsets.zero,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -105,27 +100,20 @@ class _ExpandableFormCardState extends State<ExpandableFormCard> {
                           labelStyle: const TextStyle(fontSize: 14),
                           border: InputBorder.none,
                         ),
-                        style: const TextStyle(fontSize: 15),
+                        style: const TextStyle(fontSize: 14),
                         maxLines: 4,
                         minLines: 1,
                       ),
                     ),
                     if (widget.isExpanded) ...[
                       const SizedBox(height: 16),
-                      _buildFieldRow(label: 'Location', controller: widget.locationController),
-                      const Divider(),
-                      _buildFieldRow(label: 'Price', controller: widget.priceController),
-                      const Divider(),
-                      _buildFieldRow(label: 'Weight', controller: widget.weightController),
-                      const Divider(),
-                      _buildFieldRow(label: 'Color', controller: widget.colorController),
                       const Divider(),
                       _buildFieldRow(label: 'Importance', controller: widget.importanceController),
                       const Divider(),
                       _buildFieldRow(label: 'Quantity', controller: widget.quantityController),
                       const SizedBox(height: 12),
                     ],
-                    const SizedBox(height: 16),
+
                     GestureDetector(
                       onTap: () {
                         widget.onExpandChanged(!widget.isExpanded);
@@ -154,7 +142,7 @@ class _ExpandableFormCardState extends State<ExpandableFormCard> {
                       ),
                     ),
 
-                    const SizedBox(height: 10),
+
                   ],
                 ),
               ),
