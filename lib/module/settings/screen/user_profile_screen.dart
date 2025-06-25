@@ -1,11 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../generated/l10n.dart';
 import '../../../main.dart';
-import '../../../presentation/colors.dart';
+
 import '../../home/widget/appBar/new_custom_app_bar.dart';
-import '../../login/screen/login_screen.dart';
+
 import '../widget/account.dart';
 import '../widget/settings_list_widget.dart';
 import 'language_screen.dart';
@@ -24,21 +25,18 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   String _selectedTheme = 'Light';
   String _selectedLanguage = 'en';
   int selectedValue = 100;
+
   @override
   void initState() {
     super.initState();
     _loadThemePreference();
     _loadLanguagePreference();
+    _loadMaxItemsFromFirestore();
   }
 
   Future<void> saveThemePreference(String theme) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('themeMode', theme);
-  }
-
-  Future<void> saveLanguagePreference(String languageCode) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('languageCode', languageCode);
   }
 
   Future<void> _loadThemePreference() async {
@@ -47,6 +45,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     setState(() {
       _selectedTheme = themeMode == ThemeMode.dark ? 'Dark' : 'Light';
     });
+  }
+
+  Future<void> _loadMaxItemsFromFirestore() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return;
+
+    final doc =
+    await FirebaseFirestore.instance.collection('users').doc(userId).get();
+    if (doc.exists && doc.data()?['maxItems'] != null) {
+      setState(() {
+        selectedValue = doc['maxItems'];
+      });
+    }
   }
 
   Future<void> _loadLanguagePreference() async {
@@ -72,21 +83,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     });
   }
 
-  Future<void> _changeLanguage(String languageCode) async {
-    setState(() {
-      _selectedLanguage = languageCode;
-    });
-    await saveLanguagePreference(languageCode);
-    await S.load(Locale(languageCode));
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
-    final double screenHeight = MediaQuery.of(context).size.height;
+    final isDarkTheme = Theme
+        .of(context)
+        .brightness == Brightness.dark;
 
-    final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
-    final User? currentUser = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
       appBar: const NewCustomAppBar(),
@@ -104,7 +106,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             ),
           ),
           ProfileListTile(
-            title: S.of(context).editProfile,
+            title: S
+                .of(context)
+                .editProfile,
             showTopDivider: true,
             isDarkTheme: isDarkTheme,
             onTap: () {
@@ -117,15 +121,18 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             },
           ),
           ProfileListTile(
-            title: S.of(context).applicationLanguage,
+            title: S
+                .of(context)
+                .applicationLanguage,
             isDarkTheme: isDarkTheme,
             onTap: () async {
               final newLanguage = await Navigator.push<String>(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => LanguageSelectionScreen(
-                    selectedLanguage: _selectedLanguage,
-                  ),
+                  builder: (_) =>
+                      LanguageSelectionScreen(
+                        selectedLanguage: _selectedLanguage,
+                      ),
                 ),
               );
               if (newLanguage != null && newLanguage != _selectedLanguage) {
@@ -136,7 +143,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             },
           ),
           ProfileListTile(
-            title: S.of(context).pushNotifications,
+            title: S
+                .of(context)
+                .pushNotifications,
             isDarkTheme: isDarkTheme,
             onTap: () {},
           ),
@@ -145,7 +154,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             isDarkTheme: isDarkTheme,
             onTap: () {},
             trailing: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8,),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8,
+              ),
               decoration: BoxDecoration(
                 border: Border.all(),
                 borderRadius: BorderRadius.circular(2),
@@ -153,9 +164,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               child: DropdownButton<int>(
                 value: selectedValue,
                 dropdownColor: isDarkTheme ? Colors.black : Colors.white,
-                style: TextStyle(color: isDarkTheme ? Colors.white : Colors.black),
+                style:
+                TextStyle(color: isDarkTheme ? Colors.white : Colors.black),
                 underline: const SizedBox(),
-                icon: Icon(Icons.keyboard_arrow_down_outlined, color: isDarkTheme ? Colors.white : Colors.black),
+                icon: Icon(Icons.keyboard_arrow_down_outlined,
+                    color: isDarkTheme ? Colors.white : Colors.black),
                 items: List.generate(
                   51,
                       (index) {
@@ -166,24 +179,37 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     );
                   },
                 ),
-                onChanged: (value) {
+                onChanged: (value) async {
                   if (value != null) {
+                    setState(() {
+                      selectedValue = value;
+                    });
+
+                    final userId = FirebaseAuth.instance.currentUser?.uid;
+                    if (userId != null) {
+                      await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(userId)
+                          .set({'maxItems': value}, SetOptions(merge: true));
+                    }
                   }
                 },
               ),
             ),
-          )
-          ,
+          ),
           ProfileListTile(
-            title: S.of(context).theme,
+            title: S
+                .of(context)
+                .theme,
             isDarkTheme: isDarkTheme,
             onTap: () async {
               final selectedTheme = await Navigator.push<String>(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ThemeSelectionScreen(
-                    selectedTheme: _selectedTheme,
-                  ),
+                  builder: (context) =>
+                      ThemeSelectionScreen(
+                        selectedTheme: _selectedTheme,
+                      ),
                 ),
               );
               if (selectedTheme != null && selectedTheme != _selectedTheme) {
@@ -200,17 +226,23 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           ),
           ProfileListTile(
             showTopDivider: true,
-            title: S.of(context).aboutUs,
+            title: S
+                .of(context)
+                .aboutUs,
             isDarkTheme: isDarkTheme,
             onTap: () {},
           ),
           ProfileListTile(
-            title: S.of(context).privacyPolicy,
+            title: S
+                .of(context)
+                .privacyPolicy,
             isDarkTheme: isDarkTheme,
             onTap: () {},
           ),
           ProfileListTile(
-            title: S.of(context).termsOfUse,
+            title: S
+                .of(context)
+                .termsOfUse,
             isDarkTheme: isDarkTheme,
             onTap: () {},
           ),
