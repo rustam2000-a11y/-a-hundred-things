@@ -13,10 +13,12 @@ class SetNewImageEvent extends CreateNewThingEvent {
 }
 
 class ChangeImageEvent extends CreateNewThingEvent {
-  const ChangeImageEvent(this.context);
+  const ChangeImageEvent(this.context, this.onTitleDetected);
 
   final BuildContext context;
+  final void Function(String detectedTitle) onTitleDetected;
 
   @override
   List<Object?> get props => [context];
 }
+

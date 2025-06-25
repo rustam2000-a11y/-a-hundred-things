@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:google_ml_kit/google_ml_kit.dart';
 
 import '../../../presentation/colors.dart';
 import '../../../repository/things_repository.dart';
@@ -142,7 +143,6 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                   context: context,
                   builder: (context) => Dialog(
                     backgroundColor: Colors.transparent,
-
                     child: GestureDetector(
                       behavior: HitTestBehavior.opaque,
                       onTap: () => Navigator.of(context).pop(),
@@ -155,7 +155,6 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                               setState(() {
                                 selectedType = selected;
                               });
-
                             },
                           ),
                         ),
@@ -164,7 +163,6 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                   ),
                 );
               },
-
             ),
           ),
           body: SafeArea(
@@ -182,7 +180,16 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                   ),
                 GestureDetector(
                   onTap: () {
-                    _bloc.add(ChangeImageEvent(context));
+                    _bloc.add(
+                      ChangeImageEvent(
+                        context,
+                        (detectedTitle) {
+                          setState(() {
+                            _titleController.text = detectedTitle;
+                          });
+                        },
+                      ),
+                    );
                   },
                   child: Container(
                     height: screenHeight * 0.4,
@@ -250,6 +257,7 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                             onPressed: () async {
                               try {
                                 if (state.file != null) {
+                                  await _analyzeImage(state.file!);
                                   _imageUrls = await thingsRepository
                                       .uploadImages([state.file!]);
                                 }
@@ -311,6 +319,25 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
         );
       },
     );
+  }
+
+  Future<void> _analyzeImage(File imageFile) async {
+    final inputImage = InputImage.fromFile(imageFile);
+    final imageLabeler = GoogleMlKit.vision.imageLabeler();
+
+    final labels = await imageLabeler.processImage(inputImage);
+
+    if (labels.isNotEmpty) {
+      final topLabel = labels.first;
+      setState(() {
+        _titleController.text = topLabel.label;
+      });
+      print('Recognized: ${topLabel.label}');
+    } else {
+      print('Nothing found');
+    }
+
+    await imageLabeler.close();
   }
 }
 
