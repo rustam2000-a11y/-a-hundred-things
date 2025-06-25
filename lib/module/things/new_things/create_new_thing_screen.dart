@@ -257,7 +257,6 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                             onPressed: () async {
                               try {
                                 if (state.file != null) {
-                                  await _analyzeImage(state.file!);
                                   _imageUrls = await thingsRepository
                                       .uploadImages([state.file!]);
                                 }
