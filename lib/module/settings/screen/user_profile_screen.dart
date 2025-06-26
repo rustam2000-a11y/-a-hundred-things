@@ -8,6 +8,7 @@ import '../../../main.dart';
 import '../../home/widget/appBar/new_custom_app_bar.dart';
 
 import '../widget/account.dart';
+import '../widget/max_items_dropdown.dart';
 import '../widget/settings_list_widget.dart';
 import 'language_screen.dart';
 import 'them_screen.dart';
@@ -50,9 +51,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Future<void> _loadMaxItemsFromFirestore() async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) return;
-
     final doc =
-    await FirebaseFirestore.instance.collection('users').doc(userId).get();
+    await FirebaseFirestore.instance.collection('user').doc(userId).get();
     if (doc.exists && doc.data()?['maxItems'] != null) {
       setState(() {
         selectedValue = doc['maxItems'];
@@ -153,50 +153,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             title: 'Number of items',
             isDarkTheme: isDarkTheme,
             onTap: () {},
-            trailing: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-              ),
-              decoration: BoxDecoration(
-                border: Border.all(),
-                borderRadius: BorderRadius.circular(2),
-              ),
-              child: DropdownButton<int>(
-                value: selectedValue,
-                dropdownColor: isDarkTheme ? Colors.black : Colors.white,
-                style:
-                TextStyle(color: isDarkTheme ? Colors.white : Colors.black),
-                underline: const SizedBox(),
-                icon: Icon(Icons.keyboard_arrow_down_outlined,
-                    color: isDarkTheme ? Colors.white : Colors.black),
-                items: List.generate(
-                  51,
-                      (index) {
-                    final value = 100 - index;
-                    return DropdownMenuItem<int>(
-                      value: value,
-                      child: Text(value.toString()),
-                    );
-                  },
-                ),
-                onChanged: (value) async {
-                  if (value != null) {
-                    setState(() {
-                      selectedValue = value;
-                    });
-
-                    final userId = FirebaseAuth.instance.currentUser?.uid;
-                    if (userId != null) {
-                      await FirebaseFirestore.instance
-                          .collection('users')
-                          .doc(userId)
-                          .set({'maxItems': value}, SetOptions(merge: true));
-                    }
-                  }
-                },
-              ),
+            trailing: MaxItemsDropdown(
+              selectedValue: selectedValue,
+              isDarkTheme: isDarkTheme,
+              onChanged: (value) {
+                setState(() {
+                  selectedValue = value;
+                });
+              },
             ),
           ),
+
           ProfileListTile(
             title: S
                 .of(context)

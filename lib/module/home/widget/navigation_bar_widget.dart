@@ -19,7 +19,7 @@ class NavigationBarWidget extends StatelessWidget {
     if (userId == null) return Stream<int>.value(100);
 
     return FirebaseFirestore.instance
-        .collection('users')
+        .collection('user')
         .doc(userId)
         .snapshots()
         .map((doc) => (doc.data()?['maxItems'] ?? 100) as int);

@@ -319,7 +319,6 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
       },
     );
   }
-
   Future<void> _analyzeImage(File imageFile) async {
     final inputImage = InputImage.fromFile(imageFile);
     final imageLabeler = GoogleMlKit.vision.imageLabeler();
