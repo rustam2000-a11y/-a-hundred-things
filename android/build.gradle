@@ -5,9 +5,9 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.4.2' // Обновление до стабильной версии Gradle
+        classpath 'com.android.tools.build:gradle:8.10.1'
         classpath 'com.google.gms:google-services:4.3.15' // Google Services
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version" // Использование объявленной переменной
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
