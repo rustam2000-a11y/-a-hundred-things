@@ -37,7 +37,6 @@ class CreateNewThingScreen extends StatefulWidget {
 class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _importanceController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
 
   final ThingsRepositoryI thingsRepository = GetIt.I<ThingsRepositoryI>();
@@ -50,6 +49,7 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
   final Set<String> _typeSet = {};
   bool isEditMode = false;
   bool _isFavorite = false;
+  String _selectedImportance = 'Medium';
 
   late final CreateNewThingBloc _bloc;
 
@@ -83,7 +83,7 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
       existingDocId = data['id'];
       _titleController.text = data['title'] ?? '';
       _descriptionController.text = data['description'] ?? '';
-      _importanceController.text = (data['importance'] ?? '').toString();
+      _selectedImportance = (data['importance'] ?? 'Medium').toString();
       _quantityController.text = (data['quantity'] ?? '1').toString();
       selectedType = data['type'];
       final imageUrlRaw = data['imageUrls'];
@@ -223,17 +223,23 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                   isExpanded: _isExpanded,
                   titleController: _titleController,
                   descriptionController: _descriptionController,
-                  importanceController: _importanceController,
                   quantityController: _quantityController,
                   isDarkMode: isDarkMode,
                   screenHeight: screenHeight,
                   screenWidth: screenWidth,
+                  importanceLevel: _selectedImportance,
+                  onImportanceChanged: (value) {
+                    setState(() {
+                      _selectedImportance = value;
+                    });
+                  },
                   onExpandChanged: (value) {
                     setState(() {
                       _isExpanded = value;
                     });
                   },
                 ),
+
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: Container(
@@ -273,9 +279,7 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                                       FirebaseAuth.instance.currentUser?.uid,
                                   'timestamp': Timestamp.now(),
                                   'imageUrls': _imageUrls,
-                                  'importance': int.tryParse(
-                                          _importanceController.text.trim()) ??
-                                      0,
+                                  'importance': _selectedImportance,
                                   'quantity': int.tryParse(
                                           _quantityController.text.trim()) ??
                                       1,

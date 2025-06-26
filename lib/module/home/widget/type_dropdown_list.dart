@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../generated/l10n.dart';
 import '../../../presentation/colors.dart';
+import 'build_importance_horizontal_selector.dart.dart';
 
 class ExpandableFormCard extends StatefulWidget {
   const ExpandableFormCard({
@@ -12,8 +13,8 @@ class ExpandableFormCard extends StatefulWidget {
     required this.screenHeight,
     required this.screenWidth,
     required this.onExpandChanged,
-
-    this.importanceController,
+    required this.importanceLevel,
+    required this.onImportanceChanged,
     this.quantityController,
   });
 
@@ -24,7 +25,8 @@ class ExpandableFormCard extends StatefulWidget {
   final double screenHeight;
   final double screenWidth;
   final ValueChanged<bool> onExpandChanged;
-  final TextEditingController? importanceController;
+  final String importanceLevel;
+  final ValueChanged<String> onImportanceChanged;
   final TextEditingController? quantityController;
 
   @override
@@ -38,10 +40,9 @@ class _ExpandableFormCardState extends State<ExpandableFormCard> {
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
       top: widget.isExpanded
-          ? widget.screenHeight * 0.24
-          : widget.screenHeight * 0.45 ,
-        bottom: widget.screenHeight * 0.11,
-
+          ? widget.screenHeight * 0.30
+          : widget.screenHeight * 0.45,
+      bottom: widget.screenHeight * 0.11,
       left: 0,
       right: 0,
       child: AnimatedContainer(
@@ -67,7 +68,7 @@ class _ExpandableFormCardState extends State<ExpandableFormCard> {
               : widget.screenHeight * 0.4,
         ),
         child: Column(
-         mainAxisSize: MainAxisSize.min,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Expanded(
               child: SingleChildScrollView(
@@ -107,19 +108,22 @@ class _ExpandableFormCardState extends State<ExpandableFormCard> {
                     ),
                     if (widget.isExpanded) ...[
                       const SizedBox(height: 16),
-                      const Divider(),
-                      _buildFieldRow(label: 'Importance', controller: widget.importanceController),
-                      const Divider(),
-                      _buildFieldRow(label: 'Quantity', controller: widget.quantityController),
+                      buildImportanceHorizontalSelector(
+                        selectedValue: widget.importanceLevel,
+                        onChanged: widget.onImportanceChanged,
+                      ),
+                      _buildFieldRow(
+                          label: 'Quantity',
+                          controller: widget.quantityController),
                       const SizedBox(height: 12),
                     ],
-
                     GestureDetector(
                       onTap: () {
                         widget.onExpandChanged(!widget.isExpanded);
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
                         width: double.infinity,
                         color: Colors.transparent,
                         child: Row(
@@ -135,21 +139,19 @@ class _ExpandableFormCardState extends State<ExpandableFormCard> {
                             AnimatedRotation(
                               turns: widget.isExpanded ? 0.5 : 0.0,
                               duration: const Duration(milliseconds: 300),
-                              child: const Icon(Icons.keyboard_arrow_up, size: 24),
+                              child:
+                                  const Icon(Icons.keyboard_arrow_up, size: 24),
                             ),
                           ],
                         ),
                       ),
                     ),
-
-
                   ],
                 ),
               ),
             ),
           ],
         ),
-
       ),
     );
   }
@@ -176,15 +178,14 @@ Widget _buildFieldRow({
           ),
         ),
         IconButton(
-          icon: const Icon(Icons.edit,size: 24,),
-
+          icon: const Icon(
+            Icons.edit,
+            size: 24,
+          ),
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
-          onPressed: () {
-
-          },
+          onPressed: () {},
         ),
-
       ],
     ),
   );

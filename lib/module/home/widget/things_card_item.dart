@@ -34,7 +34,7 @@ class ThingsCardWidget extends StatelessWidget {
   final int quantity;
   final ValueNotifier<List<String>>? selectedItemsNotifier;
   final List<String> allTypes;
-  final int importance;
+  final String importance;
   final bool favorites;
 
   @override
@@ -66,7 +66,6 @@ class ThingsCardWidget extends StatelessWidget {
                         'type': type,
                         'imageUrls': imageUrl ?? [],
                         'quantity': quantity,
-
                         'importance': importance,
                         'favorites': favorites,
                       },

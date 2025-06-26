@@ -25,7 +25,7 @@ class ThingsModel extends Equatable {
 
       imageUrl: (json['imageUrls'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
       quantity: json['quantity'] as int? ?? 0,
-      importance: json['importance'] as int? ?? 0,
+      importance: json['importance'] as String? ?? 'Medium',
       favorites: json['favorites'] as bool? ?? false,
     );
   }
@@ -40,7 +40,8 @@ class ThingsModel extends Equatable {
   final List<String>? imageUrl;
   final int quantity;
 
-  final int importance;
+  final String importance;
+
 
   final bool favorites;
 
@@ -72,7 +73,7 @@ class ThingsModel extends Equatable {
     int? quantity,
     double? price,
     String? location,
-    int? importance,
+    String? importance,
     double? weight,
     bool? favorites
   }) {

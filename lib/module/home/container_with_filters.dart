@@ -19,11 +19,8 @@ class ContainerWithFilters extends StatelessWidget {
     final filterOptions = [
       'Sorting',
       'Tags',
-      'Price',
       'Importance',
-      'Weight',
-      'Color',
-      'Location',
+
     ];
 
     return AnimatedPositioned(
@@ -144,11 +141,7 @@ class FilterOption extends StatelessWidget {
 
     const firestoreFields = {
       'Tags': 'type',
-      'Price': 'price',
       'Importance': 'importance',
-      'Weight': 'weight',
-      'Location': 'location',
-      'Color': 'colorText',
     };
 
     if (firestoreFields.containsKey(title)) {

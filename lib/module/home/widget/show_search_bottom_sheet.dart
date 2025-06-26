@@ -131,7 +131,7 @@ class _SearchPageState extends State<SearchPage> {
                               onStateUpdate: () {},
                               quantity: item.quantity,
                               allTypes: const [],
-                              importance: item.importance ?? 0,
+                              importance: item.importance,
                               favorites: item.favorites,
                             );
                           },
