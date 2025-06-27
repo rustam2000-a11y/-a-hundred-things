@@ -1,54 +1,50 @@
+// Updated ThingsRepository (things_repository.dart)
 import 'dart:io';
 
 import 'package:injectable/injectable.dart';
-import 'package:rxdart/rxdart.dart';
 import '../model/things_model.dart';
 import '../network/base_data_api.dart';
 
 @LazySingleton(as: ThingsRepositoryI)
 class ThingsRepository implements ThingsRepositoryI {
-  ThingsRepository({required BaseDataApiI baseDataApi})
-      : _baseDataApi = baseDataApi;
-  final BaseDataApiI _baseDataApi;
+  ThingsRepository({required BaseDataApiI baseDataApi}) : _baseDataApi = baseDataApi;
 
-  BehaviorSubject<List<ThingsModel>>? appStateStream =
-      BehaviorSubject<List<ThingsModel>>();
+  final BaseDataApiI _baseDataApi;
 
   @override
   Stream<List<ThingsModel>> fetchMyThings() {
-    _baseDataApi.fetchAllThings().listen((things) {
-      appStateStream!.sink.add(things);
-    });
-    return appStateStream!;
+    return _baseDataApi.fetchAllThings();
   }
+
+  @override
+  Future<List<ThingsModel>> fetchMyThingsOnce() {
+    return _baseDataApi.fetchAllThings().first;
+  }
+
 
   @override
   Future<void> deleteThingsByType(String type) async {
     return _baseDataApi.deleteThingsByType(type);
   }
+
   @override
   Future<List<String>> uploadImages(List<File> images) async {
     return _baseDataApi.uploadImages(images);
   }
+
   @override
   Future<void> deleteItemByUid(String uid) async {
     return _baseDataApi.deleteItemByUid(uid);
   }
+
   @override
   Stream<List<ThingsModel>> searchThingsByTitle(String searchQuery) {
-    final searchStreamController = BehaviorSubject<String>();
-    searchStreamController.add(searchQuery);
-
-
-    return searchStreamController.switchMap(
-          (query) => _baseDataApi.searchThingsByTitle(query),
-    );
+    return _baseDataApi.searchThingsByTitle(searchQuery);
   }
 
-  @disposeMethod
   @override
   void dispose() {
-    appStateStream?.close();
+    // No longer needed
   }
 }
 
@@ -56,6 +52,8 @@ abstract class ThingsRepositoryI {
   void dispose();
 
   Stream<List<ThingsModel>> fetchMyThings();
+
+  Future<List<ThingsModel>> fetchMyThingsOnce();
 
   Future<void> deleteThingsByType(String type);
 

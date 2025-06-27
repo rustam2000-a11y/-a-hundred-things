@@ -1,3 +1,4 @@
+// Updated HomeBloc (home_bloc.dart)
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
@@ -8,7 +9,6 @@ import '../../model/things_model.dart';
 import '../../repository/things_repository.dart';
 
 part 'home_event.dart';
-
 part 'home_state.dart';
 
 @Injectable()
@@ -32,7 +32,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<HomeSelectTypeThingsEvent>((event, emit) {
       filterThingsByField(event.field, event.value);
     });
-
     on<DeleteThingsByTypeEvent>((event, emit) {
       deleteThingsByType(event.type);
     });
@@ -62,7 +61,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   void filterThingsByField(String field, String value) {
-    print(' filterThingsByField: value="$value"');
     categorySub?.cancel();
 
     if (value.trim().isEmpty) {
@@ -94,6 +92,22 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   Future<void> deleteItemByUid(String uid) async {
     await _thingsRepository.deleteItemByUid(uid);
   }
+
+  Future<void> forceReload() async {
+    final list = await _thingsRepository.fetchMyThingsOnce();
+
+    final updatedList = list.map((e) => e.copyWith()).toList();
+
+    add(HomeThingsEvent(things: updatedList));
+
+    final typesWithColors = updatedList.fold<Map<String, String>>({}, (map, item) {
+      map[item.type] = item.color;
+      return map;
+    });
+
+    add(HomeTypeThingsEvent(typesWithColors: typesWithColors));
+  }
+
 
   @override
   Future<void> close() {

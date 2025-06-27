@@ -49,10 +49,7 @@ class ThingsCardWidget extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 4.0),
           child: GestureDetector(
-            onTap: () async {
-              if (selectedItemsNotifier != null && selectedItems.isNotEmpty) {
-                _toggleSelection(selectedItemsNotifier!, itemId);
-              } else {
+              onTap: () async {
                 final result = await Navigator.push(
                   context,
                   MaterialPageRoute<bool>(
@@ -74,11 +71,12 @@ class ThingsCardWidget extends StatelessWidget {
                 );
 
                 if (result == true) {
+                  print('[ThingsCardWidget] Вызов onStateUpdate после Navigator.pop');
                   onStateUpdate();
                 }
-              }
-            },
-            onLongPress: () {
+              },
+
+              onLongPress: () {
               if (selectedItemsNotifier != null) {
                 _toggleSelection(selectedItemsNotifier!, itemId);
               }

@@ -126,16 +126,23 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                   print('existingDocId: $existingDocId');
 
                   if (existingDocId != null) {
-                    await FirebaseFirestore.instance
-                        .collection('item')
-                        .doc(existingDocId)
-                        .update({'favorites': _isFavorite});
+                    try {
+                      await FirebaseFirestore.instance
+                          .collection('item')
+                          .doc(existingDocId)
+                          .update({'favorites': _isFavorite});
+                      await Future<void>.delayed(const Duration(milliseconds: 200));
 
-                    Navigator.pop(context, true);
+
+                      Navigator.pop(context, true);
+                    } catch (e) {
+                      print('Ошибка при обновлении favorites: $e');
+                    }
                   } else {
                     print('ERROR: existingDocId is null');
                   }
-                }),
+                }
+            ),
             logo: WidgetDrawerContainer(
               typ: selectedType,
               onTap: () {
@@ -297,7 +304,7 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                                       .add(itemData);
                                 }
 
-                                Navigator.pop(context);
+                                Navigator.pop(context, true);
                               } catch (e) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(content: Text('Error: $e')),
@@ -308,7 +315,7 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                           CustomMainButton(
                             text: 'DELETE',
                             onPressed: () {
-                              Navigator.pop(context);
+                              Navigator.pop(context, true);
                             },
                           ),
                         ],

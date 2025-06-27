@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'things_card_item.dart';
 
-class ThingsTypeListWidget extends StatelessWidget {
+class ThingsTypeListWidget extends StatefulWidget {
   const ThingsTypeListWidget({
     super.key,
     required this.things,
@@ -18,14 +18,27 @@ class ThingsTypeListWidget extends StatelessWidget {
   final VoidCallback onStateUpdate;
 
   @override
+  State<ThingsTypeListWidget> createState() => _ThingsTypeListWidgetState();
+}
+
+class _ThingsTypeListWidgetState extends State<ThingsTypeListWidget> {
+  @override
+  void didUpdateWidget(covariant ThingsTypeListWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.things != widget.things) {
+      setState(() {}); // перерисовать, если список изменился
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 100),
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: things.length,
+        itemCount: widget.things.length,
         itemBuilder: (context, index) {
-          final item = things[index];
+          final item = widget.things[index];
           return Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
             child: ThingsCardWidget(
@@ -34,15 +47,14 @@ class ThingsTypeListWidget extends StatelessWidget {
               description: item.description,
               type: item.type,
               imageUrl: item.imageUrl,
-              selectedCategoryType: selectedCategoryType,
-              onStateUpdate: onStateUpdate,
+              selectedCategoryType: widget.selectedCategoryType,
+              onStateUpdate: widget.onStateUpdate,
               quantity: item.quantity,
-              onDeleteItem: () => onDeleteItem(item.id),
-              selectedItemsNotifier: selectedItemsNotifier,
+              onDeleteItem: () => widget.onDeleteItem(item.id),
+              selectedItemsNotifier: widget.selectedItemsNotifier,
               allTypes: [],
               importance: item.importance,
               favorites: item.favorites,
-
             ),
           );
         },
@@ -50,3 +62,4 @@ class ThingsTypeListWidget extends StatelessWidget {
     );
   }
 }
+

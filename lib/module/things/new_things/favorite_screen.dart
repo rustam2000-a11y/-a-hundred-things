@@ -1,19 +1,16 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import '../../../core/utils/presentation.utils.dart';
+import '../../../model/things_model.dart';
 import '../../../presentation/colors.dart';
-import '../../home/category/category_card_widget.dart';
-import '../../home/container_with_filters.dart';
 import '../../home/home_bloc.dart';
 import '../../home/widget/appBar/new_custom_app_bar.dart';
 import '../../home/widget/drawer.dart';
 import '../../home/widget/list_of_things_widget.dart';
 import '../../home/widget/navigation_bar_widget.dart';
-import '../../home/widget/type_widget/type_add_screen.dart';
+
 import '../../login/widget/custom_text.dart';
 
 class FavorieteScreen extends StatefulWidget {
@@ -30,9 +27,9 @@ class FavorieteScreenState extends State<FavorieteScreen> {
   late HomeBloc _bloc;
   ValueNotifier<List<String>> selectedItemsNotifier = ValueNotifier([]);
 
-  bool _isListMode = true;
+
   bool _showCategoryList = false;
-  bool _showFilters = false;
+
 
   @override
   void initState() {
@@ -51,163 +48,78 @@ class FavorieteScreenState extends State<FavorieteScreen> {
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    return BlocBuilder<HomeBloc, HomeState>(
-      bloc: _bloc,
-      builder: (context, state) {
-        final filteredThings = state.things
-            .where((e) => e.title.trim().isNotEmpty && e.favorites == true)
-            .toList();
-
-        return Scaffold(
-          drawer: CustomDrawer(
-            onToggleCategoryList: _toggleCategoryList,
-          ),
-          backgroundColor: isDarkMode ? AppColors.blackSand : Colors.white,
-          appBar: const NewCustomAppBar(showBackButton: false),
-          body: Stack(
+    return Scaffold(
+      drawer: CustomDrawer(
+        onToggleCategoryList: _toggleCategoryList,
+      ),
+      backgroundColor: isDarkMode ? AppColors.blackSand : Colors.white,
+      appBar: const NewCustomAppBar(showBackButton: false),
+      body: Stack(
+        children: [
+          Column(
             children: [
-              Column(
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CustomText5(
-                          text: 'Favorites',
-                          fontSize: 20,
-                        ),
-                      ],
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CustomText5(
+                      text: 'Favorites',
+                      fontSize: 20,
                     ),
-                  ),
-                  const Divider(thickness: 1, height: 1, color: Colors.black),
-
-                  if (_showCategoryList)
-                    SizedBox(
-                      height: 50,
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.only(left: 16),
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute<void>(
-                                  builder: (context) => const AddTypePage(),
-                                ),
-                              );
-                            },
-                            child: Container(
-                              margin: const EdgeInsets.only(right: 8),
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.circular(3),
-                              ),
-                              alignment: Alignment.center,
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'Add',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Icon(Icons.add,
-                                      color: Colors.white, size: 20),
-                                ],
-                              ),
-                            ),
-                          ),
-                          ...state.typesWithColors.entries.map((entry) {
-                            final type = entry.key;
-                            final color = entry.value.isEmpty
-                                ? PresentationUtils.getRandomColor()
-                                : entry.value;
-
-                            return CategoryCardWidget(
-                              selectedCategoryType: _selectedCategoryType,
-                              onChangeCategory: (String? category) {
-                                setState(() {
-                                  if (_selectedCategoryType == category) {
-                                    _selectedCategoryType = null;
-                                    _bloc.add(
-                                      const HomeSelectTypeThingsEvent(
-                                        field: 'type',
-                                        value: '',
-                                      ),
-                                    );
-                                  } else {
-                                    _selectedCategoryType = category;
-                                    _bloc.add(
-                                      HomeSelectTypeThingsEvent(
-                                        field: 'type',
-                                        value: _selectedCategoryType!,
-                                      ),
-                                    );
-                                  }
-                                });
-                              },
-                              onDeleteThings: () {
-                                _bloc.add(DeleteThingsByTypeEvent(type: type));
-                              },
-                              type: type,
-                            );
-                          }).toList(),
-                        ],
-                      ),
-                    ),
-                  const SizedBox(height: 12),
-                  Expanded(
-                      child: ThingsTypeListWidget(
-                    things: filteredThings,
-                    selectedCategoryType: _selectedCategoryType,
-                    selectedItemsNotifier: selectedItemsNotifier,
-                    onStateUpdate: () {
-                      _bloc.add(const HomeInitEvent());
-                    },
-                    onDeleteItem: (uid) =>
-                        _bloc.add(DeleteItemByUidEvent(uid: uid)),
-                  )),
-                ],
-              ),
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: NavigationBarWidget(
-                  isDarkMode: isDarkMode,
-                  types: state.typesWithColors.keys.toList(),
+                  ],
                 ),
               ),
-              if (_showFilters)
-                ContainerWithFilters(
-                  onClose: () {
-                    setState(() {
-                      _showFilters = false;
-                    });
-                  },
-                  selectedType: _selectedCategoryType,
-                  onTypeSelected: (String field, String value) {
-                    setState(() {
-                      _selectedCategoryType = value;
-                      _showFilters = false;
-                    });
-                    _bloc.add(
-                        HomeSelectTypeThingsEvent(field: field, value: value));
+              const Divider(thickness: 1, height: 1, color: Colors.black),
+
+              const SizedBox(height: 12),
+
+
+              Expanded(
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('item')
+                      .where('favorites', isEqualTo: true)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    final docs = snapshot.data?.docs ?? [];
+
+                    final things = docs
+                        .map((e) => ThingsModel.fromJson(e.data() as Map<String, dynamic>)
+                        .copyWith(id: e.id))
+                        .where((e) => e.title.trim().isNotEmpty)
+                        .toList();
+
+                    return ThingsTypeListWidget(
+                      things: things,
+                      selectedCategoryType: _selectedCategoryType,
+                      selectedItemsNotifier: selectedItemsNotifier,
+                      onDeleteItem: (uid) => _bloc.add(DeleteItemByUidEvent(uid: uid)),
+                      onStateUpdate: () {},
+                    );
                   },
                 ),
+              ),
             ],
           ),
-        );
-      },
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: NavigationBarWidget(
+              isDarkMode: isDarkMode,
+              types: _bloc.state.typesWithColors.keys.toList(),
+            ),
+          ),
+        ],
+      ),
     );
   }
+
 
   Future<void> deleteSelectedItems(BuildContext context) async {
     try {
@@ -219,11 +131,11 @@ class FavorieteScreenState extends State<FavorieteScreen> {
       }
       selectedItemsNotifier.value = [];
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Выбранные элементы удалены')),
+        const SnackBar(content: Text('The selected items have been removed.')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка при удалении элементов: $e')),
+        SnackBar(content: Text('Error while deleting elements: $e')),
       );
     }
   }

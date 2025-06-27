@@ -238,25 +238,34 @@ class CategoriePageState extends State<CategoriePage> {
                                 itemCount: uniqueThings.length,
                                 itemBuilder: (context, index) {
                                   final thing = uniqueThings[index];
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0, vertical: 6.0),
-                                    child: TypeCardWidget(
-                                      isSelected: selectedItemsNotifier.value
-                                          .contains(thing.id),
-                                      isDarkTheme: isDarkMode,
-                                      typDescription:
-                                          thing.typDescription ?? '',
-                                      imageUrl: thing.imageUrl,
-                                      itemId: thing.id,
-                                      type: thing.type,
-                                      onDeleteItem: () => _bloc.add(
-                                          DeleteItemByUidEvent(uid: thing.id)),
-                                      selectedCategoryType:
-                                          _selectedCategoryType,
-                                      onStateUpdate: () => setState(() {}),
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute<void>(
+                                          builder: (_) => DetailingTypesPage(
+                                            initialSelectedType: thing.type,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
+                                      child: TypeCardWidget(
+                                        isSelected: selectedItemsNotifier.value.contains(thing.id),
+                                        isDarkTheme: isDarkMode,
+                                        typDescription: thing.typDescription ?? '',
+                                        imageUrl: thing.imageUrl,
+                                        itemId: thing.id,
+                                        type: thing.type,
+                                        onDeleteItem: () =>
+                                            _bloc.add(DeleteItemByUidEvent(uid: thing.id)),
+                                        selectedCategoryType: _selectedCategoryType,
+                                        onStateUpdate: () => setState(() {}),
+                                      ),
                                     ),
                                   );
+
                                 },
                               );
                             },
