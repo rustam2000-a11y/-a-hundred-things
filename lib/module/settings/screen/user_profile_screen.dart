@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../generated/l10n.dart';
 import '../../../main.dart';
@@ -8,6 +10,7 @@ import '../../../main.dart';
 import '../../home/widget/appBar/new_custom_app_bar.dart';
 
 import '../widget/account.dart';
+import '../bloc/account_bloc.dart';
 import '../widget/max_items_dropdown.dart';
 import '../widget/settings_list_widget.dart';
 import 'language_screen.dart';
@@ -115,10 +118,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute<dynamic>(
-                  builder: (context) => const Account(),
+                  builder: (context) => BlocProvider(
+                    create: (_) => GetIt.I<AccountBloc>()..add(LoadAccountData()),
+                    child: const Account(),
+                  ),
                 ),
               );
             },
+
           ),
           ProfileListTile(
             title: S
