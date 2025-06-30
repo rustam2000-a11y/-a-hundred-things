@@ -16,6 +16,7 @@ class AppColors {
   static const Color grey = Color(0xFF747474);
   static const Color greyNew = Color(0xFF5D5D5D);
   static const Color mutedBlueGrey = Color(0xFFACB5BB);
+  static const Color red = Color(0xFFD55F5A);
   static const LinearGradient whiteToBlackGradient = LinearGradient(
     colors: [
       Color(0xFF000000),Color(0xFFFFFFFF),

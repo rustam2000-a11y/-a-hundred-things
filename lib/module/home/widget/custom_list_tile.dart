@@ -3,18 +3,22 @@ import 'package:flutter/material.dart';
 class CustomListTile extends StatefulWidget {
   const CustomListTile({
     Key? key,
-    required this.icon,
+    this.icon,
+    this.imagePath,
     required this.text,
     required this.onTap,
     this.lightThemeColor,
     this.darkThemeColor,
+    this.textColor,
   }) : super(key: key);
 
-  final IconData icon;
+  final IconData? icon;
+  final String? imagePath;
   final String text;
   final VoidCallback onTap;
   final Color? lightThemeColor;
   final Color? darkThemeColor;
+  final Color? textColor;
 
   @override
   State<CustomListTile> createState() => _CustomListTileState();
@@ -37,14 +41,31 @@ class _CustomListTileState extends State<CustomListTile> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final Color defaultBackground = isDarkMode
-        ? (widget.darkThemeColor ?? Colors.black)
-        : (widget.lightThemeColor ?? Colors.white);
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    final backgroundColor = isPressed
+        ? Colors.black
+        : (isDarkMode
+        ? widget.darkThemeColor ?? Colors.black
+        : widget.lightThemeColor ?? Colors.white);
+
+    final effectiveTextColor =
+    isPressed ? Colors.white : widget.textColor ?? Colors.black;
+
+    Widget? leadingWidget;
+    if (widget.icon != null) {
+      leadingWidget = Icon(widget.icon, color: effectiveTextColor);
+    } else if (widget.imagePath != null) {
+      leadingWidget = Image.asset(
+        widget.imagePath!,
+        width: 24,
+        height: 24,
+      );
+    }
 
     return Container(
       decoration: BoxDecoration(
-        color: isPressed ? Colors.black : defaultBackground,
+        color: backgroundColor,
         border: const Border(
           top: BorderSide(),
           bottom: BorderSide(),
@@ -56,15 +77,10 @@ class _CustomListTileState extends State<CustomListTile> {
         onTapUp: _handleTapUp,
         onTapCancel: _handleTapCancel,
         child: ListTile(
-          leading: Icon(
-            widget.icon,
-            color: isPressed ? Colors.white : Colors.black,
-          ),
+          leading: leadingWidget,
           title: Text(
             widget.text,
-            style: TextStyle(
-              color: isPressed ? Colors.white : Colors.black,
-            ),
+            style: TextStyle(color: effectiveTextColor),
           ),
         ),
       ),

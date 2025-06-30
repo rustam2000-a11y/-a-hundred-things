@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../../../presentation/colors.dart';
 import '../../login/screen/login_screen.dart';
 import '../../settings/screen/user_profile_screen.dart';
 import '../../things/new_things/favorite_screen.dart';
@@ -223,15 +224,16 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
               const SizedBox(height: 80),
               CustomListTile(
-                icon: Icons.question_mark_sharp,
+                imagePath: 'assets/images/material-symbols_help.png',
                 text: 'Help',
                 onTap: () {
                   Navigator.pop(context);
                 },
               ),
               CustomListTile(
-                icon: Icons.logout,
+                imagePath: 'assets/images/bxs_exit.png',
                 text: 'Logout',
+                textColor: AppColors.red,
                 onTap: () async {
                   try {
                     await FirebaseAuth.instance.signOut();
