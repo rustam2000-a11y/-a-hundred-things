@@ -20,15 +20,14 @@ class RegistrationFormWidget extends StatefulWidget {
 class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _birthdayController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
 
   Future<void> addUserToFirestore(User? user) async {
     if (user != null) {
       await FirebaseFirestore.instance.collection('user').doc(user.uid).set({
         'email': user.email ?? 'No Email',
-        'birthday': _birthdayController.text.trim(),
+        'name': _nameController.text.trim(),
         'password': _passwordController.text.trim(),
-        // Store password securely (for demo purposes only)
       });
     }
   }
@@ -69,20 +68,18 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
             const SizedBox(height: 4),
             CustomTextField(
               controller: _passwordController,
-              // hintText: CustomText4(text: 'Password'),
               isPasswordField: true,
             ),
             const SizedBox(height: 16),
-            Align(
+            const Align(
               alignment: Alignment.bottomLeft,
-              child: CustomText3(text: S.of(context).dateOfBirth),
+              child: CustomText3(text: 'Name'),
             ),
             const SizedBox(
               height: 4,
             ),
             CustomTextField(
-              controller: _birthdayController,
-              // hintText: const CustomText4(text: 'Date of birth'),
+              controller: _nameController,
             ),
             const SizedBox(height: 18),
             ReusableButton(
