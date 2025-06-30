@@ -9,10 +9,13 @@ class ContainerWithFilters extends StatelessWidget {
     required this.onClose,
     required this.selectedType,
     required this.onTypeSelected,
+    required this.selectedFilters,
   });
   final VoidCallback onClose;
   final String? selectedType;
   final void Function(String field, String value) onTypeSelected;
+  final Map<String, String> selectedFilters;
+
 
   @override
   Widget build(BuildContext context) {
@@ -34,13 +37,55 @@ class ContainerWithFilters extends StatelessWidget {
         color: Colors.white,
         child: Column(
           children: [
-            ListTile(
-              title: const Text('Filters'),
-              trailing: IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: onClose,
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Text('Filters'),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Text('Price from high'),
+                    ],
+                  ),
+                ],
               ),
             ),
+
+            if (selectedFilters.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, ),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: selectedFilters.entries.map((entry) {
+                      return InputChip(
+                        backgroundColor: Colors.white,
+                        label: Text(
+                          entry.value,
+                          style: const TextStyle(color: Colors.black),
+                        ),
+                        onDeleted: () {
+                          onTypeSelected(entry.key, '');
+                        },
+                        deleteIcon: const Icon(Icons.close, color: Colors.black),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(3)),
+                          side: BorderSide(),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+             const SizedBox(height: 18,),
+
+
             Expanded(
               child: SingleChildScrollView(
                 child: Column(

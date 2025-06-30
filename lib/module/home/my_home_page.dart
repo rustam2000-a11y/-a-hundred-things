@@ -37,6 +37,8 @@ class MyHomePageState extends State<MyHomePage> {
   bool _isListMode = true;
   bool _showCategoryList = false;
   bool _showFilters = false;
+  Map<String, String> _selectedFilters = {};
+
 
   @override
   void initState() {
@@ -261,23 +263,47 @@ class MyHomePageState extends State<MyHomePage> {
                   types: state.typesWithColors.keys.toList(),
                 ),
               ),
-              if (_showFilters)
-                ContainerWithFilters(
-                  onClose: () {
-                    setState(() {
-                      _showFilters = false;
-                    });
-                  },
-                  selectedType: _selectedCategoryType,
-                  onTypeSelected: (String field, String value) {
-                    setState(() {
-                      _selectedCategoryType = value;
-                      _showFilters = false;
-                    });
-                    _bloc.add(
-                        HomeSelectTypeThingsEvent(field: field, value: value));
-                  },
-                ),
+              Stack(
+                children: [
+                  if (_showFilters)
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _showFilters = false;
+                        });
+                      },
+                      child: Container(
+                        color: Colors.black.withOpacity(0.3),
+                      ),
+                    ),
+
+                  if (_showFilters)
+                    ContainerWithFilters(
+                      onClose: () {
+                        setState(() {
+                          _showFilters = false;
+                        });
+                      },
+                      selectedType: _selectedCategoryType,
+                      selectedFilters: _selectedFilters,
+                      onTypeSelected: (String field, String value) {
+                        setState(() {
+                          if (value.isEmpty) {
+                            _selectedFilters.remove(field);
+                          } else {
+                            _selectedFilters[field] = value;
+                          }
+                          _selectedCategoryType = _selectedFilters['type'];
+                          _showFilters = false;
+                        });
+
+                        _bloc.add(HomeSelectTypeThingsEvent(field: field, value: value));
+                      },
+                    ),
+                ],
+              )
+
+
             ],
           ),
         );

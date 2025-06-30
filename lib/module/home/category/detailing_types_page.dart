@@ -285,22 +285,7 @@ class DetailingTypesPageState extends State<DetailingTypesPage> {
                   types: state.typesWithColors.keys.toList(),
                 ),
               ),
-              if (_showFilters)
-                ContainerWithFilters(
-                  onClose: () {
-                    setState(() {
-                      _showFilters = false;
-                    });
-                  },
-                  selectedType: _selectedCategoryType,
-                  onTypeSelected: (String field, String value) {
-                    setState(() {
-                      _selectedCategoryType = value;
-                      _showFilters = false;
-                    });
-                    _bloc.add(HomeSelectTypeThingsEvent(field: field, value: value));
-                  },
-                ),
+
 
 
             ],
