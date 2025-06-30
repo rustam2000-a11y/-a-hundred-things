@@ -51,7 +51,7 @@ flutter_native_splash:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/images/square.png"
+  image_path: "assets/images/IMG_6118.PNG"
   min_sdk_android: 21
   background_color: "#000000"
 
