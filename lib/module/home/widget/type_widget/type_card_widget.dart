@@ -99,14 +99,8 @@ class TypeCardWidget extends StatelessWidget {
                 ),
               ],
             ),
-            if (selectedCategoryType != null || selectedCategoryType == type)
-              Align(
-                alignment: Alignment.bottomRight,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
 
-                ),
-              ),
+
           ],
         ),
       ),

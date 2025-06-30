@@ -12,49 +12,47 @@ class NewListOfTypes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        border: Border(
-          top: BorderSide(),
-          bottom: BorderSide(),
-        ),
-      ),
-      child: ListView.separated(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: types.length,
-        separatorBuilder: (context, index) => const Divider(
-          height: 1,
-          color: Colors.black,
-        ),
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () => onTypeTap(types[index]),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 17),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      types[index],
-                      style: const TextStyle(fontSize: 16),
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: types.length + 1,
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return const Divider(height: 1, color: Colors.black);
+        }
+
+        final type = types[index - 1];
+        return Column(
+          children: [
+            GestureDetector(
+              onTap: () => onTypeTap(type),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 17),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        type,
+                        style: const TextStyle(fontSize: 16),
+                      ),
                     ),
-                  ),
-                  const Row(
-                    children: [
-                      Icon(Icons.edit, size: 20),
-                      SizedBox(width: 12),
-                      Icon(Icons.close, size: 20),
-                    ],
-                  ),
-                ],
+                    const Row(
+                      children: [
+                        Icon(Icons.edit, size: 20),
+                        SizedBox(width: 12),
+                        Icon(Icons.close, size: 20),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          );
-        },
-      ),
+            const Divider(height: 1, color: Colors.black),
+          ],
+        );
+      },
     );
   }
 }
-

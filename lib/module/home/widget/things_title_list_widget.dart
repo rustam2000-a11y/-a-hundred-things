@@ -15,68 +15,66 @@ class NewListOfTitles extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        border: Border(
-          top: BorderSide(),
-          bottom: BorderSide(),
-        ),
-      ),
-      child: ListView.separated(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: things.length,
-        separatorBuilder: (context, index) => const Divider(
-          height: 1,
-          color: Colors.black,
-        ),
-        itemBuilder: (context, index) {
-          final item = things[index];
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: things.length + 1,
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return const Divider(height: 1, color: Colors.black);
+        }
 
-          return InkWell(
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => CreateNewThingScreen(
-                    allTypes: allTypes,
-                    isReadOnly: true,
-                    existingThing: {
-                      'id': item.id,
-                      'title': item.title,
-                      'description': item.description,
-                      'type': item.type,
-                      'imageUrls': item.imageUrl ?? [],
-                      'quantity': item.quantity,
-                      'importance': item.importance,
-                    },
-                  ),
-                ),
-              );
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 17),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      item.title,
-                      style: const TextStyle(fontSize: 16),
+        final item = things[index - 1];
+
+        return Column(
+          children: [
+            InkWell(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => CreateNewThingScreen(
+                      allTypes: allTypes,
+                      isReadOnly: true,
+                      existingThing: {
+                        'id': item.id,
+                        'title': item.title,
+                        'description': item.description,
+                        'type': item.type,
+                        'imageUrls': item.imageUrl ?? [],
+                        'quantity': item.quantity,
+                        'importance': item.importance,
+                      },
                     ),
                   ),
-                  const Row(
-                    children: [
-                      Icon(Icons.edit, size: 20),
-                      SizedBox(width: 12),
-                      Icon(Icons.close, size: 20),
-                    ],
-                  ),
-                ],
+                );
+              },
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 17),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        item.title,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    const Row(
+                      children: [
+                        Icon(Icons.edit, size: 20),
+                        SizedBox(width: 12),
+                        Icon(Icons.close, size: 20),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          );
-        },
-      ),
+            const Divider(height: 1, color: Colors.black),
+          ],
+        );
+      },
     );
   }
 }
