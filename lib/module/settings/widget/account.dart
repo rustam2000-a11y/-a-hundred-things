@@ -109,7 +109,6 @@ class _AccountState extends State<Account> {
                             final pickedFile =
                             await _picker.pickImage(source: ImageSource.gallery);
                             if (pickedFile != null) {
-                              // можно добавить новый эвент в блок, если нужен апдейт фото
                             }
                           },
                           child: const Icon(Icons.edit, color: Colors.white, size: 20),

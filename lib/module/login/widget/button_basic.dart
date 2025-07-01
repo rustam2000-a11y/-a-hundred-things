@@ -4,26 +4,25 @@ import '../../../presentation/colors.dart';
 
 abstract class CustomButton {
   String get text;
-  VoidCallback get onPressed;
+
+  VoidCallback? get onPressed;
 }
 
 class ReusableButton extends StatelessWidget implements CustomButton {
-
   const ReusableButton({
     required this.text,
-    required this.onPressed,
+    this.onPressed,
     Key? key,
   }) : super(key: key);
   @override
   final String text;
 
   @override
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
 
     const double buttonWidth = double.infinity;
 
@@ -31,8 +30,7 @@ class ReusableButton extends StatelessWidget implements CustomButton {
       child: Container(
         width: buttonWidth,
         decoration: BoxDecoration(
-
-          color: isDarkMode ? null :Colors.black ,
+          color: isDarkMode ? null : Colors.black,
           borderRadius: BorderRadius.circular(4),
         ),
         child: ElevatedButton(
@@ -40,7 +38,6 @@ class ReusableButton extends StatelessWidget implements CustomButton {
           style: ElevatedButton.styleFrom(
             elevation: 0,
             backgroundColor: Colors.transparent,
-
             padding: const EdgeInsets.symmetric(vertical: 14),
           ),
           child: Text(
@@ -52,8 +49,6 @@ class ReusableButton extends StatelessWidget implements CustomButton {
     );
   }
 }
-
-
 
 class CustomButtonRegist extends StatelessWidget {
   const CustomButtonRegist({
@@ -118,13 +113,6 @@ class CustomButtonRegist extends StatelessWidget {
   }
 }
 
-
-
-
-
-
-
-
 class CustomMainButton extends StatelessWidget {
   const CustomMainButton({
     super.key,
@@ -146,8 +134,8 @@ class CustomMainButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveTextColor = isEnabled ? textColor : Colors.white;
-    final effectiveBackgroundColor = isEnabled ? backgroundColor : AppColors.grey;
-
+    final effectiveBackgroundColor =
+        isEnabled ? backgroundColor : AppColors.grey;
 
     return SizedBox(
       width: double.infinity,
@@ -156,7 +144,6 @@ class CustomMainButton extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           backgroundColor: effectiveBackgroundColor,
           foregroundColor: effectiveTextColor,
-
           padding: const EdgeInsets.symmetric(vertical: 14),
           shape: const RoundedRectangleBorder(),
         ),
@@ -172,7 +159,3 @@ class CustomMainButton extends StatelessWidget {
     );
   }
 }
-
-
-
-
