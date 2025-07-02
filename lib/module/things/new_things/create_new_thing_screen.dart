@@ -113,36 +113,38 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
           appBar: NewCustomAppBar(
             showSearchIcon: false,
             showBackButton: false,
-            actionIcon: IconButton(
-                icon: Icon(
-                  _isFavorite ? Icons.favorite : Icons.favorite_border,
-                  color: Colors.black,
-                ),
-                onPressed: () async {
-                  setState(() {
-                    _isFavorite = !_isFavorite;
-                  });
+            actionIcon: isEditMode
+                ? IconButton(
+              icon: Icon(
+                _isFavorite ? Icons.favorite : Icons.favorite_border,
+                color: Colors.black,
+              ),
+              onPressed: () async {
+                setState(() {
+                  _isFavorite = !_isFavorite;
+                });
 
-                  print('existingDocId: $existingDocId');
+                print('existingDocId: $existingDocId');
 
-                  if (existingDocId != null) {
-                    try {
-                      await FirebaseFirestore.instance
-                          .collection('item')
-                          .doc(existingDocId)
-                          .update({'favorites': _isFavorite});
-                      await Future<void>.delayed(const Duration(milliseconds: 200));
+                if (existingDocId != null) {
+                  try {
+                    await FirebaseFirestore.instance
+                        .collection('item')
+                        .doc(existingDocId)
+                        .update({'favorites': _isFavorite});
+                    await Future<void>.delayed(const Duration(milliseconds: 200));
 
-
-                      Navigator.pop(context, true);
-                    } catch (e) {
-                      print('Ошибка при обновлении favorites: $e');
-                    }
-                  } else {
-                    print('ERROR: existingDocId is null');
+                    Navigator.pop(context, true);
+                  } catch (e) {
+                    print('Error updating favorites: $e');
                   }
+                } else {
+                  print('ERROR: existingDocId is null');
                 }
-            ),
+              },
+            )
+                : null,
+
             logo: WidgetDrawerContainer(
               typ: selectedType,
               onTap: () {
@@ -358,10 +360,15 @@ Widget _buildPlaceholder(double screenWidth) {
       color: Colors.white,
       borderRadius: BorderRadius.circular(20),
     ),
-    child: Icon(
-      Icons.add_a_photo_rounded,
-      color: AppColors.grey,
-      size: screenWidth * 0.18,
+    child: Center(
+      child: Image.asset(
+        'assets/images/camera_icon.png',
+        width: screenWidth * 0.18,
+        height: screenWidth * 0.18,
+        fit: BoxFit.contain,
+      ),
     ),
   );
 }
+
+
