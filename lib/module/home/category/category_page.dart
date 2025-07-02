@@ -64,7 +64,8 @@ class CategoriePageState extends State<CategoriePage> {
           drawer: CustomDrawer(onToggleCategoryList: _toggleCategoryList),
           backgroundColor: isDarkMode ? AppColors.blackSand : Colors.white,
           appBar: const NewCustomAppBar(
-            showBackButton: false,
+            showBackButton: false,useTitleText: true,
+            titleText: 'Categories',
           ),
           body: Stack(
             children: [

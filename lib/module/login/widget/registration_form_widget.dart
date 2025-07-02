@@ -68,7 +68,7 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
                 children: [
                   const SizedBox(height: 64),
                   const CustomText(text: 'Create a profile'),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 64),
                   Align(
                     alignment: Alignment.bottomLeft,
                     child: CustomText3(text: S.of(context).emailAdderss),

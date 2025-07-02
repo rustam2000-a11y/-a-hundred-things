@@ -13,6 +13,8 @@ class NewCustomAppBar extends StatefulWidget implements PreferredSizeWidget {
     this.controller,
     this.focusNode,
     this.actionIcon,
+    this.useTitleText = false,
+    this.titleText,
   }) : super(key: key);
 
   final bool showBackButton;
@@ -21,6 +23,9 @@ class NewCustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final TextEditingController? controller;
   final FocusNode? focusNode;
   final Widget? actionIcon;
+  final bool useTitleText;
+  final String? titleText;
+
 
   @override
   State<NewCustomAppBar> createState() => _NewCustomAppBarState();
@@ -95,7 +100,13 @@ class _NewCustomAppBarState extends State<NewCustomAppBar> {
                 ),
               ),
               const SizedBox(width: 2),
-              ClipRRect(
+              if (widget.useTitleText) Text(
+                widget.titleText ?? '',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ) else ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Image.asset(
                   'assets/images/inscription2.png',
@@ -106,6 +117,8 @@ class _NewCustomAppBarState extends State<NewCustomAppBar> {
               ),
             ],
           ),
+
+
       actions: [
         if (widget.actionIcon != null)
           widget.actionIcon!

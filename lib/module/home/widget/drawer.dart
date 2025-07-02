@@ -145,7 +145,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
               CustomListTile(
                 icon: Icons.home_filled,
-                text: 'Main',
+                text: 'Home',
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.pushReplacement(
@@ -171,20 +171,20 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   );
                 },
               ),
-              CustomListTile(
-                icon: Icons.email,
-                text: 'Inbox',
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              CustomListTile(
-                icon: Icons.send,
-                text: 'Outbox',
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
+              // CustomListTile(
+              //   icon: Icons.email,
+              //   text: 'Inbox',
+              //   onTap: () {
+              //     Navigator.pop(context);
+              //   },
+              // ),
+              // CustomListTile(
+              //   icon: Icons.send,
+              //   text: 'Outbox',
+              //   onTap: () {
+              //     Navigator.pop(context);
+              //   },
+              // ),
               CustomListTile(
                 icon: Icons.favorite,
                 text: 'Favorites',
@@ -214,22 +214,22 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   );
                 },
               ),
-              CustomListTile(
-                icon: Icons.qr_code_scanner,
-                text: 'Scan QR',
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
+              // CustomListTile(
+              //   icon: Icons.qr_code_scanner,
+              //   text: 'Scan QR',
+              //   onTap: () {
+              //     Navigator.pop(context);
+              //   },
+              // ),
 
               const SizedBox(height: 80),
-              CustomListTile(
-                imagePath: 'assets/images/material-symbols_help.png',
-                text: 'Help',
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
+              // CustomListTile(
+              //   imagePath: 'assets/images/material-symbols_help.png',
+              //   text: 'Help',
+              //   onTap: () {
+              //     Navigator.pop(context);
+              //   },
+              // ),
               CustomListTile(
                 imagePath: 'assets/images/bxs_exit.png',
                 text: 'Logout',

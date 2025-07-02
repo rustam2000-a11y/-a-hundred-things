@@ -53,28 +53,13 @@ class FavorieteScreenState extends State<FavorieteScreen> {
         onToggleCategoryList: _toggleCategoryList,
       ),
       backgroundColor: isDarkMode ? AppColors.blackSand : Colors.white,
-      appBar: const NewCustomAppBar(showBackButton: false),
+      appBar: const NewCustomAppBar(showBackButton: false,useTitleText: true,
+        titleText: 'Favorites',),
       body: Stack(
         children: [
           Column(
             children: [
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CustomText5(
-                      text: 'Favorites',
-                      fontSize: 20,
-                    ),
-                  ],
-                ),
-              ),
-              const Divider(thickness: 1, height: 1, color: Colors.black),
-
               const SizedBox(height: 12),
-
-
               Expanded(
                 child: StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance

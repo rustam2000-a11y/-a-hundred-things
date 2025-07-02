@@ -68,24 +68,13 @@ class MyHomePageState extends State<MyHomePage> {
             onToggleCategoryList: _toggleCategoryList,
           ),
 
-          appBar: const NewCustomAppBar(showBackButton: false),
+          appBar: const NewCustomAppBar(showBackButton: false, useTitleText: true,
+            titleText: 'All Your Things',
+          ),
           body: Stack(
             children: [
               Column(
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CustomText5(
-                          text: 'All Your Things',
-                          fontSize: 20,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Divider(thickness: 1, height: 1, color: Colors.black),
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Row(
