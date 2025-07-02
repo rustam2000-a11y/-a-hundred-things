@@ -1,10 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import '../../../generated/l10n.dart';
 import '../../home/my_home_page.dart';
+import '../bloc/registration_bloc.dart';
+import '../bloc/registration_event.dart';
+import '../bloc/registration_state.dart';
 import 'button_basic.dart';
 import 'custom_divider.dart';
 import 'custom_text.dart';
@@ -22,196 +23,114 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
 
-  Future<void> addUserToFirestore(User? user) async {
-    if (user != null) {
-      await FirebaseFirestore.instance.collection('user').doc(user.uid).set({
-        'email': user.email ?? 'No Email',
-        'name': _nameController.text.trim(),
-        'password': _passwordController.text.trim(),
-      });
-    }
+  late final RegistrationBloc _bloc;
+
+  @override
+  void initState() {
+    _bloc = GetIt.I<RegistrationBloc>();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _bloc.close();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _nameController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 64,
-            ),
-            const CustomText(text: 'Create a profile'),
-            const SizedBox(
-              height: 40,
-            ),
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: CustomText3(
-                text: S.of(context).emailAdderss,
+    return Scaffold(
+      body: BlocListener<RegistrationBloc, RegistrationState>(
+        bloc: _bloc,
+        listener: (context, state) {
+          if (state is RegistrationSuccess) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute<void>(
+                builder: (_) => MyHomePage(toggleTheme: () {}),
               ),
-            ),
-            const SizedBox(
-              height: 4,
-            ),
-            CustomTextField(
-              controller: _emailController,
-            ),
-            const SizedBox(height: 16),
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: CustomText3(text: S.of(context).password),
-            ),
-            const SizedBox(height: 4),
-            CustomTextField(
-              controller: _passwordController,
-              isPasswordField: true,
-            ),
-            const SizedBox(height: 16),
-            const Align(
-              alignment: Alignment.bottomLeft,
-              child: CustomText3(text: 'Name'),
-            ),
-            const SizedBox(
-              height: 4,
-            ),
-            CustomTextField(
-              controller: _nameController,
-            ),
-            const SizedBox(height: 18),
-            ReusableButton(
-              text: S.of(context).next,
-              onPressed: () async {
-                try {
-                  final UserCredential userCredential = await FirebaseAuth
-                      .instance
-                      .createUserWithEmailAndPassword(
-                    email: _emailController.text.trim(),
-                    password: _passwordController.text.trim(),
-                  );
-                  await addUserToFirestore(userCredential.user);
-                  await Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute<dynamic>(
-                        builder: (_) => MyHomePage(toggleTheme: () {})),
-                  );
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error: $e')),
-                  );
-                }
-              },
-            ),
-            const SizedBox(height: 20),
-            DividerWithText(text: S.of(context).or),
-            const SizedBox(height: 20),
-            CustomButtonRegist(
-              text: S.of(context).continueWithGoogle,
-              image: const AssetImage('assets/images/google.png'),
-              onPressed: () async {
-                final User? user = await signInWithGoogle();
-                if (user != null) {
-                  await addUserToFirestore(user);
-
-                  await Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute<dynamic>(
-                        builder: (_) => MyHomePage(toggleTheme: () {})),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Google login error')),
-                  );
-                }
-              },
-            ),
-            const SizedBox(height: 15),
-            CustomButtonRegist(
-              text: S.of(context).continueWithApple,
-              icon: Icons.apple,
-              onPressed: () async {
-                try {
-                  final User? user = await signInWithApple();
-                  if (user != null) {
-                    await addUserToFirestore(user);
-                    if (context.mounted) {
-                      await Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute<dynamic>(
-                          builder: (_) => MyHomePage(toggleTheme: () {}),
-                        ),
-                      );
-                    }
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Apple Sign In Error')),
-                    );
-                  }
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error: $e')),
-                  );
-                }
-              },
-            ),
-          ],
+            );
+          } else if (state is RegistrationFailure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
+          }
+        },
+        child: BlocBuilder<RegistrationBloc, RegistrationState>(
+          bloc: _bloc,
+          builder: (context, state) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: [
+                  const SizedBox(height: 64),
+                  const CustomText(text: 'Create a profile'),
+                  const SizedBox(height: 40),
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: CustomText3(text: S.of(context).emailAdderss),
+                  ),
+                  const SizedBox(height: 4),
+                  CustomTextField(controller: _emailController),
+                  const SizedBox(height: 16),
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: CustomText3(text: S.of(context).password),
+                  ),
+                  const SizedBox(height: 4),
+                  CustomTextField(
+                    controller: _passwordController,
+                    isPasswordField: true,
+                  ),
+                  const SizedBox(height: 16),
+                  const Align(
+                    alignment: Alignment.bottomLeft,
+                    child: CustomText3(text: 'Name'),
+                  ),
+                  const SizedBox(height: 4),
+                  CustomTextField(controller: _nameController),
+                  const SizedBox(height: 18),
+                  ReusableButton(
+                    text: state is RegistrationLoading
+                        ? '...'
+                        : S.of(context).next,
+                    onPressed: state is RegistrationLoading
+                        ? null
+                        : () {
+                      _bloc.add(RegisterWithEmailEvent(
+                        _emailController.text.trim(),
+                        _passwordController.text.trim(),
+                        _nameController.text.trim(),
+                      ));
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  DividerWithText(text: S.of(context).or),
+                  const SizedBox(height: 20),
+                  CustomButtonRegist(
+                    text: S.of(context).continueWithGoogle,
+                    image: const AssetImage('assets/images/google.png'),
+                    onPressed: () {
+                      _bloc.add( RegisterWithGoogleEvent());
+                    },
+                  ),
+                  const SizedBox(height: 15),
+                  CustomButtonRegist(
+                    text: S.of(context).continueWithApple,
+                    icon: Icons.apple,
+                    onPressed: () {
+                      _bloc.add( RegisterWithAppleEvent());
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
   }
-}
-
-Future<User?> signInWithGoogle() async {
-  final GoogleSignIn googleSignIn = GoogleSignIn();
-  try {
-    await googleSignIn.signOut();
-    await FirebaseAuth.instance.signOut();
-
-    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-    if (googleUser == null) {
-      print('Google sign-in cancelled');
-      return null;
-    }
-
-    final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
-
-    if (googleAuth.accessToken == null || googleAuth.idToken == null) {
-      print('Google Sign-In token is null');
-      return null;
-    }
-
-    final OAuthCredential credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
-
-    final UserCredential userCredential =
-        await FirebaseAuth.instance.signInWithCredential(credential);
-
-    print('Google sign-in successful: ${userCredential.user?.uid}');
-    return userCredential.user;
-  } catch (e) {
-    print('Error signing in with Google: $e');
-    return null;
-  }
-}
-
-Future<User?> signInWithApple() async {
-  final appleCredential = await SignInWithApple.getAppleIDCredential(
-    scopes: [
-      AppleIDAuthorizationScopes.email,
-      AppleIDAuthorizationScopes.email
-    ],
-  );
-  final oauthCredential = OAuthProvider('apple.com').credential(
-    idToken: appleCredential.identityToken,
-    accessToken: appleCredential.authorizationCode,
-  );
-  final userCredential =
-      await FirebaseAuth.instance.signInWithCredential(oauthCredential);
-  return userCredential.user;
 }

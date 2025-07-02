@@ -12,7 +12,7 @@ import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 
 import '../../module/home/home_bloc.dart' as _i17;
-import '../../module/login/bloc/login_bloc.dart' as _i490;
+import '../../module/login/bloc/registration_bloc.dart' as _i501;
 import '../../module/settings/bloc/account_bloc.dart' as _i952;
 import '../../module/things/new_things/create_new_thing_bloc.dart' as _i1045;
 import '../../module/things/new_things/image_picker_servirs.dart' as _i53;
@@ -50,7 +50,7 @@ _i174.GetIt $initGetIt(
       () => _i169.SettingRepository(gh<_i93.SettingDataApiI>()));
   gh.factory<_i952.AccountBloc>(
       () => _i952.AccountBloc(gh<_i169.SettingRepositoryI>()));
-  gh.factory<_i490.LoginBloc>(
-      () => _i490.LoginBloc(gh<_i242.AuthRepositoryI>()));
+  gh.factory<_i501.RegistrationBloc>(
+      () => _i501.RegistrationBloc(gh<_i242.AuthRepositoryI>()));
   return getIt;
 }
