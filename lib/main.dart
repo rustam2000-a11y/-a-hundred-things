@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'core/di/service_locator.dart';
 import 'generated/l10n.dart';
 import 'module/home/my_home_page.dart';
+import 'module/home/widget/splash_screen.dart';
 import 'module/login/screen/login_screen.dart';
 import 'presentation/them/dark_theme.dart';
 
@@ -85,29 +86,44 @@ import 'presentation/them/dark_theme.dart';
     }
   }
 
-  class AuthCheck extends StatelessWidget {
 
-    const AuthCheck({super.key, required this.toggleTheme});
-    final VoidCallback toggleTheme;
-    @override
-    Widget build(BuildContext context) {
-      return StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.active) {
-            final User? user = snapshot.data;
-            if (user == null) {
-              return LoginPage(toggleTheme: toggleTheme);
-            } else {
-              return MyHomePage(toggleTheme: toggleTheme);
-            }
-          } else {
-            return const Center(child: CircularProgressIndicator());
-          }
-        },
-      );
-    }
+
+class AuthCheck extends StatelessWidget {
+  const AuthCheck({super.key, required this.toggleTheme});
+  final VoidCallback toggleTheme;
+
+  Future<User?> _delayedAuthCheck() async {
+    final userFuture = FirebaseAuth.instance.authStateChanges().first;
+
+
+    final delayFuture = Future<User?>.delayed(const Duration(seconds: 2), () => null);
+
+    final results = await Future.wait([userFuture, delayFuture]);
+
+    return results.first;
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<User?>(
+      future: _delayedAuthCheck(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const SplashScreen();
+        }
+
+        final user = snapshot.data;
+        if (user == null) {
+          return LoginPage(toggleTheme: toggleTheme);
+        } else {
+          return MyHomePage(toggleTheme: toggleTheme);
+        }
+      },
+    );
+  }
+}
+
+
 
 
 
