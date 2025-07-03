@@ -94,20 +94,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
 
     return Scaffold(
-      appBar: const NewCustomAppBar(),
+      appBar: const NewCustomAppBar(showSearchIcon:false,useTitleText: true,
+          titleText: 'Settings'),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            child: Text(
-              'Settings',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isDarkTheme ? Colors.white : Colors.black,
-              ),
-            ),
-          ),
+
           ProfileListTile(
             title: S
                 .of(context)
