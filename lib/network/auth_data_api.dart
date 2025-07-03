@@ -49,8 +49,23 @@ class AuthDataApi implements AuthDataApiI {
       idToken: googleAuth.idToken,
     );
     final userCred = await _auth.signInWithCredential(credential);
-    return userCred.user;
+    final user = userCred.user;
+
+    if (user != null) {
+      final userDoc = FirebaseFirestore.instance.collection('user').doc(user.uid);
+      final snapshot = await userDoc.get();
+      if (!snapshot.exists) {
+        await userDoc.set({
+          'name': googleUser.displayName,
+          'email': googleUser.email,
+          'avatarUrl': googleUser.photoUrl,
+        });
+      }
+    }
+
+    return user;
   }
+
 
   @override
   Future<User?> signInWithApple() async {
