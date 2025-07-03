@@ -272,18 +272,21 @@ class CategoriePageState extends State<CategoriePage> {
                             },
                           )
                         : NewListOfTypes(
-                            types: state.typesWithColors.keys.toList(),
-                            onTypeTap: (String tappedType) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute<void>(
-                                  builder: (_) => DetailingTypesPage(
-                                    initialSelectedType: tappedType,
-                                  ),
-                                ),
-                              );
-                            },
+                      types: state.typesWithColors.keys.toList(),
+                      onTypeTap: (String tappedType) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (_) => DetailingTypesPage(
+                              initialSelectedType: tappedType,
+                            ),
                           ),
+                        );
+                      },
+                      onDeleteType: (String typeToDelete) {
+                        _bloc.add(DeleteThingsByTypeEvent(type: typeToDelete));
+                      },
+                    ),
                   ),
                 ],
               ),

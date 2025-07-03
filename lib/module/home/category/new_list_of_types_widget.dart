@@ -5,10 +5,12 @@ class NewListOfTypes extends StatelessWidget {
     super.key,
     required this.types,
     required this.onTypeTap,
+    required this.onDeleteType,
   });
 
   final List<String> types;
   final void Function(String type) onTypeTap;
+  final void Function(String type) onDeleteType;
 
   @override
   Widget build(BuildContext context) {
@@ -22,13 +24,14 @@ class NewListOfTypes extends StatelessWidget {
         }
 
         final type = types[index - 1];
+
         return Column(
           children: [
             GestureDetector(
               onTap: () => onTypeTap(type),
               child: Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 17),
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 17),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -38,11 +41,14 @@ class NewListOfTypes extends StatelessWidget {
                         style: const TextStyle(fontSize: 16),
                       ),
                     ),
-                    const Row(
+                    Row(
                       children: [
-                        Icon(Icons.edit, size: 20),
-                        SizedBox(width: 12),
-                        Icon(Icons.close, size: 20),
+                        const Icon(Icons.edit, size: 20),
+                        const SizedBox(width: 12),
+                        GestureDetector(
+                          onTap: () => onDeleteType(type),
+                          child: const Icon(Icons.close, size: 20),
+                        ),
                       ],
                     ),
                   ],

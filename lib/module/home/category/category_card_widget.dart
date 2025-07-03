@@ -44,15 +44,8 @@ class CategoryCardWidget extends StatelessWidget {
                   fontSize: 16,
                 ),
               ),
-              const SizedBox(width: 8),
-              GestureDetector(
-                onTap: onDeleteThings,
-                child: Icon(
-                  Icons.close,
-                  color: contentColor,
-                  size: 18,
-                ),
-              ),
+
+
             ],
           ),
         ),

@@ -263,13 +263,14 @@ class DetailingTypesPageState extends State<DetailingTypesPage> {
                           context,
                           MaterialPageRoute<void>(
                             builder: (_) => DetailingTypesPage(
-
                               initialSelectedType: tappedType,
                             ),
                           ),
                         );
                       },
-
+                      onDeleteType: (String typeToDelete) {
+                        _bloc.add(DeleteThingsByTypeEvent(type: typeToDelete));
+                      },
                     ),
 
 
