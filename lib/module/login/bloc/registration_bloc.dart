@@ -6,18 +6,22 @@ import 'registration_state.dart';
 
 @injectable
 class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
+  final AuthRepositoryI _authRepository;
+  bool _isHandlingRegistration = false;
 
   RegistrationBloc(this._authRepository) : super(RegistrationInitial()) {
     on<RegisterWithEmailEvent>(_onRegisterWithEmail);
     on<RegisterWithGoogleEvent>(_onRegisterWithGoogle);
     on<RegisterWithAppleEvent>(_onRegisterWithApple);
   }
-  final AuthRepositoryI _authRepository;
 
   Future<void> _onRegisterWithEmail(
       RegisterWithEmailEvent event,
       Emitter<RegistrationState> emit,
       ) async {
+    if (_isHandlingRegistration) return;
+    _isHandlingRegistration = true;
+
     emit(RegistrationLoading());
     try {
       final user = await _authRepository.register(event.email, event.password);
@@ -33,6 +37,8 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
       }
     } catch (e) {
       emit(RegistrationFailure(e.toString()));
+    } finally {
+      _isHandlingRegistration = false;
     }
   }
 
@@ -40,6 +46,9 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
       RegisterWithGoogleEvent event,
       Emitter<RegistrationState> emit,
       ) async {
+    if (_isHandlingRegistration) return;
+    _isHandlingRegistration = true;
+
     emit(RegistrationLoading());
     try {
       final user = await _authRepository.loginWithGoogle();
@@ -55,6 +64,8 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
       }
     } catch (e) {
       emit(RegistrationFailure(e.toString()));
+    } finally {
+      _isHandlingRegistration = false;
     }
   }
 
@@ -62,6 +73,9 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
       RegisterWithAppleEvent event,
       Emitter<RegistrationState> emit,
       ) async {
+    if (_isHandlingRegistration) return;
+    _isHandlingRegistration = true;
+
     emit(RegistrationLoading());
     try {
       final user = await _authRepository.loginWithApple();
@@ -77,6 +91,8 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
       }
     } catch (e) {
       emit(RegistrationFailure(e.toString()));
+    } finally {
+      _isHandlingRegistration = false;
     }
   }
 }

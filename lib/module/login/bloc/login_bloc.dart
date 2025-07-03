@@ -1,6 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:injectable/injectable.dart';
-
 import '../../../repository/auth_repository.dart';
 import 'login_event.dart';
 import 'login_state.dart';
@@ -8,6 +6,7 @@ import 'login_state.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final AuthRepositoryI repository;
+  bool _isHandlingLogin = false;
 
   LoginBloc(this.repository) : super(const LoginInitial()) {
     on<LoginWithEmailEvent>(_onLoginWithEmail);
@@ -16,6 +15,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
 
   Future<void> _onLoginWithEmail(LoginWithEmailEvent event, Emitter<LoginState> emit) async {
+    if (_isHandlingLogin) return;
+    _isHandlingLogin = true;
+
     emit(const LoginLoading());
     try {
       final user = await repository.login(event.email, event.password);
@@ -26,10 +28,15 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       }
     } catch (e) {
       emit(LoginFailure('Login failed: $e'));
+    } finally {
+      _isHandlingLogin = false;
     }
   }
 
   Future<void> _onLoginWithGoogle(LoginWithGoogleEvent event, Emitter<LoginState> emit) async {
+    if (_isHandlingLogin) return;
+    _isHandlingLogin = true;
+
     emit(const LoginLoading());
     try {
       final user = await repository.loginWithGoogle();
@@ -40,10 +47,15 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       }
     } catch (e) {
       emit(LoginFailure('Google login error: $e'));
+    } finally {
+      _isHandlingLogin = false;
     }
   }
 
   Future<void> _onLoginWithApple(LoginWithAppleEvent event, Emitter<LoginState> emit) async {
+    if (_isHandlingLogin) return;
+    _isHandlingLogin = true;
+
     emit(const LoginLoading());
     try {
       final user = await repository.loginWithApple();
@@ -54,6 +66,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       }
     } catch (e) {
       emit(LoginFailure('Apple login error: $e'));
+    } finally {
+      _isHandlingLogin = false;
     }
   }
 }
+
