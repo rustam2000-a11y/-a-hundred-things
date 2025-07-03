@@ -24,7 +24,7 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
   final TextEditingController _nameController = TextEditingController();
 
   late final RegistrationBloc _bloc;
-
+  bool _isSubmitting = false;
   @override
   void initState() {
     _bloc = GetIt.I<RegistrationBloc>();
@@ -46,7 +46,14 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
       body: BlocListener<RegistrationBloc, RegistrationState>(
         bloc: _bloc,
         listener: (context, state) {
-          if (state is RegistrationSuccess) {
+          if (state is RegistrationLoading) {
+            setState(() {
+              _isSubmitting = true;
+            });
+          } else if (state is RegistrationSuccess) {
+            setState(() {
+              _isSubmitting = false;
+            });
             Navigator.pushReplacement(
               context,
               MaterialPageRoute<void>(
@@ -54,6 +61,9 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
               ),
             );
           } else if (state is RegistrationFailure) {
+            setState(() {
+              _isSubmitting = false;
+            });
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message)),
             );
@@ -94,10 +104,8 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
                   CustomTextField(controller: _nameController),
                   const SizedBox(height: 18),
                   ReusableButton(
-                    text: state is RegistrationLoading
-                        ? '...'
-                        : S.of(context).next,
-                    onPressed: state is RegistrationLoading
+                    text: _isSubmitting ? 'Loading...' : S.of(context).next,
+                    onPressed: _isSubmitting
                         ? null
                         : () {
                       _bloc.add(RegisterWithEmailEvent(

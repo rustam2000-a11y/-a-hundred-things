@@ -25,7 +25,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _birthdayController = TextEditingController();
-  bool _rememberMe = false;
+  bool _isSubmitting = false;
 
   late final LoginBloc _bloc;
 
@@ -50,7 +50,15 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
       body: BlocListener<LoginBloc, LoginState>(
         bloc: _bloc,
         listener: (context, state) {
-          if (state is LoginSuccess) {
+          if (state is LoginLoading) {
+            setState(() {
+              _isSubmitting = true;
+            });
+          } else if (state is LoginSuccess) {
+            setState(() {
+              _isSubmitting = false;
+            });
+
             Navigator.pushReplacement(
               context,
               MaterialPageRoute<void>(
@@ -58,6 +66,10 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
               ),
             );
           } else if (state is LoginFailure) {
+            setState(() {
+              _isSubmitting = false;
+            });
+
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message)),
             );
@@ -90,33 +102,8 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                       ),
                       const SizedBox(height: 16),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Row(
-                            children: [
-                              Checkbox(
-                                value: _rememberMe,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _rememberMe = value ?? false;
-                                  });
-                                },
-                                fillColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                        (states) {
-                                  if (states.contains(MaterialState.selected)) {
-                                    return Colors.black;
-                                  }
-                                  return Colors.transparent;
-                                }),
-                                checkColor: Colors.white,
-                              ),
-                              CustomText2(
-                                text: S.of(context).remember,
-                                color: AppColors.grey,
-                              ),
-                            ],
-                          ),
                           GestureDetector(
                             onTap: () {
                               Navigator.push<void>(
@@ -135,17 +122,18 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                       ),
                       const SizedBox(height: 20),
                       ReusableButton(
-                        text:
-                            state is LoginLoading ? '...' : S.of(context).login,
-                        onPressed: state is LoginLoading
+                        text: _isSubmitting ? 'Loading...' : S.of(context).login,
+                        onPressed: _isSubmitting
                             ? null
                             : () {
-                                _bloc.add(LoginWithEmailEvent(
-                                  _emailController.text.trim(),
-                                  _passwordController.text.trim(),
-                                ));
-                              },
+                          _bloc.add(LoginWithEmailEvent(
+                            _emailController.text.trim(),
+                            _passwordController.text.trim(),
+                          ));
+                        },
+
                       ),
+
                       const SizedBox(height: 20),
                       DividerWithText(text: S.of(context).or),
                       const SizedBox(height: 30),

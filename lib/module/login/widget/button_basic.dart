@@ -8,39 +8,56 @@ abstract class CustomButton {
   VoidCallback? get onPressed;
 }
 
-class ReusableButton extends StatelessWidget implements CustomButton {
+class ReusableButton extends StatelessWidget {
   const ReusableButton({
     required this.text,
     this.onPressed,
+    this.isLoading = false,
     Key? key,
   }) : super(key: key);
-  @override
-  final String text;
 
-  @override
+  final String text;
   final VoidCallback? onPressed;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    const double buttonWidth = double.infinity;
-
     return Align(
       child: Container(
-        width: buttonWidth,
+        width: double.infinity,
         decoration: BoxDecoration(
           color: isDarkMode ? null : Colors.black,
           borderRadius: BorderRadius.circular(4),
         ),
         child: ElevatedButton(
-          onPressed: onPressed,
+          onPressed: isLoading ? null : onPressed,
           style: ElevatedButton.styleFrom(
             elevation: 0,
             backgroundColor: Colors.transparent,
             padding: const EdgeInsets.symmetric(vertical: 14),
           ),
-          child: Text(
+          child: isLoading
+              ? const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(width: 12),
+              Text(
+                'Loading...',
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
+            ],
+          )
+              : Text(
             text,
             style: const TextStyle(fontSize: 16, color: Colors.white),
           ),
@@ -49,6 +66,8 @@ class ReusableButton extends StatelessWidget implements CustomButton {
     );
   }
 }
+
+
 
 class CustomButtonRegist extends StatelessWidget {
   const CustomButtonRegist({
