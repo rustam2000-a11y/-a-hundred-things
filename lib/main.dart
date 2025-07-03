@@ -93,14 +93,8 @@ class AuthCheck extends StatelessWidget {
   final VoidCallback toggleTheme;
 
   Future<User?> _delayedAuthCheck() async {
-    final userFuture = FirebaseAuth.instance.authStateChanges().first;
-
-
-    final delayFuture = Future<User?>.delayed(const Duration(seconds: 2), () => null);
-
-    final results = await Future.wait([userFuture, delayFuture]);
-
-    return results.first;
+    await Future<void>.delayed(const Duration(seconds: 2));
+    return FirebaseAuth.instance.currentUser;
   }
 
   @override
@@ -108,7 +102,7 @@ class AuthCheck extends StatelessWidget {
     return FutureBuilder<User?>(
       future: _delayedAuthCheck(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
+        if (snapshot.connectionState != ConnectionState.done) {
           return const SplashScreen();
         }
 
@@ -122,6 +116,10 @@ class AuthCheck extends StatelessWidget {
     );
   }
 }
+
+
+
+
 
 
 
