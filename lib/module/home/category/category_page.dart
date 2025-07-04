@@ -290,15 +290,7 @@ class CategoriePageState extends State<CategoriePage> {
                   ),
                 ],
               ),
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: NavigationBarWidget(
-                  isDarkMode: isDarkMode,
-                  types: state.typesWithColors.keys.toList(),
-                ),
-              ),
+
             ],
           ),
         );

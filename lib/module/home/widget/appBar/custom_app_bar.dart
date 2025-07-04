@@ -7,7 +7,6 @@ import '../../../../presentation/colors.dart';
 import '../../../../repository/things_repository.dart';
 import '../../../settings/screen/user_profile_screen.dart';
 import '../icon_home.dart';
-import '../show_search_bottom_sheet.dart';
 
 
 class CustomAppBar extends StatelessWidget {

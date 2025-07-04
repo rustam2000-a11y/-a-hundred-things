@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../../../repository/things_repository.dart';
-import '../show_search_bottom_sheet.dart';
+
 
 class NewCustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   const NewCustomAppBar({
@@ -119,27 +119,7 @@ class _NewCustomAppBarState extends State<NewCustomAppBar> {
           ),
 
 
-      actions: [
-        if (widget.actionIcon != null)
-          widget.actionIcon!
-        else if (widget.showSearchIcon)
-          IconButton(
-            icon: ImageIcon(
-              const AssetImage('assets/images/iconamoon_search.png'),
-              size: 22,
-              color: theme.iconTheme.color,
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute<void>(
-                  builder: (context) => SearchPage(repository: repository),
-                ),
-              );
-            },
-          ),
 
-      ],
       bottom: const PreferredSize(
         preferredSize: Size.fromHeight(1.0),
         child: Divider(height: 1, color: Colors.black),

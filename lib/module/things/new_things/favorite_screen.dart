@@ -91,15 +91,7 @@ class FavorieteScreenState extends State<FavorieteScreen> {
               ),
             ],
           ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: NavigationBarWidget(
-              isDarkMode: isDarkMode,
-              types: _bloc.state.typesWithColors.keys.toList(),
-            ),
-          ),
+
         ],
       ),
     );
