@@ -52,15 +52,19 @@
 				</array>
 			</dict>
 		</array>
-		<key>CADisableMinimumFrameDurationOnPhone</key>
-		<true/>
-		<key>UIApplicationSupportsIndirectInputEvents</key>
-		<true/>
 		<key>NSPhotoLibraryUsageDescription</key>
-		<key>NSCameraUsageDescription</key>
-		<key>NSPhotoLibraryAddUsageDescription</key>
-		<key>NSMicrophoneUsageDescription</key>
-		<key>UIStatusBarHidden</key>
-		<false/>
+            <string>We need access to your photo library to let you choose photos for upload.</string>
+
+            <key>NSCameraUsageDescription</key>
+            <string>We need access to your camera to take new photos.</string>
+
+            <key>NSPhotoLibraryAddUsageDescription</key>
+            <string>We need permission to save images to your photo library.</string>
+
+            <key>NSMicrophoneUsageDescription</key>
+            <string>We need access to the microphone for audio recording features.</string>
+
+            <key>UIStatusBarHidden</key>
+            <false/>
 	</dict>
 </plist>
