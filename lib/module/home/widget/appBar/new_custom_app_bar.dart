@@ -118,6 +118,23 @@ class _NewCustomAppBarState extends State<NewCustomAppBar> {
             ],
           ),
 
+      actions: [
+        if (widget.actionIcon != null)
+          widget.actionIcon!
+        else if (widget.showSearchIcon)
+          IconButton(
+            icon: ImageIcon(
+              const AssetImage('assets/images/iconamoon_search.png'),
+              size: 22,
+              color: theme.iconTheme.color,
+            ),
+            onPressed: () {
+
+            },
+          ),
+
+      ],
+
 
 
       bottom: const PreferredSize(

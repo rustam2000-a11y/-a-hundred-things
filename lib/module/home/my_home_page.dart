@@ -79,7 +79,7 @@ class MyHomePageState extends State<MyHomePage> {
           drawer: CustomDrawer(
             onToggleCategoryList: _toggleCategoryList,
           ),
-          appBar: const NewCustomAppBar(showBackButton: false,
+          appBar: const NewCustomAppBar(showBackButton: false,showSearchIcon: false,
           ),
           body: Stack(
             children: [
