@@ -53,7 +53,7 @@ class FavorieteScreenState extends State<FavorieteScreen> {
         onToggleCategoryList: _toggleCategoryList,
       ),
       backgroundColor: isDarkMode ? AppColors.blackSand : Colors.white,
-      appBar: const NewCustomAppBar(showBackButton: false,useTitleText: true,
+      appBar: const NewCustomAppBar(showBackButton: false,useTitleText: true,showSearchIcon: false,
         titleText: 'Favorites',),
       body: Stack(
         children: [
