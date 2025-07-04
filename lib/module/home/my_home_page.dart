@@ -1,12 +1,9 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-
 import '../../core/utils/presentation.utils.dart';
-import '../../presentation/colors.dart';
 import '../login/widget/custom_text.dart';
 import 'category/category_card_widget.dart';
 import 'container_with_filters.dart';
@@ -15,6 +12,7 @@ import 'widget/appBar/new_custom_app_bar.dart';
 import 'widget/drawer.dart';
 import 'widget/list_of_things_widget.dart';
 import 'widget/navigation_bar_widget.dart';
+import 'widget/search_text_field_widget.dart';
 import 'widget/things_title_list_widget.dart';
 import 'widget/type_widget/type_add_screen.dart';
 
@@ -35,16 +33,31 @@ class MyHomePageState extends State<MyHomePage> {
   ValueNotifier<List<String>> selectedItemsNotifier = ValueNotifier([]);
 
   bool _isListMode = true;
-  bool _showCategoryList = false;
+  late bool _showCategoryList = false;
   bool _showFilters = false;
-  Map<String, String> _selectedFilters = {};
+  final Map<String, String> _selectedFilters = {};
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
 
 
   @override
   void initState() {
     _bloc = GetIt.I<HomeBloc>();
     _bloc.add(const HomeInitEvent());
+
+    _searchController.addListener(() {
+      setState(() {});
+    });
+
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _searchFocusNode.dispose();
+
+    super.dispose();
   }
 
   void _toggleCategoryList(bool show) {
@@ -52,7 +65,6 @@ class MyHomePageState extends State<MyHomePage> {
       _showCategoryList = show;
     });
   }
-
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -67,14 +79,17 @@ class MyHomePageState extends State<MyHomePage> {
           drawer: CustomDrawer(
             onToggleCategoryList: _toggleCategoryList,
           ),
-
-          appBar: const NewCustomAppBar(showBackButton: false, useTitleText: true,
-            titleText: 'All Your Things',
+          appBar: const NewCustomAppBar(showBackButton: false,
           ),
           body: Stack(
             children: [
               Column(
                 children: [
+                  SearchTextFieldWidget(
+                    controller: _searchController,
+                    focusNode: _searchFocusNode,
+                    isDarkMode: isDarkMode,
+                  ),
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Row(
@@ -227,20 +242,34 @@ class MyHomePageState extends State<MyHomePage> {
                     ),
                   const SizedBox(height: 12),
                   Expanded(
-                    child: _isListMode
-                        ? ThingsTypeListWidget(
-                            things: filteredThings,
-                            selectedCategoryType: _selectedCategoryType,
-                            selectedItemsNotifier: selectedItemsNotifier,
-                            onStateUpdate: () => setState(() {}),
-                            onDeleteItem: (uid) =>
-                                _bloc.add(DeleteItemByUidEvent(uid: uid)),
-                          )
-                        : NewListOfTitles(
-                            things: filteredThings,
-                            allTypes: state.typesWithColors.keys.toList(),
-                          ),
+                    child: Builder(
+                      builder: (context) {
+                        final searchQuery = _searchController.text.toLowerCase().trim();
+
+                        final filteredThings = state.things
+                            .where((thing) =>
+                        thing.title.trim().isNotEmpty &&
+                            thing.title.toLowerCase().contains(searchQuery))
+                            .toList();
+
+                        return _isListMode
+                            ? ThingsTypeListWidget(
+                          things: filteredThings,
+                          selectedCategoryType: _selectedCategoryType,
+                          selectedItemsNotifier: selectedItemsNotifier,
+                          onStateUpdate: () => setState(() {}),
+                          onDeleteItem: (uid) =>
+                              _bloc.add(DeleteItemByUidEvent(uid: uid)),
+                        )
+                            : NewListOfTitles(
+                          things: filteredThings,
+                          allTypes: state.typesWithColors.keys.toList(),
+                        );
+                      },
+                    ),
                   ),
+
+
                 ],
               ),
               Positioned(
