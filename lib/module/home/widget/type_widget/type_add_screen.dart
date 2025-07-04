@@ -16,7 +16,18 @@ import '../appBar/new_custom_app_bar.dart';
 class AddTypePage extends StatefulWidget {
   const AddTypePage({
     super.key,
+    this.initialType,
+    this.initialDescription,
+    this.initialImageUrls,
+    this.isEditing = false,
+    this.editingItemId,
   });
+
+  final String? initialType;
+  final String? initialDescription;
+  final List<String>? initialImageUrls;
+  final bool isEditing;
+  final String? editingItemId;
 
   @override
   State<AddTypePage> createState() => _AddItemPageState();
@@ -40,6 +51,15 @@ class _AddItemPageState extends State<AddTypePage> {
   void initState() {
     super.initState();
 
+    if (widget.initialType != null) {
+      _typeController.text = widget.initialType!;
+    }
+    if (widget.initialDescription != null) {
+      _descriptionController.text = widget.initialDescription!;
+    }
+
+    _imageUrls = widget.initialImageUrls ?? [];
+
     _descriptionController.addListener(_checkFormFilled);
     _typeController.addListener(_checkFormFilled);
   }
@@ -54,7 +74,6 @@ class _AddItemPageState extends State<AddTypePage> {
       });
     }
   }
-
 
   Future<void> _pickAndCropImage() async {
     try {
@@ -179,7 +198,8 @@ class _AddItemPageState extends State<AddTypePage> {
               right: 0,
               child: Container(
                 height: screenHeight * 0.6,
-                padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   gradient: isDarkMode ? AppColors.darkBlueGradient : null,
                   color: Colors.white,
@@ -200,7 +220,8 @@ class _AddItemPageState extends State<AddTypePage> {
                       decoration: InputDecoration(
                         hintText: 'CATEGORY NAME',
                         border: InputBorder.none,
-                        suffixIcon: Icon(Icons.edit, color: isDarkMode ? Colors.white : Colors.black),
+                        suffixIcon: Icon(Icons.edit,
+                            color: isDarkMode ? Colors.white : Colors.black),
                       ),
                       style: TextStyle(
                         color: isDarkMode ? Colors.white : Colors.black,
@@ -208,8 +229,6 @@ class _AddItemPageState extends State<AddTypePage> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-
-
                     const SizedBox(height: 8),
                     TextField(
                       controller: _descriptionController,
@@ -247,7 +266,8 @@ class _AddItemPageState extends State<AddTypePage> {
                         onPressed: () async {
                           try {
                             if (_selectedImages.isNotEmpty) {
-                              _imageUrls = await thingsRepository.uploadImages(_selectedImages);
+                              _imageUrls = await thingsRepository
+                                  .uploadImages(_selectedImages);
                             }
 
                             final type = _typeController.text.trim();
@@ -257,9 +277,10 @@ class _AddItemPageState extends State<AddTypePage> {
 
                             final randomColor = typeColorsCache[type]!;
 
-                            await FirebaseFirestore.instance.collection('item').add({
+                            final data = {
                               'title': _titleController.text.trim(),
-                              'typDescription': _descriptionController.text.trim(),
+                              'typDescription':
+                                  _descriptionController.text.trim(),
                               'type': type,
                               'userId': FirebaseAuth.instance.currentUser?.uid,
                               'color': randomColor,
@@ -267,7 +288,19 @@ class _AddItemPageState extends State<AddTypePage> {
                               'timestamp': Timestamp.now(),
                               'imageUrls': _imageUrls,
                               'quantity': 1,
-                            });
+                            };
+
+                            if (widget.isEditing &&
+                                widget.editingItemId != null) {
+                              await FirebaseFirestore.instance
+                                  .collection('item')
+                                  .doc(widget.editingItemId)
+                                  .update(data);
+                            } else {
+                              await FirebaseFirestore.instance
+                                  .collection('item')
+                                  .add(data);
+                            }
 
                             Navigator.pop(context, _typeController.text);
                           } catch (e) {
@@ -277,7 +310,6 @@ class _AddItemPageState extends State<AddTypePage> {
                           }
                         },
                       ),
-
                       CustomMainButton(
                         text: 'DELETE',
                         onPressed: () {

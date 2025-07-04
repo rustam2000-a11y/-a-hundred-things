@@ -11,6 +11,7 @@ class ActionIcons extends StatelessWidget {
     required this.type,
     this.imageUrl,
     this.onDeleteItem,
+    this.onEdit,
   }) : super(key: key);
 
   final bool isDarkTheme;
@@ -21,6 +22,7 @@ class ActionIcons extends StatelessWidget {
   final String type;
   final List<String>? imageUrl;
   final VoidCallback? onDeleteItem;
+  final VoidCallback? onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +50,7 @@ class ActionIcons extends StatelessWidget {
             Icons.edit,
             color: isDarkTheme ? Colors.white : Colors.black,
           ),
-          onPressed: () {},
+          onPressed: onEdit,
         ),
         IconButton(
           padding: EdgeInsets.zero,

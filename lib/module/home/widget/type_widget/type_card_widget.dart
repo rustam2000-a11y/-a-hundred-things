@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../action_icons.dart';
 
 import '../item_image.dart';
+import 'type_add_screen.dart';
 
 class TypeCardWidget extends StatelessWidget {
   const TypeCardWidget({
@@ -20,7 +21,7 @@ class TypeCardWidget extends StatelessWidget {
   final bool isSelected;
   final bool isDarkTheme;
   final String typDescription;
-  final List <String>? imageUrl;
+  final List<String>? imageUrl;
   final String itemId;
   final String type;
   final VoidCallback? onDeleteItem;
@@ -62,7 +63,8 @@ class TypeCardWidget extends StatelessWidget {
                             child: Text(
                               type,
                               style: TextStyle(
-                                color: isDarkTheme ? Colors.white : Colors.black,
+                                color:
+                                    isDarkTheme ? Colors.white : Colors.black,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -77,30 +79,40 @@ class TypeCardWidget extends StatelessWidget {
                             type: type,
                             imageUrl: imageUrl,
                             onDeleteItem: onDeleteItem,
+                            onEdit: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute<void>(
+                                  builder: (_) => AddTypePage(
+                                    initialType: type,
+                                    initialDescription: typDescription,
+                                    initialImageUrls: imageUrl,
+                                    isEditing: true,
+                                    editingItemId: itemId,
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),
-
                       const SizedBox(height: 18),
                       Text(
                         typDescription.isNotEmpty
                             ? (typDescription.length > 18
-                            ? '${typDescription.substring(0, 18)}...'
-                            : typDescription)
+                                ? '${typDescription.substring(0, 18)}...'
+                                : typDescription)
                             : 'Описание отсутствует',
                         style: TextStyle(
                           fontSize: 14,
                           color: isDarkTheme ? Colors.white : Colors.black,
                         ),
                       ),
-
                     ],
                   ),
                 ),
               ],
             ),
-
-
           ],
         ),
       ),
