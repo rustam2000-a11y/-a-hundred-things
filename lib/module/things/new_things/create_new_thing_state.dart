@@ -3,23 +3,24 @@ part of 'create_new_thing_bloc.dart';
 class CreateNewThingState extends Equatable {
   const CreateNewThingState({
     this.file,
-    this.detectedLabel,
+    this.thing,
   });
 
   final File? file;
-  final String? detectedLabel;
+  final ThingsModel? thing;
 
   @override
-  List<Object?> get props => [file, detectedLabel];
+  List<Object?> get props => [file, thing];
 
   CreateNewThingState copyWith({
     File? file,
-    String? detectedLabel,
+    ThingsModel? thing,
   }) {
     return CreateNewThingState(
       file: file ?? this.file,
-      detectedLabel: detectedLabel ?? this.detectedLabel,
+      thing: thing ?? this.thing,
     );
   }
 }
+
 

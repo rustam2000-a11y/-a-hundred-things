@@ -16,10 +16,13 @@ import '../../module/login/bloc/registration_bloc.dart' as _i501;
 import '../../module/settings/bloc/account_bloc.dart' as _i952;
 import '../../module/things/new_things/create_new_thing_bloc.dart' as _i1045;
 import '../../module/things/new_things/image_picker_servirs.dart' as _i53;
+import '../../module/things/new_things/image_upload_service.dart' as _i885;
 import '../../network/auth_data_api.dart' as _i380;
 import '../../network/base_data_api.dart' as _i323;
+import '../../network/create_thing_api.dart' as _i841;
 import '../../network/setting_data_api.dart' as _i93;
 import '../../repository/auth_repository.dart' as _i242;
+import '../../repository/create_new_thing_repository.dart' as _i535;
 import '../../repository/setting_repository.dart' as _i169;
 import '../../repository/things_repository.dart' as _i878;
 
@@ -35,13 +38,21 @@ _i174.GetIt $initGetIt(
     environmentFilter,
   );
   gh.lazySingleton<_i53.ImagePickerService>(() => _i53.ImagePickerService());
+  gh.lazySingleton<_i885.ImageUploadService>(
+      () => _i885.FirebaseImageUploadService());
+  gh.lazySingleton<_i841.CreateThingApiI>(() => _i841.CreateThingApi());
   gh.lazySingleton<_i380.AuthDataApiI>(() => _i380.AuthDataApi());
   gh.lazySingleton<_i323.BaseDataApiI>(() => _i323.BaseDataApi());
-  gh.factory<_i1045.CreateNewThingBloc>(
-      () => _i1045.CreateNewThingBloc(gh<_i53.ImagePickerService>()));
   gh.lazySingleton<_i93.SettingDataApiI>(() => _i93.SettingDataApi());
   gh.lazySingleton<_i878.ThingsRepositoryI>(
       () => _i878.ThingsRepository(baseDataApi: gh<_i323.BaseDataApiI>()));
+  gh.lazySingleton<_i535.CreateThingRepositoryI>(
+      () => _i535.CreateThingRepository(gh<_i841.CreateThingApiI>()));
+  gh.factory<_i1045.CreateNewThingBloc>(() => _i1045.CreateNewThingBloc(
+        gh<_i53.ImagePickerService>(),
+        gh<_i535.CreateThingRepositoryI>(),
+        gh<_i885.ImageUploadService>(),
+      ));
   gh.factory<_i17.HomeBloc>(
       () => _i17.HomeBloc(thingsRepository: gh<_i878.ThingsRepositoryI>()));
   gh.lazySingleton<_i242.AuthRepositoryI>(
