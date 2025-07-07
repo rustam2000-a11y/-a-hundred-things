@@ -1,16 +1,9 @@
-import 'dart:io';
-import 'dart:math';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:google_ml_kit/google_ml_kit.dart';
-
+import '../../../model/things_model.dart';
 import '../../../presentation/colors.dart';
-import '../../../repository/things_repository.dart';
 import '../../home/widget/appBar/dropdown_container.dart';
 import '../../home/widget/appBar/dropdown_title_widget.dart';
 import '../../home/widget/appBar/new_custom_app_bar.dart';
@@ -19,100 +12,44 @@ import '../../login/widget/button_basic.dart';
 import 'create_new_thing_bloc.dart';
 
 class CreateNewThingScreen extends StatefulWidget {
-  const CreateNewThingScreen({
-    super.key,
-    required this.allTypes,
-    this.isReadOnly = false,
-    this.existingThing,
-  });
+  const CreateNewThingScreen({super.key, required this.allTypes, this.existingThing, required this.isReadOnly});
 
   final List<String> allTypes;
-  final bool isReadOnly;
   final Map<String, dynamic>? existingThing;
-
+  final bool isReadOnly;
   @override
   State<CreateNewThingScreen> createState() => _CreateNewThingScreenState();
 }
 
 class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _quantityController = TextEditingController();
-
-  final ThingsRepositoryI thingsRepository = GetIt.I<ThingsRepositoryI>();
-  final Map<String, String> typeColorsCache = {};
-  List<String> _imageUrls = [];
-  String? selectedType;
-  String? existingDocId;
-  bool isFormValid = false;
-  final bool _showDrawer = false;
-  final Set<String> _typeSet = {};
-  bool isEditMode = false;
-  bool _isFavorite = false;
-  String _selectedImportance = 'Medium';
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final _quantityController = TextEditingController(text: '1');
+  final _typeSet = <String>{};
 
   late final CreateNewThingBloc _bloc;
+  bool _isFavorite = false;
+  bool _isExpanded = false;
+  String? _existingDocId;
+  String? _selectedType;
+  String _selectedImportance = 'Medium';
 
-  void _validateForm() {
-    final valid = _titleController.text.trim().isNotEmpty &&
-        _descriptionController.text.trim().isNotEmpty;
-
-    if (isFormValid != valid) {
-      setState(() {
-        isFormValid = valid;
-      });
-    }
-  }
-
+  bool get isFormValid => _titleController.text.trim().isNotEmpty && _descriptionController.text.trim().isNotEmpty;
 
   @override
   void initState() {
     super.initState();
-
     _bloc = GetIt.I<CreateNewThingBloc>();
     _typeSet.addAll(widget.allTypes);
 
-    _titleController.addListener(_validateForm);
-    _descriptionController.addListener(_validateForm);
-
-    isEditMode = widget.existingThing != null;
-
-    if (isEditMode) {
-      existingDocId = widget.existingThing?['id'];
-
-      if (existingDocId != null) {
-        FirebaseFirestore.instance
-            .collection('item')
-            .doc(existingDocId)
-            .get()
-            .then((doc) {
-          final data = doc.data();
-          if (data != null) {
-            setState(() {
-              _isFavorite = data['favorites'] ?? false;
-              _titleController.text = data['title'] ?? '';
-              _descriptionController.text = data['description'] ?? '';
-              _selectedImportance = (data['importance'] ?? 'Medium').toString();
-              _quantityController.text = (data['quantity'] ?? '1').toString();
-              selectedType = data['type'];
-
-              final imageUrlRaw = data['imageUrls'];
-              if (imageUrlRaw is List<String>) {
-                _imageUrls = imageUrlRaw;
-              } else if (imageUrlRaw is List) {
-                _imageUrls = List<String>.from(imageUrlRaw.whereType<String>());
-              }
-            });
-          }
-        });
+    if (widget.existingThing != null) {
+      _existingDocId = widget.existingThing!['id'] as String?;
+      if (_existingDocId != null) {
+        _bloc.add(LoadThingEvent(_existingDocId!));
       }
     }
 
-    _validateForm();
   }
-
-
-  bool _isExpanded = false;
 
   @override
   Widget build(BuildContext context) {
@@ -120,127 +57,62 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    return BlocBuilder<CreateNewThingBloc, CreateNewThingState>(
+    return BlocConsumer<CreateNewThingBloc, CreateNewThingState>(
       bloc: _bloc,
+      listener: (context, state) {
+        final thing = state.thing;
+        if (thing != null) {
+          _isFavorite = thing.favorites;
+          _titleController.text = thing.title;
+          _descriptionController.text = thing.description;
+          _quantityController.text = thing.quantity.toString();
+          _selectedType = thing.type;
+          _selectedImportance = thing.importance;
+        }
+      },
       builder: (context, state) {
         return Scaffold(
           backgroundColor: Colors.white,
           appBar: NewCustomAppBar(
             showSearchIcon: false,
             showBackButton: false,
-            actionIcon: isEditMode
+            actionIcon: _existingDocId != null
                 ? IconButton(
-              icon: Icon(
-                _isFavorite ? Icons.favorite : Icons.favorite_border,
-                color: Colors.black,
-              ),
-              onPressed: () async {
-                setState(() {
-                  _isFavorite = !_isFavorite;
-                });
-
-                print('existingDocId: $existingDocId');
-
-                if (existingDocId != null) {
-                  try {
-                    await FirebaseFirestore.instance
-                        .collection('item')
-                        .doc(existingDocId)
-                        .update({'favorites': _isFavorite});
-                    await Future<void>.delayed(const Duration(milliseconds: 200));
-
-                    Navigator.pop(context, true);
-                  } catch (e) {
-                    print('Error updating favorites: $e');
-                  }
-                } else {
-                  print('ERROR: existingDocId is null');
+              icon: Icon(_isFavorite ? Icons.favorite : Icons.favorite_border, color: Colors.black),
+              onPressed: () {
+                if (_existingDocId != null) {
+                  _bloc.add(ToggleFavoriteEvent(_existingDocId!, !_isFavorite));
+                  setState(() => _isFavorite = !_isFavorite);
                 }
               },
             )
                 : null,
-
             logo: WidgetDrawerContainer(
-              typ: selectedType,
-              onTap: () {
-                showDialog<void>(
-                  context: context,
-                  builder: (context) => Dialog(
-                    backgroundColor: Colors.transparent,
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () => Navigator.of(context).pop(),
-                      child: Center(
-                        child: GestureDetector(
-                          onTap: () {},
-                          child: WidgetDrawer(
-                            types: _typeSet.toList(),
-                            onTypeSelected: (selected) {
-                              setState(() {
-                                selectedType = selected;
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
+              typ: _selectedType,
+              onTap: () => _showTypeSelector(context),
             ),
           ),
           body: SafeArea(
             child: Stack(
               clipBehavior: Clip.none,
               children: [
-                if (_showDrawer && _typeSet.isNotEmpty)
-                  WidgetDrawer(
-                    types: _typeSet.toList(),
-                    onTypeSelected: (selected) {
-                      setState(() {
-                        selectedType = selected;
-                      });
-                    },
-                  ),
                 GestureDetector(
                   onTap: () {
-                    _bloc.add(
-                      ChangeImageEvent(
-                        context,
-                        (detectedTitle) {
-                          setState(() {
-                            _titleController.text = detectedTitle;
-                          });
-                        },
-                      ),
-                    );
+                    _bloc.add(ChangeImageEvent(context, (detectedTitle) {
+                      setState(() {
+                        _titleController.text = detectedTitle;
+                      });
+                    }));
                   },
                   child: Container(
                     height: screenHeight * 0.4,
                     width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: isDarkMode ? Colors.white : Colors.white,
-                    ),
-                    child: (state.file != null && !isEditMode)
-                        ? Image.file(
-                            state.file!,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: double.infinity,
-                          )
-                        : _imageUrls.isNotEmpty
-                            ? Image.network(
-                                _imageUrls.first,
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: double.infinity,
-                                errorBuilder: (context, error, stackTrace) {
-                                  print('Image load error: $error');
-                                  return const Center(
-                                      child: Icon(Icons.broken_image));
-                                },
-                              )
-                            : _buildPlaceholder(screenWidth),
+                    color: Colors.white,
+                    child: state.file != null
+                        ? Image.file(state.file!, fit: BoxFit.cover)
+                        : (state.thing?.imageUrl?.isNotEmpty == true
+                        ? Image.network(state.thing!.imageUrl!.first, fit: BoxFit.cover)
+                        : _buildPlaceholder(screenWidth)),
                   ),
                 ),
                 ExpandableFormCard(
@@ -252,26 +124,15 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                   screenHeight: screenHeight,
                   screenWidth: screenWidth,
                   importanceLevel: _selectedImportance,
-                  onImportanceChanged: (value) {
-                    setState(() {
-                      _selectedImportance = value;
-                    });
-                  },
-                  onExpandChanged: (value) {
-                    setState(() {
-                      _isExpanded = value;
-                    });
-                  },
+                  onImportanceChanged: (value) => setState(() => _selectedImportance = value),
+                  onExpandChanged: (value) => setState(() => _isExpanded = value),
                 ),
-
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: Container(
                     height: screenHeight * 0.16,
                     decoration: BoxDecoration(
-                      color: isDarkMode
-                          ? AppColors.blackSand
-                          : AppColors.whiteColor,
+                      color: isDarkMode ? AppColors.blackSand : AppColors.whiteColor,
                       border: const Border(top: BorderSide()),
                     ),
                     child: Padding(
@@ -283,57 +144,27 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                             text: 'SAVE',
                             textColor: Colors.white,
                             backgroundColor: Colors.black,
-                            isEnabled: isFormValid,
-                            onPressed: () async {
-                              try {
-                                if (state.file != null) {
-                                  _imageUrls = await thingsRepository
-                                      .uploadImages([state.file!]);
-                                }
-
-                                final type = selectedType!.trim();
-                                if (!typeColorsCache.containsKey(type)) {}
-
-                                final Map<String, dynamic> itemData = {
-                                  'title': _titleController.text.trim(),
-                                  'description':
-                                      _descriptionController.text.trim(),
-                                  'type': type,
-                                  'userId':
-                                      FirebaseAuth.instance.currentUser?.uid,
-                                  'timestamp': Timestamp.now(),
-                                  'imageUrls': _imageUrls,
-                                  'importance': _selectedImportance,
-                                  'quantity': int.tryParse(
-                                          _quantityController.text.trim()) ??
-                                      1,
-                                  'favorites': _isFavorite,
-                                };
-
-                                if (existingDocId != null) {
-                                  await FirebaseFirestore.instance
-                                      .collection('item')
-                                      .doc(existingDocId)
-                                      .update(itemData);
-                                } else {
-                                  await FirebaseFirestore.instance
-                                      .collection('item')
-                                      .add(itemData);
-                                }
-
-                                Navigator.pop(context, true);
-                              } catch (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Error: $e')),
-                                );
-                              }
+                            isEnabled: isFormValid && _selectedType != null,
+                            onPressed: () {
+                              final model = ThingsModel(
+                                id: _existingDocId ?? '',
+                                title: _titleController.text.trim(),
+                                description: _descriptionController.text.trim(),
+                                type: _selectedType ?? '',
+                                typDescription: '',
+                                color: '',
+                                imageUrl: state.file != null ? [] : state.thing?.imageUrl ?? [],
+                                quantity: int.tryParse(_quantityController.text.trim()) ?? 1,
+                                importance: _selectedImportance,
+                                favorites: _isFavorite,
+                              );
+                              _bloc.add(SaveThingEvent(model));
+                              Navigator.pop(context, true);
                             },
                           ),
                           CustomMainButton(
                             text: 'DELETE',
-                            onPressed: () {
-                              Navigator.pop(context, true);
-                            },
+                            onPressed: () => Navigator.pop(context, true),
                           ),
                         ],
                       ),
@@ -347,43 +178,52 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
       },
     );
   }
-  Future<void> _analyzeImage(File imageFile) async {
-    final inputImage = InputImage.fromFile(imageFile);
-    final imageLabeler = GoogleMlKit.vision.imageLabeler();
 
-    final labels = await imageLabeler.processImage(inputImage);
+  void _showTypeSelector(BuildContext context) {
+    showDialog<String>(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => Navigator.of(context).pop(),
+          child: Center(
+            child: GestureDetector(
+              onTap: () {},
+              child: WidgetDrawer(
+                types: _typeSet.toList(),
+                onTypeSelected: (selected) {
+                  Navigator.of(context).pop(selected);
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    ).then((selected) {
+      if (selected != null) {
+        setState(() => _selectedType = selected);
+      }
+    });
+  }
 
-    if (labels.isNotEmpty) {
-      final topLabel = labels.first;
-      setState(() {
-        _titleController.text = topLabel.label;
-      });
-      print('Recognized: ${topLabel.label}');
-    } else {
-      print('Nothing found');
-    }
 
-    await imageLabeler.close();
+  Widget _buildPlaceholder(double screenWidth) {
+    return Container(
+      width: screenWidth * 0.5,
+      height: screenWidth * 0.5,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Center(
+        child: Image.asset(
+          'assets/images/camera_icon.png',
+          width: screenWidth * 0.18,
+          height: screenWidth * 0.18,
+          fit: BoxFit.contain,
+        ),
+      ),
+    );
   }
 }
-
-Widget _buildPlaceholder(double screenWidth) {
-  return Container(
-    width: screenWidth * 0.5,
-    height: screenWidth * 0.5,
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: Center(
-      child: Image.asset(
-        'assets/images/camera_icon.png',
-        width: screenWidth * 0.18,
-        height: screenWidth * 0.18,
-        fit: BoxFit.contain,
-      ),
-    ),
-  );
-}
-
-
