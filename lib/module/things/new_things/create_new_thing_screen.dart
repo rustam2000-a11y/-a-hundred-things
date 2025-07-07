@@ -64,7 +64,7 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
     }
   }
 
-  @override
+
   @override
   void initState() {
     super.initState();
@@ -78,24 +78,39 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
     isEditMode = widget.existingThing != null;
 
     if (isEditMode) {
-      final data = widget.existingThing!;
-      _isFavorite = data['favorites'] ?? false;
-      existingDocId = data['id'];
-      _titleController.text = data['title'] ?? '';
-      _descriptionController.text = data['description'] ?? '';
-      _selectedImportance = (data['importance'] ?? 'Medium').toString();
-      _quantityController.text = (data['quantity'] ?? '1').toString();
-      selectedType = data['type'];
-      final imageUrlRaw = data['imageUrls'];
-      if (imageUrlRaw is List<String>) {
-        _imageUrls = imageUrlRaw;
-      } else if (imageUrlRaw is List) {
-        _imageUrls = List<String>.from(imageUrlRaw.whereType<String>());
+      existingDocId = widget.existingThing?['id'];
+
+      if (existingDocId != null) {
+        FirebaseFirestore.instance
+            .collection('item')
+            .doc(existingDocId)
+            .get()
+            .then((doc) {
+          final data = doc.data();
+          if (data != null) {
+            setState(() {
+              _isFavorite = data['favorites'] ?? false;
+              _titleController.text = data['title'] ?? '';
+              _descriptionController.text = data['description'] ?? '';
+              _selectedImportance = (data['importance'] ?? 'Medium').toString();
+              _quantityController.text = (data['quantity'] ?? '1').toString();
+              selectedType = data['type'];
+
+              final imageUrlRaw = data['imageUrls'];
+              if (imageUrlRaw is List<String>) {
+                _imageUrls = imageUrlRaw;
+              } else if (imageUrlRaw is List) {
+                _imageUrls = List<String>.from(imageUrlRaw.whereType<String>());
+              }
+            });
+          }
+        });
       }
     }
 
     _validateForm();
   }
+
 
   bool _isExpanded = false;
 
