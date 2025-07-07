@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
 class ThingsModel extends Equatable {
@@ -12,6 +13,8 @@ class ThingsModel extends Equatable {
     required this.quantity,
     required this.importance,
     this.favorites = false,
+    this.timestamp,
+    this.userId,
   });
 
   factory ThingsModel.fromJson(Map<String, dynamic> json) {
@@ -22,14 +25,19 @@ class ThingsModel extends Equatable {
       type: json['type'] as String? ?? '',
       typDescription: json['typDescription'] as String? ?? '',
       color: json['color'] as String? ?? '',
-
-      imageUrl: (json['imageUrls'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
+      imageUrl: (json['imageUrls'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
       quantity: json['quantity'] as int? ?? 0,
       importance: json['importance'] as String? ?? 'Medium',
       favorites: json['favorites'] as bool? ?? false,
+      timestamp: json['timestamp'] is Timestamp
+          ? (json['timestamp'] as Timestamp).toDate()
+          : null,
+      userId: json['userId'] as String?,
     );
   }
-
 
   final String id;
   final String title;
@@ -39,27 +47,24 @@ class ThingsModel extends Equatable {
   final String color;
   final List<String>? imageUrl;
   final int quantity;
-
   final String importance;
-
-
+  final DateTime? timestamp;
   final bool favorites;
+  final String? userId;
 
   @override
   List<Object?> get props => [
-    id,
-    title,
-    description,
-    type,
-    typDescription,
-    color,
-
-    imageUrl,
-    quantity,
-
-    importance,
-
-  ];
+        id,
+        title,
+        description,
+        type,
+        typDescription,
+        color,
+        timestamp,
+        imageUrl,
+        quantity,
+        importance,
+      ];
 
   ThingsModel copyWith({
     String? id,
@@ -75,7 +80,8 @@ class ThingsModel extends Equatable {
     String? location,
     String? importance,
     double? weight,
-    bool? favorites
+    bool? favorites,
+    String? userId,
   }) {
     return ThingsModel(
       id: id ?? this.id,
@@ -88,25 +94,29 @@ class ThingsModel extends Equatable {
       quantity: quantity ?? this.quantity,
       importance: importance ?? this.importance,
       favorites: favorites ?? this.favorites,
-
+      userId: userId ?? this.userId,
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
+  Map<String, dynamic> toJson({bool includeId = true}) {
+    final data = {
       'title': title,
       'description': description,
       'type': type,
       'typDescription': typDescription,
       'color': color,
-
       'imageUrls': imageUrl,
       'quantity': quantity,
-
       'importance': importance,
-
       'favorites': favorites,
+      'timestamp': timestamp ?? DateTime.now(),
+      'userId': userId,
     };
+
+    if (includeId && id.isNotEmpty) {
+      data['id'] = id;
+    }
+
+    return data;
   }
 }

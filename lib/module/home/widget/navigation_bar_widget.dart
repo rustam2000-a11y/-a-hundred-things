@@ -78,7 +78,7 @@ class NavigationBarWidget extends StatelessWidget {
                             context,
                             MaterialPageRoute<void>(
                               builder: (context) => CreateNewThingScreen(
-                                allTypes: types,
+                                allTypes: types, isReadOnly: true,
                               ),
                             ),
                           );

@@ -55,9 +55,9 @@ class WidgetDrawer extends StatelessWidget {
                               );
 
                               if (newType != null && !types.contains(newType)) {
-                                onTypeSelected(newType);
-                                Navigator.pop(context);
+                                Navigator.pop(context, newType);
                               }
+
                             },
 
                             child: const Row(
@@ -93,9 +93,9 @@ class WidgetDrawer extends StatelessWidget {
                           itemBuilder: (context, index) {
                             return InkWell(
                               onTap: () {
-                                onTypeSelected(types[index]);
-                                Navigator.pop(context);
+                                Navigator.pop(context, types[index]);
                               },
+
                               child: Padding(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 12),

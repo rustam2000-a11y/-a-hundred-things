@@ -26,7 +26,7 @@ class _ThingsTypeListWidgetState extends State<ThingsTypeListWidget> {
   void didUpdateWidget(covariant ThingsTypeListWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.things != widget.things) {
-      setState(() {}); // перерисовать, если список изменился
+      setState(() {});
     }
   }
 
