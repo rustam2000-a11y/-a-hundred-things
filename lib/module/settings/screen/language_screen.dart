@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../app/app.dart';
 import '../../../generated/l10n.dart';
-import '../../../main.dart';
 import '../../home/widget/appBar/new_custom_app_bar.dart';
 import '../widget/settings_list_widget.dart';
 
 class LanguageSelectionScreen extends StatefulWidget {
   const LanguageSelectionScreen({super.key, required this.selectedLanguage});
+
   final String selectedLanguage;
 
   @override
-  State<LanguageSelectionScreen> createState() => _LanguageSelectionScreenState();
+  State<LanguageSelectionScreen> createState() =>
+      _LanguageSelectionScreenState();
 }
 
 class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
@@ -43,16 +45,13 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
       color: selected ? Colors.black : Colors.transparent,
       child: ProfileListTile(
         title: label,
-
         isDarkTheme: isDarkTheme || selected,
         onTap: () => _changeLanguage(code),
-
         trailing: const SizedBox(),
         showTopDivider: true,
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -88,8 +87,6 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
               ],
             ),
           ),
-
-
           _buildLanguageTile('en', 'English', isDark),
           _buildLanguageTile('ru', 'Русский', isDark),
         ],

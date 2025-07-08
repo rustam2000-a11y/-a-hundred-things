@@ -4,13 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../app/app.dart';
 import '../../../generated/l10n.dart';
-import '../../../main.dart';
-
 import '../../home/widget/appBar/new_custom_app_bar.dart';
-
-import '../widget/account.dart';
 import '../bloc/account_bloc.dart';
+import '../widget/account.dart';
 import '../widget/max_items_dropdown.dart';
 import '../widget/settings_list_widget.dart';
 import 'language_screen.dart';
@@ -55,7 +54,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) return;
     final doc =
-    await FirebaseFirestore.instance.collection('user').doc(userId).get();
+        await FirebaseFirestore.instance.collection('user').doc(userId).get();
     if (doc.exists && doc.data()?['maxItems'] != null) {
       setState(() {
         selectedValue = doc['maxItems'];
@@ -88,21 +87,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkTheme = Theme
-        .of(context)
-        .brightness == Brightness.dark;
-
+    final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: const NewCustomAppBar(showSearchIcon:false,useTitleText: true,
-          titleText: 'Settings'),
+      appBar: const NewCustomAppBar(
+          showSearchIcon: false, useTitleText: true, titleText: 'Settings'),
       body: Column(
         children: [
-
           ProfileListTile(
-            title: S
-                .of(context)
-                .editProfile,
+            title: S.of(context).editProfile,
             showTopDivider: true,
             isDarkTheme: isDarkTheme,
             onTap: () {
@@ -110,27 +103,24 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 context,
                 MaterialPageRoute<dynamic>(
                   builder: (context) => BlocProvider(
-                    create: (_) => GetIt.I<AccountBloc>()..add(LoadAccountData()),
+                    create: (_) =>
+                        GetIt.I<AccountBloc>()..add(LoadAccountData()),
                     child: const Account(),
                   ),
                 ),
               );
             },
-
           ),
           ProfileListTile(
-            title: S
-                .of(context)
-                .applicationLanguage,
+            title: S.of(context).applicationLanguage,
             isDarkTheme: isDarkTheme,
             onTap: () async {
               final newLanguage = await Navigator.push<String>(
                 context,
                 MaterialPageRoute(
-                  builder: (_) =>
-                      LanguageSelectionScreen(
-                        selectedLanguage: _selectedLanguage,
-                      ),
+                  builder: (_) => LanguageSelectionScreen(
+                    selectedLanguage: _selectedLanguage,
+                  ),
                 ),
               );
               if (newLanguage != null && newLanguage != _selectedLanguage) {
@@ -141,9 +131,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             },
           ),
           ProfileListTile(
-            title: S
-                .of(context)
-                .pushNotifications,
+            title: S.of(context).pushNotifications,
             isDarkTheme: isDarkTheme,
             onTap: () {},
           ),
@@ -161,20 +149,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               },
             ),
           ),
-
           ProfileListTile(
-            title: S
-                .of(context)
-                .theme,
+            title: S.of(context).theme,
             isDarkTheme: isDarkTheme,
             onTap: () async {
               final selectedTheme = await Navigator.push<String>(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      ThemeSelectionScreen(
-                        selectedTheme: _selectedTheme,
-                      ),
+                  builder: (context) => ThemeSelectionScreen(
+                    selectedTheme: _selectedTheme,
+                  ),
                 ),
               );
               if (selectedTheme != null && selectedTheme != _selectedTheme) {
@@ -191,23 +175,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           ),
           ProfileListTile(
             showTopDivider: true,
-            title: S
-                .of(context)
-                .aboutUs,
+            title: S.of(context).aboutUs,
             isDarkTheme: isDarkTheme,
             onTap: () {},
           ),
           ProfileListTile(
-            title: S
-                .of(context)
-                .privacyPolicy,
+            title: S.of(context).privacyPolicy,
             isDarkTheme: isDarkTheme,
             onTap: () {},
           ),
           ProfileListTile(
-            title: S
-                .of(context)
-                .termsOfUse,
+            title: S.of(context).termsOfUse,
             isDarkTheme: isDarkTheme,
             onTap: () {},
           ),

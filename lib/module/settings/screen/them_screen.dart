@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../main.dart';
+import '../../../app/app.dart';
 import '../../home/widget/appBar/new_custom_app_bar.dart';
 import '../widget/settings_list_widget.dart';
 
