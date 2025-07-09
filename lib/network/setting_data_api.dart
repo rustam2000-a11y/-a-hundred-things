@@ -47,7 +47,12 @@ class SettingDataApi implements SettingDataApiI {
     final filename = '$uid.jpg';
     final ref = _storage.ref().child('user_avatars/$filename');
     final taskSnapshot = await ref.putData(bytes);
-    return taskSnapshot.ref.getDownloadURL();
+    final downloadUrl = await taskSnapshot.ref.getDownloadURL();
+    await _firestore.collection('user').doc(uid).update({
+      'avatarUrl': downloadUrl,
+    });
+
+    return downloadUrl;
   }
 
   @override

@@ -24,4 +24,13 @@ class UpdateAccountData extends AccountEvent {
 
   @override
   List<Object?> get props => [name, email, phone, password];
+
+}
+class UpdateAvatarEvent extends AccountEvent {
+
+  const UpdateAvatarEvent(this.avatarPath);
+  final String avatarPath;
+
+  @override
+  List<Object?> get props => [avatarPath];
 }

@@ -1,8 +1,9 @@
+import 'dart:io';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:injectable/injectable.dart';
 import '../../../repository/setting_repository.dart';
-
 part 'account_event.dart';
 part 'account_state.dart';
 
@@ -13,6 +14,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   AccountBloc(this._repository) : super(const AccountState()) {
     on<LoadAccountData>(_onLoadAccountData);
     on<UpdateAccountData>(_onUpdateAccountData);
+    on<UpdateAvatarEvent>(_onUpdateAvatar);
   }
 
   Future<void> _onLoadAccountData(
@@ -48,6 +50,20 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         email: event.email,
         phone: event.phone,
         password: event.password,
+        isLoading: false,
+      ));
+    } catch (e) {
+      emit(state.copyWith(isLoading: false, error: e.toString()));
+    }
+  }
+  Future<void> _onUpdateAvatar(
+      UpdateAvatarEvent event, Emitter<AccountState> emit) async {
+    emit(state.copyWith(isLoading: true));
+    try {
+      final newAvatarUrl = await _repository.uploadAvatar(File(event.avatarPath));
+
+      emit(state.copyWith(
+        avatarUrl: newAvatarUrl,
         isLoading: false,
       ));
     } catch (e) {

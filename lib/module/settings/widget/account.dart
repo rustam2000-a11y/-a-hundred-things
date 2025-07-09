@@ -109,10 +109,14 @@ class _AccountState extends State<Account> {
                         bottom: 0,
                         child: GestureDetector(
                           onTap: () async {
-                            final pickedFile = await _picker.pickImage(
-                                source: ImageSource.gallery);
-                            if (pickedFile != null) {}
+                            final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+                            if (pickedFile != null) {
+                              context.read<AccountBloc>().add(
+                                UpdateAvatarEvent(pickedFile.path),
+                              );
+                            }
                           },
+
                           child: const Icon(Icons.edit,
                               color: Colors.white, size: 20),
                         ),
