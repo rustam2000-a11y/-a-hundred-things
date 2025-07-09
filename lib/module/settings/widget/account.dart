@@ -92,18 +92,25 @@ class _AccountState extends State<Account> {
                         width: 150,
                         decoration: BoxDecoration(
                           color: Colors.grey,
-                          image: (state.avatarUrl.isNotEmpty)
+                          image: (!state.isAvatarUploading && state.avatarUrl.isNotEmpty)
                               ? DecorationImage(
-                                  image: NetworkImage(state.avatarUrl),
-                                  fit: BoxFit.cover,
-                                )
+                            image: NetworkImage(state.avatarUrl),
+                            fit: BoxFit.cover,
+                          )
                               : null,
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        child: (state.avatarUrl.isEmpty)
-                            ? const Icon(Icons.person,
-                                size: 80, color: Colors.white)
-                            : null,
+                        child: state.isAvatarUploading
+                            ? const Center(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                            : (state.avatarUrl.isEmpty
+                            ? const Icon(Icons.person, size: 80, color: Colors.white)
+                            : null),
                       ),
+
                       Positioned(
                         right: 0,
                         bottom: 0,

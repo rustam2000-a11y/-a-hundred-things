@@ -58,16 +58,21 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   }
   Future<void> _onUpdateAvatar(
       UpdateAvatarEvent event, Emitter<AccountState> emit) async {
-    emit(state.copyWith(isLoading: true));
+    emit(state.copyWith(isAvatarUploading: true));
     try {
-      final newAvatarUrl = await _repository.uploadAvatar(File(event.avatarPath));
+      final newAvatarUrl =
+      await _repository.uploadAvatar(File(event.avatarPath));
 
       emit(state.copyWith(
         avatarUrl: newAvatarUrl,
-        isLoading: false,
+        isAvatarUploading: false,
       ));
     } catch (e) {
-      emit(state.copyWith(isLoading: false, error: e.toString()));
+      emit(state.copyWith(
+        isAvatarUploading: false,
+        error: e.toString(),
+      ));
     }
   }
+
 }

@@ -9,6 +9,7 @@ class AccountState extends Equatable {
     this.password = '',
     this.avatarUrl = '',
     this.isLoading = false,
+    this.isAvatarUploading = false,
     this.error,
   });
   final String name;
@@ -18,6 +19,7 @@ class AccountState extends Equatable {
   final String avatarUrl;
   final bool isLoading;
   final String? error;
+  final bool isAvatarUploading;
 
   AccountState copyWith({
     String? name,
@@ -27,6 +29,7 @@ class AccountState extends Equatable {
     String? avatarUrl,
     bool? isLoading,
     String? error,
+    bool? isAvatarUploading,
   }) {
     return AccountState(
       name: name ?? this.name,
@@ -36,9 +39,10 @@ class AccountState extends Equatable {
       avatarUrl: avatarUrl ?? this.avatarUrl,
       isLoading: isLoading ?? this.isLoading,
       error: error,
+      isAvatarUploading: isAvatarUploading ?? this.isAvatarUploading,
     );
   }
 
   @override
-  List<Object?> get props => [name, email, phone, password, avatarUrl, isLoading, error];
+  List<Object?> get props => [name, email, phone, password, avatarUrl, isLoading, error,isAvatarUploading,];
 }
