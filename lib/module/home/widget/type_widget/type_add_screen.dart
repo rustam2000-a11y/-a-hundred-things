@@ -164,16 +164,25 @@ class _AddItemPageState extends State<AddTypePage> {
                   color: isDarkMode ? Colors.white : Colors.white,
                 ),
                 child: Center(
-                  child: _selectedImages.isNotEmpty
+                  child: (_selectedImages.isNotEmpty || _imageUrls.isNotEmpty)
                       ? PageView.builder(
-                          itemCount: _selectedImages.length,
+                          itemCount: _selectedImages.length + _imageUrls.length,
                           itemBuilder: (context, index) {
-                            return Image.file(
-                              _selectedImages[index],
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: double.infinity,
-                            );
+                            if (index < _selectedImages.length) {
+                              return Image.file(
+                                _selectedImages[index],
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: double.infinity,
+                              );
+                            } else {
+                              return Image.network(
+                                _imageUrls[index - _selectedImages.length],
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: double.infinity,
+                              );
+                            }
                           },
                         )
                       : Container(

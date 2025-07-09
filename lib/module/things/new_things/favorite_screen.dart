@@ -9,9 +9,7 @@ import '../../home/home_bloc.dart';
 import '../../home/widget/appBar/new_custom_app_bar.dart';
 import '../../home/widget/drawer.dart';
 import '../../home/widget/list_of_things_widget.dart';
-import '../../home/widget/navigation_bar_widget.dart';
-
-import '../../login/widget/custom_text.dart';
+import '../../settings/bloc/account_bloc.dart';
 
 class FavorieteScreen extends StatefulWidget {
   const FavorieteScreen({
@@ -27,10 +25,6 @@ class FavorieteScreenState extends State<FavorieteScreen> {
   late HomeBloc _bloc;
   ValueNotifier<List<String>> selectedItemsNotifier = ValueNotifier([]);
 
-
-  bool _showCategoryList = false;
-
-
   @override
   void initState() {
     _bloc = GetIt.I<HomeBloc>();
@@ -39,64 +33,76 @@ class FavorieteScreenState extends State<FavorieteScreen> {
   }
 
   void _toggleCategoryList(bool show) {
-    setState(() {
-      _showCategoryList = show;
-    });
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      drawer: CustomDrawer(
-        onToggleCategoryList: _toggleCategoryList,
-      ),
-      backgroundColor: isDarkMode ? AppColors.blackSand : Colors.white,
-      appBar: const NewCustomAppBar(showBackButton: false,useTitleText: true,showSearchIcon: false,
-        titleText: 'Favorites',),
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              const SizedBox(height: 12),
-              Expanded(
-                child: StreamBuilder<QuerySnapshot>(
-                  stream: FirebaseFirestore.instance
-                      .collection('item')
-                      .where('favorites', isEqualTo: true)
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<HomeBloc>(
+          create: (_) => _bloc,
+        ),
+        BlocProvider<AccountBloc>(
+          create: (_) => GetIt.I<AccountBloc>(),
+        ),
+      ],
+      child: Scaffold(
+        drawer: CustomDrawer(
+          onToggleCategoryList: _toggleCategoryList,
+        ),
+        backgroundColor: isDarkMode ? AppColors.blackSand : Colors.white,
+        appBar: const NewCustomAppBar(
+          showBackButton: false,
+          useTitleText: true,
+          showSearchIcon: false,
+          titleText: 'Favorites',
+        ),
+        body: Stack(
+          children: [
+            Column(
+              children: [
+                const SizedBox(height: 12),
+                Expanded(
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('item')
+                        .where('favorites', isEqualTo: true)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
 
-                    final docs = snapshot.data?.docs ?? [];
+                      final docs = snapshot.data?.docs ?? [];
 
-                    final things = docs
-                        .map((e) => ThingsModel.fromJson(e.data() as Map<String, dynamic>)
-                        .copyWith(id: e.id))
-                        .where((e) => e.title.trim().isNotEmpty)
-                        .toList();
+                      final things = docs
+                          .map((e) => ThingsModel.fromJson(
+                                  e.data() as Map<String, dynamic>)
+                              .copyWith(id: e.id))
+                          .where((e) => e.title.trim().isNotEmpty)
+                          .toList();
 
-                    return ThingsTypeListWidget(
-                      things: things,
-                      selectedCategoryType: _selectedCategoryType,
-                      selectedItemsNotifier: selectedItemsNotifier,
-                      onDeleteItem: (uid) => _bloc.add(DeleteItemByUidEvent(uid: uid)),
-                      onStateUpdate: () {},
-                    );
-                  },
+                      return ThingsTypeListWidget(
+                        things: things,
+                        selectedCategoryType: _selectedCategoryType,
+                        selectedItemsNotifier: selectedItemsNotifier,
+                        onDeleteItem: (uid) =>
+                            _bloc.add(DeleteItemByUidEvent(uid: uid)),
+                        onStateUpdate: () {},
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
-          ),
-
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
-
 
   Future<void> deleteSelectedItems(BuildContext context) async {
     try {

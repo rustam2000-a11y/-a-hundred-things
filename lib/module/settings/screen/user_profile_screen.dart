@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../app/app.dart';
 import '../../../generated/l10n.dart';
+import '../../home/my_home_page.dart';
 import '../../home/widget/appBar/new_custom_app_bar.dart';
 import '../bloc/account_bloc.dart';
 import '../widget/account.dart';
@@ -90,8 +90,21 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: const NewCustomAppBar(
-          showSearchIcon: false, useTitleText: true, titleText: 'Settings'),
+      appBar: NewCustomAppBar(
+        showSearchIcon: false,
+        showBackButton: true,
+        useTitleText: true,
+        titleText: 'Settings',
+        onLeadingOverride: () {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute<void>(
+              builder: (_) => MyHomePage(toggleTheme: widget.toggleTheme),
+            ),
+            (Route<dynamic> route) => false,
+          );
+        },
+      ),
       body: Column(
         children: [
           ProfileListTile(
