@@ -8,16 +8,17 @@ class NewListOfTitles extends StatelessWidget {
     super.key,
     required this.things,
     required this.allTypes,
+    this.controller,
   });
 
   final List<ThingsModel> things;
   final List<String> allTypes;
+  final ScrollController? controller;
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
+      controller: controller,
       itemCount: things.length + 1,
       itemBuilder: (context, index) {
         if (index == 0) {

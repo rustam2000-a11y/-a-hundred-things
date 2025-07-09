@@ -39,25 +39,52 @@ class MyHomePageState extends State<MyHomePage> {
   final Map<String, String> _selectedFilters = {};
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
+  final ScrollController _scrollController = ScrollController();
+  bool _showSearchField = true;
+  double _lastOffset = 0;
 
   @override
   void initState() {
+    super.initState();
     _bloc = GetIt.I<HomeBloc>();
     _bloc.add(const HomeInitEvent());
+
     _searchController.addListener(() {
       setState(() {});
     });
 
-    super.initState();
+    _scrollController.addListener(() {
+      final offset = _scrollController.offset;
+
+      if (offset > _lastOffset && offset - _lastOffset > 10) {
+        // Scroll down — hide search
+        if (_showSearchField) {
+          setState(() {
+            _showSearchField = false;
+          });
+        }
+      } else if (offset < _lastOffset && _lastOffset - offset > 10) {
+        // Scroll up — show search
+        if (!_showSearchField) {
+          setState(() {
+            _showSearchField = true;
+          });
+        }
+      }
+
+      _lastOffset = offset;
+    });
   }
+
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _searchController.dispose();
     _searchFocusNode.dispose();
-
     super.dispose();
   }
+
 
   void _toggleCategoryList(bool show) {
     setState(() {
@@ -96,11 +123,35 @@ class MyHomePageState extends State<MyHomePage> {
               children: [
                 Column(
                   children: [
-                    SearchTextFieldWidget(
-                      controller: _searchController,
-                      focusNode: _searchFocusNode,
-                      isDarkMode: isDarkMode,
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      switchInCurve: Curves.easeOut,
+                      switchOutCurve: Curves.easeIn,
+                      transitionBuilder: (Widget child, Animation<double> animation) {
+                        return SizeTransition(
+                          sizeFactor: animation,
+                          axisAlignment: -1.0,
+                          child: FadeTransition(
+                            opacity: animation,
+                            child: child,
+                          ),
+                        );
+                      },
+                      child: _showSearchField
+                          ? SearchTextFieldWidget(
+                        key: const ValueKey('search_field_visible'),
+                        controller: _searchController,
+                        focusNode: _searchFocusNode,
+                        isDarkMode: isDarkMode,
+                      )
+                          : const SizedBox(
+                        key: ValueKey('search_field_hidden'),
+                      ),
                     ),
+
+
+
+
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: Row(
@@ -256,33 +307,32 @@ class MyHomePageState extends State<MyHomePage> {
                     Expanded(
                       child: Builder(
                         builder: (context) {
-                          final searchQuery =
-                              _searchController.text.toLowerCase().trim();
-
+                          final searchQuery = _searchController.text.toLowerCase().trim();
                           final filteredThings = state.things
                               .where((thing) =>
-                                  thing.title.trim().isNotEmpty &&
-                                  thing.title
-                                      .toLowerCase()
-                                      .contains(searchQuery))
+                          thing.title.trim().isNotEmpty &&
+                              thing.title.toLowerCase().contains(searchQuery))
                               .toList();
 
                           return _isListMode
                               ? ThingsTypeListWidget(
-                                  things: filteredThings,
-                                  selectedCategoryType: _selectedCategoryType,
-                                  selectedItemsNotifier: selectedItemsNotifier,
-                                  onStateUpdate: () => setState(() {}),
-                                  onDeleteItem: (uid) =>
-                                      _bloc.add(DeleteItemByUidEvent(uid: uid)),
-                                )
+                            controller: _scrollController,
+                            things: filteredThings,
+                            selectedCategoryType: _selectedCategoryType,
+                            selectedItemsNotifier: selectedItemsNotifier,
+                            onStateUpdate: () => setState(() {}),
+                            onDeleteItem: (uid) =>
+                                _bloc.add(DeleteItemByUidEvent(uid: uid)),
+                          )
                               : NewListOfTitles(
-                                  things: filteredThings,
-                                  allTypes: state.typesWithColors.keys.toList(),
-                                );
+                            controller: _scrollController,
+                            things: filteredThings,
+                            allTypes: state.typesWithColors.keys.toList(),
+                          );
                         },
                       ),
                     ),
+
                   ],
                 ),
                 Positioned(
