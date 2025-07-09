@@ -3,7 +3,6 @@ import 'package:get_it/get_it.dart';
 
 import '../../../../repository/things_repository.dart';
 
-
 class NewCustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   const NewCustomAppBar({
     Key? key,
@@ -15,6 +14,7 @@ class NewCustomAppBar extends StatefulWidget implements PreferredSizeWidget {
     this.actionIcon,
     this.useTitleText = false,
     this.titleText,
+    this.onLeadingOverride,
   }) : super(key: key);
 
   final bool showBackButton;
@@ -25,7 +25,7 @@ class NewCustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final Widget? actionIcon;
   final bool useTitleText;
   final String? titleText;
-
+  final VoidCallback? onLeadingOverride;
 
   @override
   State<NewCustomAppBar> createState() => _NewCustomAppBarState();
@@ -60,9 +60,8 @@ class _NewCustomAppBarState extends State<NewCustomAppBar> {
   }
 
   void _onLeadingPressed() {
-    if (_showClearIcon) {
-      widget.controller?.clear();
-      widget.focusNode?.unfocus();
+    if (widget.onLeadingOverride != null) {
+      widget.onLeadingOverride!();
     } else {
       Navigator.of(context).pop();
     }
@@ -78,10 +77,7 @@ class _NewCustomAppBarState extends State<NewCustomAppBar> {
       backgroundColor: Colors.white,
       leading: widget.showBackButton
           ? IconButton(
-              icon: Icon(
-                _showClearIcon ? Icons.close : Icons.arrow_back,
-                color: theme.iconTheme.color,
-              ),
+              icon: const Icon(Icons.arrow_back),
               onPressed: _onLeadingPressed,
             )
           : null,
@@ -100,24 +96,26 @@ class _NewCustomAppBarState extends State<NewCustomAppBar> {
                 ),
               ),
               const SizedBox(width: 2),
-              if (widget.useTitleText) Text(
-                widget.titleText ?? '',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
+              if (widget.useTitleText)
+                Text(
+                  widget.titleText ?? '',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                )
+              else
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.asset(
+                    'assets/images/inscription2.png',
+                    width: screenWidth * 0.22,
+                    height: screenWidth * 0.04,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-              ) else ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.asset(
-                  'assets/images/inscription2.png',
-                  width: screenWidth * 0.22,
-                  height: screenWidth * 0.04,
-                  fit: BoxFit.cover,
-                ),
-              ),
             ],
           ),
-
       actions: [
         if (widget.actionIcon != null)
           widget.actionIcon!
@@ -128,15 +126,9 @@ class _NewCustomAppBarState extends State<NewCustomAppBar> {
               size: 22,
               color: theme.iconTheme.color,
             ),
-            onPressed: () {
-
-            },
+            onPressed: () {},
           ),
-
       ],
-
-
-
       bottom: const PreferredSize(
         preferredSize: Size.fromHeight(1.0),
         child: Divider(height: 1, color: Colors.black),
