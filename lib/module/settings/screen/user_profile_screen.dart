@@ -10,7 +10,7 @@ import '../../home/my_home_page.dart';
 import '../../home/widget/appBar/new_custom_app_bar.dart';
 import '../bloc/account_bloc.dart';
 import '../widget/account.dart';
-import '../widget/max_items_dropdown.dart';
+import '../widget/max_items_picker_sheet.dart.dart';
 import '../widget/settings_list_widget.dart';
 import 'language_screen.dart';
 import 'them_screen.dart';
@@ -92,7 +92,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     return Scaffold(
       appBar: NewCustomAppBar(
         showSearchIcon: false,
-        showBackButton: true,
         useTitleText: true,
         titleText: 'Settings',
         onLeadingOverride: () {
@@ -142,24 +141,44 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 });
               }
             },
-          ),
-          ProfileListTile(
-            title: S.of(context).pushNotifications,
-            isDarkTheme: isDarkTheme,
-            onTap: () {},
+            trailing: Text(
+              _selectedLanguage == 'ru' ? 'Русский' : 'English',
+              style: TextStyle(
+                color: isDarkTheme ? Colors.white : Colors.black,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
           ),
           ProfileListTile(
             title: 'Number of items',
             isDarkTheme: isDarkTheme,
-            onTap: () {},
-            trailing: MaxItemsDropdown(
-              selectedValue: selectedValue,
-              isDarkTheme: isDarkTheme,
-              onChanged: (value) {
-                setState(() {
-                  selectedValue = value;
-                });
-              },
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.3,
+                ),
+                builder: (_) => MaxItemsPickerSheet(
+                  initialValue: selectedValue,
+                  onSelected: (value) {
+                    setState(() {
+                      selectedValue = value;
+                    });
+                  },
+                ),
+              );
+            },
+            trailing: Text(
+              selectedValue.toString(),
+              style: TextStyle(
+                color: isDarkTheme ? Colors.white : Colors.black,
+                fontWeight: FontWeight.w400,
+              ),
             ),
           ),
           ProfileListTile(
@@ -178,6 +197,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 _changeTheme(selectedTheme);
               }
             },
+            trailing: Text(
+              _selectedTheme == 'Dark' ? 'Dark' : 'Light',
+              style: TextStyle(
+                color: isDarkTheme ? Colors.white : Colors.black,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
           ),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 20),
