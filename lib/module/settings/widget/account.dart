@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,7 +7,6 @@ import '../../home/widget/appBar/new_custom_app_bar.dart';
 import '../../login/widget/text_filed.dart';
 import '../bloc/account_bloc.dart';
 import 'custom_bottom_navbar.dart';
-
 
 class Account extends StatefulWidget {
   const Account({super.key});
@@ -67,13 +65,17 @@ class _AccountState extends State<Account> {
             buttonText: 'SAVE',
             onPressed: () {
               context.read<AccountBloc>().add(
-                UpdateAccountData(
-                  name: nameController.text,
-                  email: emailController.text,
-                  phone: phoneController.text,
-                  password: passwordController.text,
-                ),
-              );
+                    UpdateAccountData(
+                      name: nameController.text,
+                      email: emailController.text,
+                      phone: phoneController.text,
+                      password: passwordController.text,
+                    ),
+                  );
+
+              Future.delayed(const Duration(milliseconds: 300), () {
+                Navigator.pop(context, true);
+              });
             },
           ),
           backgroundColor: isDarkTheme ? AppColors.blackSand : Colors.white,
@@ -92,13 +94,14 @@ class _AccountState extends State<Account> {
                           color: Colors.grey,
                           image: (state.avatarUrl.isNotEmpty)
                               ? DecorationImage(
-                            image: NetworkImage(state.avatarUrl),
-                            fit: BoxFit.cover,
-                          )
+                                  image: NetworkImage(state.avatarUrl),
+                                  fit: BoxFit.cover,
+                                )
                               : null,
                         ),
                         child: (state.avatarUrl.isEmpty)
-                            ? const Icon(Icons.person, size: 80, color: Colors.white)
+                            ? const Icon(Icons.person,
+                                size: 80, color: Colors.white)
                             : null,
                       ),
                       Positioned(
@@ -106,12 +109,12 @@ class _AccountState extends State<Account> {
                         bottom: 0,
                         child: GestureDetector(
                           onTap: () async {
-                            final pickedFile =
-                            await _picker.pickImage(source: ImageSource.gallery);
-                            if (pickedFile != null) {
-                            }
+                            final pickedFile = await _picker.pickImage(
+                                source: ImageSource.gallery);
+                            if (pickedFile != null) {}
                           },
-                          child: const Icon(Icons.edit, color: Colors.white, size: 20),
+                          child: const Icon(Icons.edit,
+                              color: Colors.white, size: 20),
                         ),
                       ),
                     ],

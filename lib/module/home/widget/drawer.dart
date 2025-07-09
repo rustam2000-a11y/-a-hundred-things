@@ -1,18 +1,20 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../presentation/colors.dart';
 import '../../login/screen/login_screen.dart';
+import '../../settings/bloc/account_bloc.dart';
 import '../../settings/screen/user_profile_screen.dart';
 import '../../things/new_things/favorite_screen.dart';
-import '../my_home_page.dart';
 import '../category/category_page.dart';
+import '../my_home_page.dart';
 import 'custom_divider.dart';
 import 'custom_list_tile.dart';
 
 class CustomDrawer extends StatefulWidget {
+  const CustomDrawer(
+      {super.key, required this.onToggleCategoryList, this.toggleTheme});
 
-  const CustomDrawer({super.key, required this.onToggleCategoryList, this.toggleTheme});
   final void Function(bool show) onToggleCategoryList;
   final VoidCallback? toggleTheme;
 
@@ -20,37 +22,15 @@ class CustomDrawer extends StatefulWidget {
   State<CustomDrawer> createState() => _CustomDrawerState();
 }
 
-
 class _CustomDrawerState extends State<CustomDrawer> {
-  String name = 'Загрузка...';
-  String email = 'Загрузка...';
-  String? avatarUrl;
-
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    context.read<AccountBloc>().add(LoadAccountData());
   }
-
-  Future<void> _loadUserData() async {
-    final userId = FirebaseAuth.instance.currentUser?.uid;
-    if (userId != null) {
-      final docSnapshot = await FirebaseFirestore.instance.collection('user').doc(userId).get();
-
-      if (docSnapshot.exists) {
-        final data = docSnapshot.data();
-        setState(() {
-          name = data?['name'] ?? "Неизвестное имя";
-          email = data?['email'] ?? "Нет email";
-          avatarUrl = data?['avatarUrl'];
-        });
-      }
-    }
-  }
-
 
   @override
-  Widget build(BuildContext context)  {
+  Widget build(BuildContext context) {
     return Drawer(
       backgroundColor: Colors.white,
       child: SafeArea(
@@ -67,7 +47,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         Navigator.pop(context);
                       },
                     ),
-
                     const SizedBox(width: 16),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
@@ -93,56 +72,73 @@ class _CustomDrawerState extends State<CustomDrawer> {
               ),
               const SizedBox(height: 16),
               const CustomDivider(),
-
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-
-                        image: avatarUrl != null
-                            ? DecorationImage(
-                          image: NetworkImage(avatarUrl!),
-                          fit: BoxFit.cover,
-                        )
-                            : null,
+              BlocBuilder<AccountBloc, AccountState>(
+                builder: (context, state) {
+                  if (state.isLoading) {
+                    return const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                  if (state.error != null) {
+                    return Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(
+                        'Loading error: ${state.error}',
+                        style: const TextStyle(color: Colors.red),
                       ),
-                      child: avatarUrl == null
-                          ? const Icon(Icons.person, color: Colors.white)
-                          : null,
-                    ),
-                    const SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    );
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
                       children: [
-                        Text(
-                          name,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade300,
+                            image: (state.avatarUrl.isNotEmpty)
+                                ? DecorationImage(
+                                    image: NetworkImage(state.avatarUrl),
+                                    fit: BoxFit.cover,
+                                  )
+                                : null,
                           ),
+                          child: (state.avatarUrl.isEmpty)
+                              ? const Icon(Icons.person, color: Colors.white)
+                              : null,
                         ),
-                        Text(
-                          email,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
+                        const SizedBox(width: 16),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              state.name.isNotEmpty ? state.name : 'No name',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              state.email.isNotEmpty
+                                  ? state.email
+                                  : 'No email',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
-
               const CustomDivider(),
               const SizedBox(height: 10),
-
-
               CustomListTile(
                 icon: Icons.home_filled,
                 text: 'Home',
@@ -151,16 +147,15 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute<void>(
-                      builder: (context) => MyHomePage(toggleTheme: widget.toggleTheme),
+                      builder: (context) =>
+                          MyHomePage(toggleTheme: widget.toggleTheme),
                     ),
                   );
                 },
               ),
-
-
               CustomListTile(
                 icon: Icons.folder_copy,
-                text: 'My categories ',
+                text: 'My categories',
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.pushReplacement(
@@ -171,26 +166,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   );
                 },
               ),
-              // CustomListTile(
-              //   icon: Icons.email,
-              //   text: 'Inbox',
-              //   onTap: () {
-              //     Navigator.pop(context);
-              //   },
-              // ),
-              // CustomListTile(
-              //   icon: Icons.send,
-              //   text: 'Outbox',
-              //   onTap: () {
-              //     Navigator.pop(context);
-              //   },
-              // ),
               CustomListTile(
                 icon: Icons.favorite,
                 text: 'Favorites',
                 onTap: () {
                   Navigator.pop(context);
-
                   Future.delayed(const Duration(milliseconds: 250), () {
                     Navigator.push(
                       context,
@@ -205,31 +185,19 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 icon: Icons.settings,
                 text: 'Settings',
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute<dynamic>(
-                      builder: (context) =>
-                          UserProfileScreen(toggleTheme: () {}),
-                    ),
-                  );
+                  Navigator.pop(context);
+                  Future.delayed(const Duration(milliseconds: 250), () {
+                    Navigator.pushReplacement<void, void>(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) => UserProfileScreen(
+                            toggleTheme: widget.toggleTheme ?? () {}),
+                      ),
+                    );
+                  });
                 },
               ),
-              // CustomListTile(
-              //   icon: Icons.qr_code_scanner,
-              //   text: 'Scan QR',
-              //   onTap: () {
-              //     Navigator.pop(context);
-              //   },
-              // ),
-
               const SizedBox(height: 80),
-              // CustomListTile(
-              //   imagePath: 'assets/images/material-symbols_help.png',
-              //   text: 'Help',
-              //   onTap: () {
-              //     Navigator.pop(context);
-              //   },
-              // ),
               CustomListTile(
                 imagePath: 'assets/images/bxs_exit.png',
                 text: 'Logout',
@@ -237,16 +205,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 onTap: () async {
                   try {
                     await FirebaseAuth.instance.signOut();
-                    await Navigator.push(
+                    await Navigator.pushReplacement(
                       context,
                       MaterialPageRoute<dynamic>(
-                        builder: (context) => LoginPage(
-                          toggleTheme: () {},
-                        ),
+                        builder: (context) => LoginPage(toggleTheme: () {}),
                       ),
                     );
                   } catch (e) {
-                    print('Error signing out: $e');
+                    debugPrint('Error signing out: $e');
                   }
                 },
               ),
