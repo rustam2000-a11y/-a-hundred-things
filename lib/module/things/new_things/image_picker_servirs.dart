@@ -7,10 +7,18 @@ import 'package:injectable/injectable.dart';
 @lazySingleton
 class ImagePickerService {
   final ImagePicker _picker = ImagePicker();
+
   Future<File?> pickAndCropImage(BuildContext context) async {
+    debugPrint('Picking image from gallery...');
+
     try {
-      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      final pickedFile = await _picker.pickImage(
+          source: ImageSource.gallery, requestFullMetadata: true);
       if (pickedFile == null) return null;
+
+      if (Platform.isIOS) {
+        await Future<void>.delayed(const Duration(milliseconds: 300));
+      }
 
       final cropperKey = GlobalKey(debugLabel: 'cropperKey');
       final File imageFile = File(pickedFile.path);
@@ -22,22 +30,27 @@ class ImagePickerService {
           return Dialog(
             child: Column(
               children: [
-                Expanded(child: Cropper(cropperKey: cropperKey, image: Image.file(imageFile))),
+                Expanded(
+                    child: Cropper(
+                        cropperKey: cropperKey, image: Image.file(imageFile))),
                 TextButton(
                   onPressed: () async {
-                    final imageBytes = await Cropper.crop(cropperKey: cropperKey);
+                    final imageBytes =
+                        await Cropper.crop(cropperKey: cropperKey);
                     if (imageBytes != null) {
                       final tempDir = Directory.systemTemp;
-                      final tempFile = File('${tempDir.path}/cropped_${DateTime.now().millisecondsSinceEpoch}.png');
+                      final tempFile = File(
+                          '${tempDir.path}/cropped_${DateTime.now().millisecondsSinceEpoch}.png');
                       await tempFile.writeAsBytes(imageBytes);
 
-
                       int retryCount = 0;
-                      while ((!tempFile.existsSync() || await tempFile.length() == 0) && retryCount < 5) {
-                        await Future<void>.delayed(const Duration(milliseconds: 200));
+                      while ((!tempFile.existsSync() ||
+                              await tempFile.length() == 0) &&
+                          retryCount < 5) {
+                        await Future<void>.delayed(
+                            const Duration(milliseconds: 200));
                         retryCount++;
                       }
-
 
                       resultFile = tempFile;
                     }
@@ -50,12 +63,10 @@ class ImagePickerService {
           );
         },
       );
-
       return resultFile;
     } catch (e) {
       debugPrint('Image cropping error: $e');
       return null;
     }
   }
-
 }
