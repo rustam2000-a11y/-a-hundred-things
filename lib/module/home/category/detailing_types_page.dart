@@ -6,7 +6,7 @@ import 'package:get_it/get_it.dart';
 import '../../../core/utils/presentation.utils.dart';
 import '../../../presentation/colors.dart';
 import '../../login/widget/custom_text.dart';
-import '../../settings/bloc/account_bloc.dart';
+import '../../settings/bloc/account_bloc/account_bloc.dart';
 import '../home_bloc.dart';
 import '../widget/appBar/new_custom_app_bar.dart';
 import '../widget/drawer.dart';

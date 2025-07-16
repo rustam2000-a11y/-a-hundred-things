@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../presentation/colors.dart';
 import '../../login/screen/login_screen.dart';
-import '../../settings/bloc/account_bloc.dart';
+import '../../settings/bloc/account_bloc/account_bloc.dart';
 import '../../settings/screen/user_profile_screen.dart';
 import '../../things/new_things/favorite_screen.dart';
 import '../category/category_page.dart';

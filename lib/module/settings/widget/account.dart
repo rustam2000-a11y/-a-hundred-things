@@ -5,7 +5,7 @@ import '../../../generated/l10n.dart';
 import '../../../presentation/colors.dart';
 import '../../home/widget/appBar/new_custom_app_bar.dart';
 import '../../login/widget/text_filed.dart';
-import '../bloc/account_bloc.dart';
+import '../bloc/account_bloc/account_bloc.dart';
 import 'custom_bottom_navbar.dart';
 
 class Account extends StatefulWidget {

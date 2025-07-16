@@ -9,7 +9,7 @@ import '../../home/home_bloc.dart';
 import '../../home/widget/appBar/new_custom_app_bar.dart';
 import '../../home/widget/drawer.dart';
 import '../../home/widget/list_of_things_widget.dart';
-import '../../settings/bloc/account_bloc.dart';
+import '../../settings/bloc/account_bloc/account_bloc.dart';
 
 class FavorieteScreen extends StatefulWidget {
   const FavorieteScreen({
