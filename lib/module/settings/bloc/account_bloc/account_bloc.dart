@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:injectable/injectable.dart';
-import '../../../repository/setting_repository.dart';
+import '../../../../repository/setting_repository.dart';
 part 'account_event.dart';
 part 'account_state.dart';
 
