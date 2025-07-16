@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../presentation/colors.dart';
+import '../../things/new_things/create_new_thing_screen.dart';
 
 abstract class CustomButton {
   String get text;
@@ -125,7 +126,7 @@ class CustomButtonRegist extends StatelessWidget {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius),
-          side: const BorderSide(color: Colors.black),
+          side: const BorderSide(),
         ),
       ),
     );
@@ -178,3 +179,50 @@ class CustomMainButton extends StatelessWidget {
     );
   }
 }
+
+
+
+class SquareAddButton extends StatelessWidget {
+  const SquareAddButton({
+    super.key,
+    required this.types,
+    required this.context,
+  });
+
+  final List<String> types;
+  final BuildContext context;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(4),
+        onTap: () {
+          Navigator.push<void>(
+            this.context,
+            MaterialPageRoute<void>(
+              builder: (_) => CreateNewThingScreen(
+                allTypes: types,
+                isReadOnly: true,
+              ),
+            ),
+          );
+        },
+        child: Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(),
+          ),
+          child: const Center(
+            child: Icon(Icons.add, color: Colors.black),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
