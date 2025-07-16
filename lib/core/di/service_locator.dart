@@ -7,7 +7,7 @@ import 'service_locator.config.dart';
 
 import 'package:one_hundred_things/repository/setting_repository.dart';
 import 'package:one_hundred_things/network/setting_data_api.dart';
-import 'package:one_hundred_things/module/settings/bloc/account_bloc.dart';
+import 'package:one_hundred_things/module/settings/bloc/account_bloc/account_bloc.dart';
 
 final sl = GetIt.instance;
 

@@ -13,7 +13,8 @@ import 'package:injectable/injectable.dart' as _i526;
 
 import '../../module/home/home_bloc.dart' as _i17;
 import '../../module/login/bloc/registration_bloc.dart' as _i501;
-import '../../module/settings/bloc/account_bloc.dart' as _i952;
+import '../../module/settings/bloc/account_bloc/account_bloc.dart' as _i424;
+import '../../module/settings/bloc/max_items_bloc/max_items_bloc.dart' as _i191;
 import '../../module/things/new_things/create_new_thing_bloc.dart' as _i1045;
 import '../../module/things/new_things/image_picker_servirs.dart' as _i53;
 import '../../module/things/new_things/image_upload_service.dart' as _i885;
@@ -37,6 +38,7 @@ _i174.GetIt $initGetIt(
     environment,
     environmentFilter,
   );
+  gh.factory<_i191.MaxItemsBloc>(() => _i191.MaxItemsBloc());
   gh.lazySingleton<_i53.ImagePickerService>(() => _i53.ImagePickerService());
   gh.lazySingleton<_i885.ImageUploadService>(
       () => _i885.FirebaseImageUploadService());
@@ -59,8 +61,8 @@ _i174.GetIt $initGetIt(
       () => _i242.AuthRepository(gh<_i380.AuthDataApiI>()));
   gh.lazySingleton<_i169.SettingRepositoryI>(
       () => _i169.SettingRepository(gh<_i93.SettingDataApiI>()));
-  gh.factory<_i952.AccountBloc>(
-      () => _i952.AccountBloc(gh<_i169.SettingRepositoryI>()));
+  gh.factory<_i424.AccountBloc>(
+      () => _i424.AccountBloc(gh<_i169.SettingRepositoryI>()));
   gh.factory<_i501.RegistrationBloc>(
       () => _i501.RegistrationBloc(gh<_i242.AuthRepositoryI>()));
   return getIt;
