@@ -9,10 +9,12 @@ class NavigationBarWidget extends StatelessWidget {
     Key? key,
     required this.isDarkMode,
     required this.types,
+    this.hide = false,
   }) : super(key: key);
 
   final bool isDarkMode;
   final List<String> types;
+  final bool hide;
 
   Stream<int> _maxItemsStream() {
     final userId = FirebaseAuth.instance.currentUser?.uid;
@@ -27,6 +29,8 @@ class NavigationBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (hide) return const SizedBox.shrink();
+
     return StreamBuilder<int>(
       stream: _maxItemsStream(),
       builder: (context, maxItemsSnapshot) {
@@ -36,7 +40,7 @@ class NavigationBarWidget extends StatelessWidget {
           stream: FirebaseFirestore.instance
               .collection('item')
               .where('userId',
-                  isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+              isEqualTo: FirebaseAuth.instance.currentUser?.uid)
               .snapshots(),
           builder: (context, snapshot) {
             int totalQuantity = 0;
@@ -49,7 +53,7 @@ class NavigationBarWidget extends StatelessWidget {
 
               totalQuantity = docsWithTitle.fold<int>(
                 0,
-                (accumulator, doc) {
+                    (accumulator, doc) {
                   final quantity = doc['quantity'] as int? ?? 1;
                   return accumulator + quantity;
                 },
@@ -72,32 +76,6 @@ class NavigationBarWidget extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push<void>(
-                            context,
-                            MaterialPageRoute<void>(
-                              builder: (context) => CreateNewThingScreen(
-                                allTypes: types, isReadOnly: true,
-                              ),
-                            ),
-                          );
-                        },
-                        child: const Row(
-                          children: [
-                            Icon(Icons.add, size: 24, color: Colors.black),
-                            SizedBox(width: 4),
-                            Text(
-                              'ADD THINGS',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                       Text(
                         '$totalQuantity / $maxItems',
                         style: const TextStyle(
@@ -119,3 +97,4 @@ class NavigationBarWidget extends StatelessWidget {
     );
   }
 }
+

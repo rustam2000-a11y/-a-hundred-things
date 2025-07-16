@@ -8,7 +8,8 @@ import '../../../app/app.dart';
 import '../../../generated/l10n.dart';
 import '../../home/my_home_page.dart';
 import '../../home/widget/appBar/new_custom_app_bar.dart';
-import '../bloc/account_bloc.dart';
+import '../bloc/account_bloc/account_bloc.dart';
+import '../bloc/max_items_bloc/max_items_bloc.dart';
 import '../widget/account.dart';
 import '../widget/max_items_picker_sheet.dart.dart';
 import '../widget/settings_list_widget.dart';
@@ -28,7 +29,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   String _selectedTheme = 'Light';
   String _selectedLanguage = 'en';
   int selectedValue = 100;
-
+  bool _hideNavigationBar = false;
   @override
   void initState() {
     super.initState();
@@ -98,11 +99,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute<void>(
-              builder: (_) => MyHomePage(toggleTheme: widget.toggleTheme),
+              builder: (_) => MyHomePage(
+                toggleTheme: widget.toggleTheme,
+                hideNavigationBar: _hideNavigationBar,
+              ),
             ),
-            (Route<dynamic> route) => false,
+                (Route<dynamic> route) => false,
           );
         },
+
       ),
       body: Column(
         children: [
@@ -163,16 +168,24 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 constraints: BoxConstraints(
                   maxHeight: MediaQuery.of(context).size.height * 0.3,
                 ),
-                builder: (_) => MaxItemsPickerSheet(
-                  initialValue: selectedValue,
-                  onSelected: (value) {
-                    setState(() {
-                      selectedValue = value;
-                    });
-                  },
+                builder: (_) => BlocProvider(
+                  create: (_) => MaxItemsBloc()..add(MaxItemsInitEvent(initialValue: selectedValue)),
+                  child: MaxItemsPickerSheet(
+                    onSelected: (value) {
+
+                      setState(() => selectedValue = value);
+                    },
+                    onHideNavChanged: (value) {
+                      setState(() => _hideNavigationBar = value);
+                    },
+                    onValueChanged: (value) {
+                      setState(() => selectedValue = value);
+                    },
+                  ),
                 ),
               );
             },
+
             trailing: Text(
               selectedValue.toString(),
               style: TextStyle(

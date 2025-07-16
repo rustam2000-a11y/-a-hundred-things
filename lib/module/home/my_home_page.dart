@@ -3,9 +3,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/utils/presentation.utils.dart';
+import '../login/widget/button_basic.dart';
 import '../login/widget/custom_text.dart';
-import '../settings/bloc/account_bloc.dart';
+import '../settings/bloc/account_bloc/account_bloc.dart';
 import 'category/category_card_widget.dart';
 import 'container_with_filters.dart';
 import 'home_bloc.dart';
@@ -20,10 +22,10 @@ import 'widget/type_widget/type_add_screen.dart';
 export 'my_home_page.dart';
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.toggleTheme});
+  const MyHomePage({super.key, required this.toggleTheme,this.hideNavigationBar = false,});
 
   final VoidCallback? toggleTheme;
-
+  final bool hideNavigationBar;
   @override
   MyHomePageState createState() => MyHomePageState();
 }
@@ -42,12 +44,18 @@ class MyHomePageState extends State<MyHomePage> {
   final ScrollController _scrollController = ScrollController();
   bool _showSearchField = true;
   double _lastOffset = 0;
+  late bool _hideNavigationBar;
+  bool _isLoading = true;
+
 
   @override
   void initState() {
     super.initState();
     _bloc = GetIt.I<HomeBloc>();
     _bloc.add(const HomeInitEvent());
+
+    _hideNavigationBar = false;
+    _loadIsSpecialFromPrefs();
 
     _searchController.addListener(() {
       setState(() {});
@@ -72,6 +80,15 @@ class MyHomePageState extends State<MyHomePage> {
       _lastOffset = offset;
     });
   }
+  Future<void> _loadIsSpecialFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isSpecial = prefs.getBool('isSpecial') ?? false;
+
+    setState(() {
+      _hideNavigationBar = isSpecial;
+      _isLoading = false;
+    });
+  }
 
 
   @override
@@ -92,7 +109,11 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
+    if (_isLoading) {
+      return const Scaffold(
+        body: SizedBox(),
+      );
+    }
     return MultiBlocProvider(
       providers: [
         BlocProvider<HomeBloc>(
@@ -333,14 +354,29 @@ class MyHomePageState extends State<MyHomePage> {
                   ],
                 ),
                 Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: NavigationBarWidget(
-                    isDarkMode: isDarkMode,
+                  right: 16,
+                  bottom: _hideNavigationBar ? 40 : 110,
+                  child:SquareAddButton(
                     types: state.typesWithColors.keys.toList(),
+                    context: context,
                   ),
+
+
                 ),
+
+
+                Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: NavigationBarWidget(
+                      isDarkMode: isDarkMode,
+                      types: state.typesWithColors.keys.toList(),
+                      hide: _hideNavigationBar,
+                    ),
+                  ),
+
+
                 Stack(
                   children: [
                     if (_showFilters)
