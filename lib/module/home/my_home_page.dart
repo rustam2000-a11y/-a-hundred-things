@@ -1,16 +1,19 @@
 import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../core/utils/presentation.utils.dart';
 import '../login/widget/button_basic.dart';
 import '../login/widget/custom_text.dart';
 import '../settings/bloc/account_bloc/account_bloc.dart';
+import 'bloc/home_bloc/home_bloc.dart';
+import 'bloc/progress_bar_bloc/progress_bar_bloc.dart';
 import 'category/category_card_widget.dart';
 import 'container_with_filters.dart';
-import 'home_bloc.dart';
 import 'widget/appBar/new_custom_app_bar.dart';
 import 'widget/drawer.dart';
 import 'widget/list_of_things_widget.dart';
@@ -22,10 +25,15 @@ import 'widget/type_widget/type_add_screen.dart';
 export 'my_home_page.dart';
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.toggleTheme,this.hideNavigationBar = false,});
+  const MyHomePage({
+    super.key,
+    required this.toggleTheme,
+    this.hideNavigationBar = false,
+  });
 
   final VoidCallback? toggleTheme;
   final bool hideNavigationBar;
+
   @override
   MyHomePageState createState() => MyHomePageState();
 }
@@ -46,7 +54,6 @@ class MyHomePageState extends State<MyHomePage> {
   double _lastOffset = 0;
   late bool _hideNavigationBar;
   bool _isLoading = true;
-
 
   @override
   void initState() {
@@ -80,6 +87,7 @@ class MyHomePageState extends State<MyHomePage> {
       _lastOffset = offset;
     });
   }
+
   Future<void> _loadIsSpecialFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     final isSpecial = prefs.getBool('isSpecial') ?? false;
@@ -90,7 +98,6 @@ class MyHomePageState extends State<MyHomePage> {
     });
   }
 
-
   @override
   void dispose() {
     _scrollController.dispose();
@@ -98,7 +105,6 @@ class MyHomePageState extends State<MyHomePage> {
     _searchFocusNode.dispose();
     super.dispose();
   }
-
 
   void _toggleCategoryList(bool show) {
     setState(() {
@@ -121,6 +127,9 @@ class MyHomePageState extends State<MyHomePage> {
         ),
         BlocProvider<AccountBloc>(
           create: (_) => GetIt.I<AccountBloc>(),
+        ),
+        BlocProvider<ProgressBarBloc>(
+          create: (_) => GetIt.I<ProgressBarBloc>()..add(LoadProgressBar()),
         ),
       ],
       child: BlocBuilder<HomeBloc, HomeState>(
@@ -145,7 +154,8 @@ class MyHomePageState extends State<MyHomePage> {
                       duration: const Duration(milliseconds: 300),
                       switchInCurve: Curves.easeOut,
                       switchOutCurve: Curves.easeIn,
-                      transitionBuilder: (Widget child, Animation<double> animation) {
+                      transitionBuilder:
+                          (Widget child, Animation<double> animation) {
                         return SizeTransition(
                           sizeFactor: animation,
                           axisAlignment: -1.0,
@@ -157,19 +167,15 @@ class MyHomePageState extends State<MyHomePage> {
                       },
                       child: _showSearchField
                           ? SearchTextFieldWidget(
-                        key: const ValueKey('search_field_visible'),
-                        controller: _searchController,
-                        focusNode: _searchFocusNode,
-                        isDarkMode: isDarkMode,
-                      )
+                              key: const ValueKey('search_field_visible'),
+                              controller: _searchController,
+                              focusNode: _searchFocusNode,
+                              isDarkMode: isDarkMode,
+                            )
                           : const SizedBox(
-                        key: ValueKey('search_field_hidden'),
-                      ),
+                              key: ValueKey('search_field_hidden'),
+                            ),
                     ),
-
-
-
-
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: Row(
@@ -325,58 +331,60 @@ class MyHomePageState extends State<MyHomePage> {
                     Expanded(
                       child: Builder(
                         builder: (context) {
-                          final searchQuery = _searchController.text.toLowerCase().trim();
+                          final searchQuery =
+                              _searchController.text.toLowerCase().trim();
                           final filteredThings = state.things
                               .where((thing) =>
-                          thing.title.trim().isNotEmpty &&
-                              thing.title.toLowerCase().contains(searchQuery))
+                                  thing.title.trim().isNotEmpty &&
+                                  thing.title
+                                      .toLowerCase()
+                                      .contains(searchQuery))
                               .toList();
 
                           return _isListMode
                               ? ThingsTypeListWidget(
-                            controller: _scrollController,
-                            things: filteredThings,
-                            selectedCategoryType: _selectedCategoryType,
-                            selectedItemsNotifier: selectedItemsNotifier,
-                            onStateUpdate: () => setState(() {}),
-                            onDeleteItem: (uid) =>
-                                _bloc.add(DeleteItemByUidEvent(uid: uid)),
-                          )
+                                  controller: _scrollController,
+                                  things: filteredThings,
+                                  selectedCategoryType: _selectedCategoryType,
+                                  selectedItemsNotifier: selectedItemsNotifier,
+                                  onStateUpdate: () => setState(() {}),
+                                  onDeleteItem: (uid) =>
+                                      _bloc.add(DeleteItemByUidEvent(uid: uid)),
+                                )
                               : NewListOfTitles(
-                            controller: _scrollController,
-                            things: filteredThings,
-                            allTypes: state.typesWithColors.keys.toList(),
-                          );
+                                  controller: _scrollController,
+                                  things: filteredThings,
+                                  allTypes: state.typesWithColors.keys.toList(),
+                                );
                         },
                       ),
                     ),
-
                   ],
                 ),
                 Positioned(
                   right: 16,
                   bottom: _hideNavigationBar ? 40 : 110,
-                  child:SquareAddButton(
+                  child: SquareAddButton(
                     types: state.typesWithColors.keys.toList(),
                     context: context,
                   ),
-
-
                 ),
-
-
                 Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: NavigationBarWidget(
-                      isDarkMode: isDarkMode,
-                      types: state.typesWithColors.keys.toList(),
-                      hide: _hideNavigationBar,
-                    ),
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: BlocBuilder<ProgressBarBloc, ProgressBarState>(
+                    builder: (context, progressState) {
+                      return NavigationBarWidget(
+                        isDarkMode: isDarkMode,
+                        types: state.typesWithColors.keys.toList(),
+                        hide: _hideNavigationBar,
+                        maxItems: progressState.maxItems,
+                        totalQuantity: progressState.totalQuantity,
+                      );
+                    },
                   ),
-
-
+                ),
                 Stack(
                   children: [
                     if (_showFilters)
