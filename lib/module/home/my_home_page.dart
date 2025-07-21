@@ -70,22 +70,28 @@ class MyHomePageState extends State<MyHomePage> {
 
     _scrollController.addListener(() {
       final offset = _scrollController.offset;
+
       if (offset > _lastOffset && offset - _lastOffset > 5) {
         if (_showSearchField) {
-          setState(() {
-            _showSearchField = false;
-          });
+          _searchFocusNode.unfocus();
+          setState(() => _showSearchField = false);
         }
       } else if (offset < _lastOffset && _lastOffset - offset > 5) {
         if (!_showSearchField) {
-          setState(() {
-            _showSearchField = true;
-          });
+          setState(() => _showSearchField = true);
         }
       }
 
       _lastOffset = offset;
     });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _searchFocusNode.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadIsSpecialFromPrefs() async {
@@ -96,14 +102,6 @@ class MyHomePageState extends State<MyHomePage> {
       _hideNavigationBar = isSpecial;
       _isLoading = false;
     });
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    _searchController.dispose();
-    _searchFocusNode.dispose();
-    super.dispose();
   }
 
   void _toggleCategoryList(bool show) {
