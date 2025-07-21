@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import '../../../model/things_model.dart';
 import '../../../presentation/colors.dart';
-import '../../home/home_bloc.dart';
+import '../../home/bloc/home_bloc/home_bloc.dart';
 import '../../home/widget/appBar/new_custom_app_bar.dart';
 import '../../home/widget/drawer.dart';
 import '../../home/widget/list_of_things_widget.dart';

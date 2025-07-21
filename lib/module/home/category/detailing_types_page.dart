@@ -7,11 +7,10 @@ import '../../../core/utils/presentation.utils.dart';
 import '../../../presentation/colors.dart';
 import '../../login/widget/custom_text.dart';
 import '../../settings/bloc/account_bloc/account_bloc.dart';
-import '../home_bloc.dart';
+import '../bloc/home_bloc/home_bloc.dart';
 import '../widget/appBar/new_custom_app_bar.dart';
 import '../widget/drawer.dart';
 import '../widget/list_of_things_widget.dart';
-import '../widget/navigation_bar_widget.dart';
 import '../widget/type_widget/type_add_screen.dart';
 import 'category_card_widget.dart';
 import 'new_list_of_types_widget.dart';
@@ -35,7 +34,6 @@ class DetailingTypesPageState extends State<DetailingTypesPage> {
 
   bool _isListMode = true;
   bool _showCategoryList = false;
-  bool _showFilters = false;
 
   @override
   void initState() {
@@ -218,10 +216,6 @@ class DetailingTypesPageState extends State<DetailingTypesPage> {
                             ),
                             ...state.typesWithColors.entries.map((entry) {
                               final type = entry.key;
-                              final color = entry.value.isEmpty
-                                  ? PresentationUtils.getRandomColor()
-                                  : entry.value;
-
                               return CategoryCardWidget(
                                 selectedCategoryType: _selectedCategoryType,
                                 onChangeCategory: (String? category) {
@@ -285,15 +279,6 @@ class DetailingTypesPageState extends State<DetailingTypesPage> {
                             ),
                     ),
                   ],
-                ),
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: NavigationBarWidget(
-                    isDarkMode: isDarkMode,
-                    types: state.typesWithColors.keys.toList(),
-                  ),
                 ),
               ],
             ),
