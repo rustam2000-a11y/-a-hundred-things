@@ -5,8 +5,8 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:injectable/injectable.dart';
 
-import '../../model/things_model.dart';
-import '../../repository/things_repository.dart';
+import '../../../../model/things_model.dart';
+import '../../../../repository/things_repository.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
