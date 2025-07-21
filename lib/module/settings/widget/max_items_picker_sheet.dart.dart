@@ -14,6 +14,7 @@ class MaxItemsPickerSheet extends StatefulWidget {
   final ValueChanged<int> onSelected;
   final ValueChanged<bool> onHideNavChanged;
   final ValueChanged<int> onValueChanged;
+
   @override
   State<MaxItemsPickerSheet> createState() => _MaxItemsPickerSheetState();
 }
@@ -27,7 +28,6 @@ class _MaxItemsPickerSheetState extends State<MaxItemsPickerSheet> {
 
     final bloc = context.read<MaxItemsBloc>();
     _controller = TextEditingController();
-
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final state = bloc.state;
@@ -56,13 +56,14 @@ class _MaxItemsPickerSheetState extends State<MaxItemsPickerSheet> {
           _controller.text = state.maxItems.toString();
         }
       },
-      child:BlocBuilder<MaxItemsBloc, MaxItemsState>(
+      child: BlocBuilder<MaxItemsBloc, MaxItemsState>(
         buildWhen: (previous, current) =>
-        previous.maxItems != current.maxItems ||
+            previous.maxItems != current.maxItems ||
             previous.errorText != current.errorText,
         builder: (context, state) {
           return Padding(
-            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -74,7 +75,9 @@ class _MaxItemsPickerSheetState extends State<MaxItemsPickerSheet> {
                     keyboardType: TextInputType.number,
                     onChanged: (value) {
                       final parsed = int.tryParse(value.trim()) ?? 0;
-                      context.read<MaxItemsBloc>().add(MaxItemsChangedEvent(parsed));
+                      context
+                          .read<MaxItemsBloc>()
+                          .add(MaxItemsChangedEvent(parsed));
                     },
                     decoration: InputDecoration(
                       errorText: state.errorText,
@@ -82,33 +85,35 @@ class _MaxItemsPickerSheetState extends State<MaxItemsPickerSheet> {
                     ),
                   ),
                 ),
-
-
                 BlocBuilder<MaxItemsBloc, MaxItemsState>(
                   buildWhen: (previous, current) =>
-                  previous.isSpecial != current.isSpecial,
+                      previous.isSpecial != current.isSpecial,
                   builder: (context, state) {
                     return CheckboxListTile(
                       title: const Text('hide item count indicator'),
                       value: state.isSpecial,
                       onChanged: (bool? value) {
                         context.read<MaxItemsBloc>().add(
-                          MaxItemsSpecialChangedEvent(value ?? false),
-                        );
+                              MaxItemsSpecialChangedEvent(value ?? false),
+                            );
                       },
                       controlAffinity: ListTileControlAffinity.leading,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 24),
                     );
                   },
                 ),
-
                 const SizedBox(height: 10),
                 SizedBox(
                   width: 150,
                   child: CustomMainButton(
                     text: 'Select',
                     onPressed: () {
-                      context.read<MaxItemsBloc>().add(const MaxItemsSubmittedEvent());
+                      context
+                          .read<MaxItemsBloc>()
+                          .add(const MaxItemsSubmittedEvent());
+
+                      Navigator.of(context).pop();
                     },
                   ),
                 ),
@@ -121,4 +126,3 @@ class _MaxItemsPickerSheetState extends State<MaxItemsPickerSheet> {
     );
   }
 }
-
