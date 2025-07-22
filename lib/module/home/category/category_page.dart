@@ -87,73 +87,9 @@ class CategoriePageState extends State<CategoriePage> {
                       height: 1,
                       color: Colors.black,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        //
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.import_export, size: 24),
-                              SizedBox(width: 4),
-                              CustomText5(
-                                text: 'FILTER',
-                                fontSize: 20,
-                              ),
-                            ],
-                          ),
-                          Container(
-                            width: 74,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _isListMode = true;
-                                    });
-                                  },
-                                  child: Icon(
-                                    Icons.view_list,
-                                    size: 18,
-                                    color: _isListMode
-                                        ? Colors.black
-                                        : Colors.black26,
-                                  ),
-                                ),
-                                Container(
-                                  width: 1,
-                                  height: 20,
-                                  color: Colors.black26,
-                                  margin:
-                                      const EdgeInsets.symmetric(horizontal: 8),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _isListMode = false;
-                                    });
-                                  },
-                                  child: Icon(
-                                    Icons.view_list_outlined,
-                                    size: 18,
-                                    color: !_isListMode
-                                        ? Colors.black
-                                        : Colors.black26,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                    const Padding(
+                      padding: EdgeInsets.all(16),
+
                     ),
                     SizedBox(
                       height: 50,
