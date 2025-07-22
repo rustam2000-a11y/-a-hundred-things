@@ -9,6 +9,7 @@ import '../../../../model/things_model.dart';
 import '../../../../repository/things_repository.dart';
 
 part 'home_event.dart';
+
 part 'home_state.dart';
 
 @Injectable()
@@ -49,12 +50,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     thingsSub = _thingsRepository.fetchMyThings().listen((list) {
       add(HomeThingsEvent(things: List.from(list)));
 
-      final typesWithColors = list.fold<Map<String, String>>({}, (map, item) {
-        final type = item.type;
+      final typesWithColors = <String, String>{};
+
+      for (final item in list) {
         final color = item.color;
-        map[type] = color;
-        return map;
-      });
+        for (final type in item.type) {
+          typesWithColors[type] = color;
+        }
+      }
 
       add(HomeTypeThingsEvent(typesWithColors: typesWithColors));
     });
@@ -75,10 +78,17 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
         if (fieldValue == null) return false;
 
-        final normalizedFieldValue = fieldValue.toString().trim().toLowerCase();
         final normalizedTargetValue = value.trim().toLowerCase();
 
-        return normalizedFieldValue == normalizedTargetValue;
+        if (field == 'type' && fieldValue is List) {
+          return fieldValue
+              .map((t) => t.toString().trim().toLowerCase())
+              .contains(normalizedTargetValue);
+        } else {
+          final normalizedFieldValue =
+              fieldValue.toString().trim().toLowerCase();
+          return normalizedFieldValue == normalizedTargetValue;
+        }
       }).toList();
 
       add(HomeThingsEvent(things: filteredList));
@@ -100,14 +110,15 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     add(HomeThingsEvent(things: updatedList));
 
-    final typesWithColors = updatedList.fold<Map<String, String>>({}, (map, item) {
-      map[item.type] = item.color;
-      return map;
-    });
+    final typesWithColors = <String, String>{};
+    for (final item in updatedList) {
+      for (final type in item.type) {
+        typesWithColors[type] = item.color;
+      }
+    }
 
     add(HomeTypeThingsEvent(typesWithColors: typesWithColors));
   }
-
 
   @override
   Future<void> close() {

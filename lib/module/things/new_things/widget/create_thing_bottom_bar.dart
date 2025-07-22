@@ -10,7 +10,7 @@ class CreateThingBottomBar extends StatelessWidget {
     required this.screenHeight,
     required this.isDarkMode,
     required this.isFormValid,
-    required this.selectedType,
+    required this.selectedTypes,
     required this.titleController,
     required this.descriptionController,
     required this.quantityController,
@@ -25,7 +25,7 @@ class CreateThingBottomBar extends StatelessWidget {
   final double screenHeight;
   final bool isDarkMode;
   final bool isFormValid;
-  final String? selectedType;
+  final List<String> selectedTypes;
   final TextEditingController titleController;
   final TextEditingController descriptionController;
   final TextEditingController quantityController;
@@ -55,16 +55,17 @@ class CreateThingBottomBar extends StatelessWidget {
                 text: 'SAVE',
                 textColor: Colors.white,
                 backgroundColor: Colors.black,
-                isEnabled: isFormValid && selectedType != null,
+                isEnabled: isFormValid && selectedTypes.isNotEmpty,
                 onPressed: () {
                   final model = ThingsModel(
                     id: existingDocId ?? '',
                     title: titleController.text.trim(),
                     description: descriptionController.text.trim(),
-                    type: selectedType ?? '',
+                    type: selectedTypes,
                     typDescription: '',
                     color: '',
-                    imageUrl: stateFile != null ? [] : stateThing?.imageUrl ?? [],
+                    imageUrl:
+                        stateFile != null ? [] : stateThing?.imageUrl ?? [],
                     quantity: int.tryParse(quantityController.text.trim()) ?? 1,
                     importance: selectedImportance,
                     favorites: isFavorite,

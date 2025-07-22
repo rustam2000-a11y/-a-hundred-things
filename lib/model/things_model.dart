@@ -22,12 +22,15 @@ class ThingsModel extends Equatable {
       id: json['id'] as String? ?? '',
       title: json['title'] as String? ?? '',
       description: json['description'] as String? ?? '',
-      type: json['type'] as String? ?? '',
+      type: json['type'] is List
+          ? List<String>.from(json['type'])
+          : [json['type']?.toString() ?? ''],
+
       typDescription: json['typDescription'] as String? ?? '',
       color: json['color'] as String? ?? '',
       imageUrl: (json['imageUrls'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
+          ?.map((e) => e as String)
+          .toList() ??
           [],
       quantity: json['quantity'] as int? ?? 0,
       importance: json['importance'] as String? ?? 'Medium',
@@ -42,7 +45,7 @@ class ThingsModel extends Equatable {
   final String id;
   final String title;
   final String description;
-  final String type;
+  final List<String> type;
   final String typDescription;
   final String color;
   final List<String>? imageUrl;
@@ -54,32 +57,28 @@ class ThingsModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        description,
-        type,
-        typDescription,
-        color,
-        timestamp,
-        imageUrl,
-        quantity,
-        importance,
-      ];
+    id,
+    title,
+    description,
+    type,
+    typDescription,
+    color,
+    timestamp,
+    imageUrl,
+    quantity,
+    importance,
+  ];
 
   ThingsModel copyWith({
     String? id,
     String? title,
     String? description,
-    String? type,
+    List<String>? type,
     String? typDescription,
     String? color,
-    String? colorText,
     List<String>? imageUrl,
     int? quantity,
-    double? price,
-    String? location,
     String? importance,
-    double? weight,
     bool? favorites,
     String? userId,
   }) {

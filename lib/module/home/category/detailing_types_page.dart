@@ -34,6 +34,7 @@ class DetailingTypesPageState extends State<DetailingTypesPage> {
 
   bool _isListMode = true;
   bool _showCategoryList = false;
+  bool _showFilters = false;
 
   @override
   void initState() {
@@ -72,12 +73,17 @@ class DetailingTypesPageState extends State<DetailingTypesPage> {
       child: BlocBuilder<HomeBloc, HomeState>(
         bloc: _bloc,
         builder: (context, state) {
-          final filteredThings = state.things
-              .where((e) =>
-                  e.title.trim().isNotEmpty &&
-                  (_selectedCategoryType == null ||
-                      e.type == _selectedCategoryType))
-              .toList();
+          final selected = _selectedCategoryType?.trim().toLowerCase();
+
+          final selectedType = _selectedCategoryType?.trim().toLowerCase();
+
+          final filteredThings = state.things.where((e) {
+            final normalizedTypes =
+                e.type.map((t) => t.trim().toLowerCase()).toList();
+            final matches =
+                selectedType == null || normalizedTypes.contains(selectedType);
+            return e.title.trim().isNotEmpty && matches;
+          }).toList();
 
           return Scaffold(
             drawer: CustomDrawer(
@@ -216,6 +222,10 @@ class DetailingTypesPageState extends State<DetailingTypesPage> {
                             ),
                             ...state.typesWithColors.entries.map((entry) {
                               final type = entry.key;
+                              final color = entry.value.isEmpty
+                                  ? PresentationUtils.getRandomColor()
+                                  : entry.value;
+
                               return CategoryCardWidget(
                                 selectedCategoryType: _selectedCategoryType,
                                 onChangeCategory: (String? category) {

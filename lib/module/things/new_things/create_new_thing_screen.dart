@@ -34,7 +34,7 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
   bool _isFavorite = false;
   bool _isExpanded = false;
   String? _existingDocId;
-  String? _selectedType;
+  final Set<String> _selectedTypes = {};
   String _selectedImportance = 'Medium';
 
   bool get isFormValid =>
@@ -66,8 +66,9 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
           _titleController.text = thing.title;
           _descriptionController.text = thing.description;
           _quantityController.text = thing.quantity.toString();
-          _selectedType = thing.type;
-          _selectedImportance = thing.importance;
+          _selectedTypes
+            ..clear()
+            ..addAll(thing.type);
         }
       },
       builder: (context, state) {
@@ -91,7 +92,7 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                   )
                 : null,
             logo: WidgetDrawerContainer(
-              typ: _selectedType,
+              types: _selectedTypes.toList(),
               onTap: () => _showTypeSelector(context),
             ),
           ),
@@ -139,7 +140,7 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                   screenHeight: MediaQuery.of(context).size.height,
                   isDarkMode: Theme.of(context).brightness == Brightness.dark,
                   isFormValid: isFormValid,
-                  selectedType: _selectedType,
+                  selectedTypes: _selectedTypes.toList(),
                   titleController: _titleController,
                   descriptionController: _descriptionController,
                   quantityController: _quantityController,
@@ -165,7 +166,7 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
     ).then((selected) {
       if (selected != null) {
         setState(() {
-          _selectedType = selected;
+          _selectedTypes.add(selected);
         });
       }
     });

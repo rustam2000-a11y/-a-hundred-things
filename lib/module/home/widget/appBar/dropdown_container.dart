@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 
 class WidgetDrawerContainer extends StatelessWidget {
-  const WidgetDrawerContainer({super.key, required this.onTap, this.typ});
-  final String? typ;
+  const WidgetDrawerContainer({
+    super.key,
+    required this.onTap,
+    this.types,
+  });
+
+  final List<String>? types;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final typesText =
+        (types == null || types!.isEmpty) ? 'Categories' : types!.join(', ');
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -15,9 +23,12 @@ class WidgetDrawerContainer extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              typ ?? 'Categories',
-              style: const TextStyle(fontSize: 24),
+            Flexible(
+              child: Text(
+                typesText,
+                style: const TextStyle(fontSize: 24),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
             const SizedBox(width: 6),
             const Icon(Icons.keyboard_arrow_down),
@@ -27,4 +38,3 @@ class WidgetDrawerContainer extends StatelessWidget {
     );
   }
 }
-

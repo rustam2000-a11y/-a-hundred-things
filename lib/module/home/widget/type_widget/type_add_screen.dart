@@ -290,7 +290,7 @@ class _AddItemPageState extends State<AddTypePage> {
                               'title': _titleController.text.trim(),
                               'typDescription':
                                   _descriptionController.text.trim(),
-                              'type': type,
+                              'type': [type],
                               'userId': FirebaseAuth.instance.currentUser?.uid,
                               'color': randomColor,
                               'typeColor': randomColor,
