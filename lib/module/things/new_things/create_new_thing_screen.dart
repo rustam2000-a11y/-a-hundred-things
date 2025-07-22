@@ -69,6 +69,7 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
           _selectedTypes
             ..clear()
             ..addAll(thing.type);
+          _selectedImportance = thing.importance;
         }
       },
       builder: (context, state) {
