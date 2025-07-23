@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import '../../../core/utils/internet_banner_overlay.dart';
 import '../../home/widget/appBar/dropdown_container.dart';
 import '../../home/widget/appBar/new_custom_app_bar.dart';
 import '../../home/widget/type_dropdown_list.dart';
@@ -101,6 +102,7 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
             child: Stack(
               clipBehavior: Clip.none,
               children: [
+                const InternetBannerOverlay(),
                 GestureDetector(
                   onTap: () {
                     _bloc.add(ChangeImageEvent(context, (detectedTitle) {

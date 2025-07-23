@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../core/utils/internet_banner_overlay.dart';
 import '../../../generated/l10n.dart';
 import '../../../presentation/colors.dart';
 import '../../home/widget/appBar/new_custom_app_bar.dart';
@@ -87,6 +88,7 @@ class _AccountState extends State<Account> {
                 Center(
                   child: Stack(
                     children: [
+                      const InternetBannerOverlay(),
                       Container(
                         height: 150,
                         width: 150,

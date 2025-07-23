@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../app/app.dart';
+import '../../../core/utils/internet_banner_overlay.dart';
 import '../../../generated/l10n.dart';
 import '../../home/my_home_page.dart';
 import '../../home/widget/appBar/new_custom_app_bar.dart';
@@ -111,6 +112,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       ),
       body: Column(
         children: [
+          const InternetBannerOverlay(),
           ProfileListTile(
             title: S.of(context).editProfile,
             showTopDivider: true,

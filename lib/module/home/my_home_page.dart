@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import '../../core/utils/internet_banner_overlay.dart';
 import '../../core/utils/presentation.utils.dart';
 import '../login/widget/button_basic.dart';
 import '../login/widget/custom_text.dart';
@@ -21,7 +21,6 @@ import 'widget/navigation_bar_widget.dart';
 import 'widget/search_text_field_widget.dart';
 import 'widget/things_title_list_widget.dart';
 import 'widget/type_widget/type_add_screen.dart';
-
 export 'my_home_page.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -146,6 +145,7 @@ class MyHomePageState extends State<MyHomePage> {
             ),
             body: Stack(
               children: [
+                const InternetBannerOverlay(),
                 Column(
                   children: [
                     AnimatedSwitcher(

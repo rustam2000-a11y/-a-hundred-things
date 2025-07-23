@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../app/app.dart';
+import '../../../core/utils/internet_banner_overlay.dart';
 import '../../home/widget/appBar/new_custom_app_bar.dart';
 import '../widget/settings_list_widget.dart';
 
@@ -57,6 +58,7 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
       appBar: const NewCustomAppBar(),
       body: Column(
         children: [
+          const InternetBannerOverlay(),
           const Divider(color: Colors.black, height: 1, thickness: 1),
           SizedBox(
             height: kToolbarHeight,

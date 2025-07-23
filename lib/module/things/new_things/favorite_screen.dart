@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import '../../../core/utils/internet_banner_overlay.dart';
 import '../../../model/things_model.dart';
 import '../../../presentation/colors.dart';
 import '../../home/bloc/home_bloc/home_bloc.dart';
@@ -62,6 +63,7 @@ class FavorieteScreenState extends State<FavorieteScreen> {
         ),
         body: Stack(
           children: [
+            const InternetBannerOverlay(),
             Column(
               children: [
                 const SizedBox(height: 12),

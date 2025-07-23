@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../app/app.dart';
+import '../../../core/utils/internet_banner_overlay.dart';
 import '../../../generated/l10n.dart';
 import '../../home/widget/appBar/new_custom_app_bar.dart';
 import '../widget/settings_list_widget.dart';
@@ -61,6 +62,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
       appBar: const NewCustomAppBar(),
       body: Column(
         children: [
+          const InternetBannerOverlay(),
           SizedBox(
             height: kToolbarHeight,
             child: Stack(

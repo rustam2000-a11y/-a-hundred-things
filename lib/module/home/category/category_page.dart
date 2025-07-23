@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../../core/utils/internet_banner_overlay.dart';
 import '../../../presentation/colors.dart';
-import '../../login/widget/custom_text.dart';
+
 import '../../settings/bloc/account_bloc/account_bloc.dart';
 import '../bloc/home_bloc/home_bloc.dart';
 import '../widget/appBar/new_custom_app_bar.dart';
@@ -29,8 +30,6 @@ class CategoriePageState extends State<CategoriePage> {
   late HomeBloc _bloc;
   ValueNotifier<List<String>> selectedItemsNotifier = ValueNotifier([]);
 
-  bool _isListMode = true;
-  bool _showCategoryList = false;
 
   @override
   void initState() {
@@ -41,7 +40,6 @@ class CategoriePageState extends State<CategoriePage> {
 
   void _toggleCategoryList(bool show) {
     setState(() {
-      _showCategoryList = show;
     });
   }
 
@@ -80,6 +78,8 @@ class CategoriePageState extends State<CategoriePage> {
             ),
             body: Stack(
               children: [
+                const InternetBannerOverlay(),
+                const InternetBannerOverlay(),
                 Column(
                   children: [
                     const Divider(
