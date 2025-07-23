@@ -39,6 +39,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<DeleteItemByUidEvent>((event, emit) {
       deleteItemByUid(event.uid);
     });
+    on<DeleteItemsByUidsEvent>(_onDeleteItemsByUids);
+
   }
 
   final ThingsRepositoryI _thingsRepository;
@@ -118,6 +120,30 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
 
     add(HomeTypeThingsEvent(typesWithColors: typesWithColors));
+  }
+  Future<void> _onDeleteItemsByUids(
+      DeleteItemsByUidsEvent event,
+      Emitter<HomeState> emit,
+      ) async {
+    emit(state.copyWith(isProgress: true));
+
+    try {
+      await _thingsRepository.deleteItemsByUids(event.uids);
+
+      final updatedList = await _thingsRepository.fetchMyThingsOnce();
+      add(HomeThingsEvent(things: updatedList));
+
+      final typesWithColors = <String, String>{};
+      for (final item in updatedList) {
+        for (final type in item.type) {
+          typesWithColors[type] = item.color;
+        }
+      }
+      add(HomeTypeThingsEvent(typesWithColors: typesWithColors));
+    } catch (e) {
+    }
+
+    emit(state.copyWith(isProgress: false));
   }
 
   @override

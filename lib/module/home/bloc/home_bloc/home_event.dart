@@ -70,3 +70,12 @@ class DeleteItemByUidEvent extends HomeEvent {
   @override
   List<Object?> get props => [uid];
 }
+
+class DeleteItemsByUidsEvent extends HomeEvent {
+  final List<String> uids;
+
+  const DeleteItemsByUidsEvent({required this.uids});
+
+  @override
+  List<Object?> get props => [uids];
+}

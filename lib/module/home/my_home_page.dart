@@ -42,6 +42,7 @@ class MyHomePageState extends State<MyHomePage> {
   late HomeBloc _bloc;
   ValueNotifier<List<String>> selectedItemsNotifier = ValueNotifier([]);
 
+
   bool _isListMode = true;
   late bool _showCategoryList = false;
   bool _showFilters = false;
@@ -369,7 +370,17 @@ class MyHomePageState extends State<MyHomePage> {
                         types: state.typesWithColors.keys.toList(),
                         context: context,
                         isAnyItemSelected: selectedItems.isNotEmpty,
-                        onDeleteSelected: () => deleteSelectedItems(context),
+                        onDeleteSelected: () {
+                          if (selectedItemsNotifier.value.isNotEmpty) {
+                            _bloc.add(DeleteItemsByUidsEvent(uids: selectedItemsNotifier.value));
+                            selectedItemsNotifier.value = [];
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('The selected items have been removed')),
+                            );
+                          }
+                        },
+
                       );
                     },
                   ),
@@ -440,24 +451,7 @@ class MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future<void> deleteSelectedItems(BuildContext context) async {
-    try {
-      for (final String itemId in selectedItemsNotifier.value) {
-        await FirebaseFirestore.instance
-            .collection('item')
-            .doc(itemId)
-            .delete();
-      }
-      selectedItemsNotifier.value = [];
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('The selected items have been removed')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error while deleting elements: $e')),
-      );
-    }
-  }
+
 }
 
 Future<void> loadTypeColorsFromFirestore() async {
