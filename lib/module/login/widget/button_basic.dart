@@ -187,10 +187,14 @@ class SquareAddButton extends StatelessWidget {
     super.key,
     required this.types,
     required this.context,
+    required this.isAnyItemSelected,
+    required this.onDeleteSelected,
   });
 
   final List<String> types;
   final BuildContext context;
+  final bool isAnyItemSelected;
+  final VoidCallback onDeleteSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -199,15 +203,19 @@ class SquareAddButton extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(4),
         onTap: () {
-          Navigator.push<void>(
-            this.context,
-            MaterialPageRoute<void>(
-              builder: (_) => CreateNewThingScreen(
-                allTypes: types,
-                isReadOnly: true,
+          if (isAnyItemSelected) {
+            onDeleteSelected();
+          } else {
+            Navigator.push<void>(
+              this.context,
+              MaterialPageRoute<void>(
+                builder: (_) => CreateNewThingScreen(
+                  allTypes: types,
+                  isReadOnly: true,
+                ),
               ),
-            ),
-          );
+            );
+          }
         },
         child: Container(
           width: 48,
@@ -217,12 +225,17 @@ class SquareAddButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(4),
             border: Border.all(),
           ),
-          child: const Center(
-            child: Icon(Icons.add, color: Colors.black),
+          child: Center(
+            child: Icon(
+              isAnyItemSelected ? Icons.delete : Icons.add,
+              color: Colors.black,
+            ),
           ),
         ),
       ),
     );
   }
 }
+
+
 

@@ -53,24 +53,7 @@ class ItemImage extends StatelessWidget {
             );
           },
         ),
-        if (isSelected)
-          Positioned(
-            top: 4,
-            right: 4,
-            child: Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.check,
-                color: Colors.white,
-                size: 16,
-              ),
-            ),
-          ),
+
       ],
     );
   }

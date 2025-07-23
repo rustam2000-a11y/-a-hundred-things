@@ -362,10 +362,20 @@ class MyHomePageState extends State<MyHomePage> {
                 Positioned(
                   right: 16,
                   bottom: _hideNavigationBar ? 40 : 110,
-                  child: SquareAddButton(
-                    types: state.typesWithColors.keys.toList(),
-                    context: context,
+                  child: ValueListenableBuilder<List<String>>(
+                    valueListenable: selectedItemsNotifier,
+                    builder: (context, selectedItems, _) {
+                      return SquareAddButton(
+                        types: state.typesWithColors.keys.toList(),
+                        context: context,
+                        isAnyItemSelected: selectedItems.isNotEmpty,
+                        onDeleteSelected: () => deleteSelectedItems(context),
+                      );
+                    },
                   ),
+
+
+
                 ),
                 Positioned(
                   left: 0,
