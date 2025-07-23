@@ -111,6 +111,17 @@ class BaseDataApi implements BaseDataApiI {
   Future<void> deleteItemByUid(String uid) async {
     await databaseReference.collection('item').doc(uid).delete();
   }
+  @override
+  Future<void> deleteItemsByUids(List<String> uids) async {
+    final batch = FirebaseFirestore.instance.batch();
+
+    for (final uid in uids) {
+      final docRef = FirebaseFirestore.instance.collection('item').doc(uid);
+      batch.delete(docRef);
+    }
+
+    await batch.commit();
+  }
 
 
 }
@@ -127,6 +138,10 @@ abstract class BaseDataApiI {
 
   Future<void> deleteItemByUid(String uid);
 
+  Future<void> deleteItemsByUids(List<String> uids);
+
   Stream<List<ThingsModel>> searchThingsByTitle(String searchQuery);
+
   Future<List<String>> uploadImages(List<File> images);
 }
+

@@ -1,6 +1,4 @@
-
 import 'dart:io';
-
 import 'package:injectable/injectable.dart';
 import '../model/things_model.dart';
 import '../network/base_data_api.dart';
@@ -43,6 +41,11 @@ class ThingsRepository implements ThingsRepositoryI {
   }
 
   @override
+  Future<void> deleteItemsByUids(List<String> uids) async {
+    return _baseDataApi.deleteItemsByUids(uids);
+  }
+
+  @override
   void dispose() {
     // No longer needed
   }
@@ -59,6 +62,7 @@ abstract class ThingsRepositoryI {
 
   Future<void> deleteItemByUid(String uid);
 
+  Future<void> deleteItemsByUids(List<String> uids);
   Stream<List<ThingsModel>> searchThingsByTitle(String searchQuery);
 
   Future<List<String>> uploadImages(List<File> images);
