@@ -53,3 +53,11 @@ class ToggleFavoriteEvent extends CreateNewThingEvent {
   @override
   List<Object?> get props => [docId, isFavorite];
 }
+class SetImageFileEvent extends CreateNewThingEvent {
+  const SetImageFileEvent(this.file);
+  final File file;
+
+  @override
+  List<Object> get props => [file];
+}
+

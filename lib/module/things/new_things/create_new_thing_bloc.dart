@@ -33,6 +33,8 @@ class CreateNewThingBloc
     on<LoadThingEvent>(_loadThing);
     on<SaveThingEvent>(_saveThing);
     on<ToggleFavoriteEvent>(_toggleFavorite);
+    on<SetImageFileEvent>(_onSetImageFile);
+
   }
 
   final ImagePickerService imagePickerService;
@@ -113,4 +115,11 @@ class CreateNewThingBloc
   ) async {
     await repository.updateFavorite(event.docId, event.isFavorite);
   }
+  Future<void> _onSetImageFile(
+      SetImageFileEvent event,
+      Emitter<CreateNewThingState> emit,
+      ) async {
+    emit(state.copyWith(file: event.file));
+  }
+
 }

@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../core/utils/internet_banner_overlay.dart';
 import '../../home/widget/appBar/dropdown_container.dart';
 import '../../home/widget/appBar/new_custom_app_bar.dart';
@@ -104,27 +107,46 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
               children: [
                 const InternetBannerOverlay(),
                 GestureDetector(
-                  onTap: () {
-                    _bloc.add(ChangeImageEvent(context, (detectedTitle) {
-                      setState(() {
-                        _titleController.text = detectedTitle;
-                      });
-                    }));
+                  onTap: () async {
+                    try {
+                      final picker = ImagePicker();
+                      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+                      if (pickedFile != null) {
+                        _bloc.add(SetImageFileEvent(File(pickedFile.path)));
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('No image selected')),
+                        );
+                      }
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Loading error: $e')),
+                      );
+                    }
                   },
                   child: Container(
                     height: MediaQuery.of(context).size.height * 0.4,
                     width: double.infinity,
                     color: Colors.white,
-                    child: state.file != null
-                        ? Image.file(state.file!, fit: BoxFit.cover)
-                        : (state.thing?.imageUrl?.isNotEmpty == true
-                            ? Image.network(state.thing!.imageUrl!.first,
-                                fit: BoxFit.cover)
-                            : ThingImagePlaceholder(
-                                screenWidth:
-                                    MediaQuery.of(context).size.width)),
+                    child: Builder(
+                      builder: (_) {
+                        if (state.file != null) {
+                          return Image.file(state.file!, fit: BoxFit.cover);
+                        } else if (state.thing?.imageUrl?.isNotEmpty == true) {
+                          return Image.network(state.thing!.imageUrl!.first,
+                              fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) {
+                                return const Center(child: Text('Error loading image'));
+                              });
+                        } else {
+                          return ThingImagePlaceholder(
+                              screenWidth: MediaQuery.of(context).size.width);
+                        }
+                      },
+                    ),
                   ),
                 ),
+
                 ExpandableFormCard(
                   isExpanded: _isExpanded,
                   titleController: _titleController,
