@@ -21,7 +21,10 @@ dependencies:
   intl_utils: ^2.8.7
   shared_preferences: ^2.3.3
   firebase_storage: ^12.3.6
+
   image_picker: ^1.1.2
+  image_cropper: ^9.1.0
+
   photo_manager: ^3.6.3
   cropperx: ^1.1.1
   flutter_bloc: ^8.1.6
