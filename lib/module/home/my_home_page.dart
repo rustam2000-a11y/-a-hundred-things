@@ -43,14 +43,9 @@ class MyHomePageState extends State<MyHomePage> {
   ValueNotifier<List<String>> selectedItemsNotifier = ValueNotifier([]);
 
 
-  bool _isListMode = true;
-  late bool _showCategoryList = false;
-  bool _showFilters = false;
-  final Map<String, String> _selectedFilters = {};
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
-  bool _showSearchField = true;
   double _lastOffset = 0;
   late bool _hideNavigationBar;
   bool _isLoading = true;
@@ -71,19 +66,22 @@ class MyHomePageState extends State<MyHomePage> {
     _scrollController.addListener(() {
       final offset = _scrollController.offset;
 
+      final showSearchField = _bloc.state.showSearchField;
+
       if (offset > _lastOffset && offset - _lastOffset > 5) {
-        if (_showSearchField) {
+        if (showSearchField) {
           _searchFocusNode.unfocus();
-          setState(() => _showSearchField = false);
+          _bloc.add(const ToggleSearchVisibilityEvent(false));
         }
       } else if (offset < _lastOffset && _lastOffset - offset > 5) {
-        if (!_showSearchField) {
-          setState(() => _showSearchField = true);
+        if (!showSearchField) {
+          _bloc.add(const ToggleSearchVisibilityEvent(true));
         }
       }
 
       _lastOffset = offset;
     });
+
   }
 
   @override
@@ -105,9 +103,8 @@ class MyHomePageState extends State<MyHomePage> {
   }
 
   void _toggleCategoryList(bool show) {
-    setState(() {
-      _showCategoryList = show;
-    });
+    _bloc.add(ToggleCategoryListEvent(show));
+
   }
 
   @override
@@ -134,7 +131,7 @@ class MyHomePageState extends State<MyHomePage> {
         bloc: _bloc,
         builder: (context, state) {
           final filteredThings =
-              state.things.where((e) => e.title.trim().isNotEmpty).toList();
+          state.things.where((e) => e.title.trim().isNotEmpty).toList();
 
           return Scaffold(
             drawer: CustomDrawer(
@@ -164,16 +161,16 @@ class MyHomePageState extends State<MyHomePage> {
                           ),
                         );
                       },
-                      child: _showSearchField
+                      child: state.showSearchField
                           ? SearchTextFieldWidget(
-                              key: const ValueKey('search_field_visible'),
-                              controller: _searchController,
-                              focusNode: _searchFocusNode,
-                              isDarkMode: isDarkMode,
-                            )
+                        key: const ValueKey('search_field_visible'),
+                        controller: _searchController,
+                        focusNode: _searchFocusNode,
+                        isDarkMode: isDarkMode,
+                      )
                           : const SizedBox(
-                              key: ValueKey('search_field_hidden'),
-                            ),
+                        key: ValueKey('search_field_hidden'),
+                      ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(16),
@@ -182,9 +179,8 @@ class MyHomePageState extends State<MyHomePage> {
                         children: [
                           GestureDetector(
                             onTap: () {
-                              setState(() {
-                                _showFilters = true;
-                              });
+                              _bloc.add(const ToggleFiltersVisibilityEvent(true));
+
                             },
                             child: const Row(
                               children: [
@@ -206,16 +202,12 @@ class MyHomePageState extends State<MyHomePage> {
                               children: [
                                 GestureDetector(
                                   onTap: () {
-                                    setState(() {
-                                      _isListMode = true;
-                                    });
+                                    _bloc.add(const ToggleListModeEvent(true));
                                   },
                                   child: Icon(
                                     Icons.view_list,
                                     size: 20,
-                                    color: _isListMode
-                                        ? Colors.black
-                                        : Colors.black26,
+                                    color: state.isListMode ? Colors.black : Colors.black26,
                                   ),
                                 ),
                                 Container(
@@ -223,20 +215,16 @@ class MyHomePageState extends State<MyHomePage> {
                                   height: 20,
                                   color: Colors.black26,
                                   margin:
-                                      const EdgeInsets.symmetric(horizontal: 8),
+                                  const EdgeInsets.symmetric(horizontal: 8),
                                 ),
                                 GestureDetector(
                                   onTap: () {
-                                    setState(() {
-                                      _isListMode = false;
-                                    });
+                                    _bloc.add(const ToggleListModeEvent(false));
                                   },
                                   child: Icon(
                                     Icons.view_list_outlined,
                                     size: 20,
-                                    color: !_isListMode
-                                        ? Colors.black
-                                        : Colors.black26,
+                                    color: !state.isListMode ? Colors.black : Colors.black26,
                                   ),
                                 ),
                               ],
@@ -245,7 +233,7 @@ class MyHomePageState extends State<MyHomePage> {
                         ],
                       ),
                     ),
-                    if (_showCategoryList)
+                    if (state.showCategoryList)
                       SizedBox(
                         height: 50,
                         child: ListView(
@@ -264,7 +252,7 @@ class MyHomePageState extends State<MyHomePage> {
                               child: Container(
                                 margin: const EdgeInsets.only(right: 8),
                                 padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
+                                const EdgeInsets.symmetric(horizontal: 10),
                                 decoration: BoxDecoration(
                                   color: Colors.black,
                                   borderRadius: BorderRadius.circular(3),
@@ -331,30 +319,30 @@ class MyHomePageState extends State<MyHomePage> {
                       child: Builder(
                         builder: (context) {
                           final searchQuery =
-                              _searchController.text.toLowerCase().trim();
+                          _searchController.text.toLowerCase().trim();
                           final filteredThings = state.things
                               .where((thing) =>
-                                  thing.title.trim().isNotEmpty &&
-                                  thing.title
-                                      .toLowerCase()
-                                      .contains(searchQuery))
+                          thing.title.trim().isNotEmpty &&
+                              thing.title
+                                  .toLowerCase()
+                                  .contains(searchQuery))
                               .toList();
 
-                          return _isListMode
+                          return state.isListMode
                               ? ThingsTypeListWidget(
-                                  controller: _scrollController,
-                                  things: filteredThings,
-                                  selectedCategoryType: _selectedCategoryType,
-                                  selectedItemsNotifier: selectedItemsNotifier,
-                                  onStateUpdate: () => setState(() {}),
-                                  onDeleteItem: (uid) =>
-                                      _bloc.add(DeleteItemByUidEvent(uid: uid)),
-                                )
+                            controller: _scrollController,
+                            things: filteredThings,
+                            selectedCategoryType: _selectedCategoryType,
+                            selectedItemsNotifier: selectedItemsNotifier,
+                            onStateUpdate: () => setState(() {}),
+                            onDeleteItem: (uid) =>
+                                _bloc.add(DeleteItemByUidEvent(uid: uid)),
+                          )
                               : NewListOfTitles(
-                                  controller: _scrollController,
-                                  things: filteredThings,
-                                  allTypes: state.typesWithColors.keys.toList(),
-                                );
+                            controller: _scrollController,
+                            things: filteredThings,
+                            allTypes: state.typesWithColors.keys.toList(),
+                          );
                         },
                       ),
                     ),
@@ -380,13 +368,9 @@ class MyHomePageState extends State<MyHomePage> {
                             );
                           }
                         },
-
                       );
                     },
                   ),
-
-
-
                 ),
                 Positioned(
                   left: 0,
@@ -406,40 +390,39 @@ class MyHomePageState extends State<MyHomePage> {
                 ),
                 Stack(
                   children: [
-                    if (_showFilters)
+                    if (state.showFilters)
                       GestureDetector(
                         onTap: () {
-                          setState(() {
-                            _showFilters = false;
-                          });
+                          _bloc.add(const ToggleFiltersVisibilityEvent(true));
                         },
+
                         child: Container(
                           color: Colors.black.withOpacity(0.3),
                         ),
                       ),
-                    if (_showFilters)
+                    if (state.showFilters)
                       ContainerWithFilters(
                         onClose: () {
-                          setState(() {
-                            _showFilters = false;
-                          });
+                          _bloc.add(const ToggleFiltersVisibilityEvent(false));
                         },
-                        selectedType: _selectedCategoryType,
-                        selectedFilters: _selectedFilters,
-                        onTypeSelected: (String field, String value) {
-                          setState(() {
-                            if (value.isEmpty) {
-                              _selectedFilters.remove(field);
-                            } else {
-                              _selectedFilters[field] = value;
-                            }
-                            _selectedCategoryType = _selectedFilters['type'];
-                            _showFilters = false;
-                          });
+                        selectedType: state.selectedCategoryType,
+                        selectedFilters: state.selectedFilters,
 
-                          _bloc.add(HomeSelectTypeThingsEvent(
-                              field: field, value: value));
+                        onTypeSelected: (String field, String value) {
+                          final newFilters = Map<String, String>.from(state.selectedFilters);
+
+                          if (value.isEmpty) {
+                            newFilters.remove(field);
+                          } else {
+                            newFilters[field] = value;
+                          }
+
+                          _bloc..add(UpdateSelectedCategoryEvent(newFilters['type']))
+                          ..add(UpdateSelectedFiltersEvent(newFilters))
+                          ..add(HomeSelectTypeThingsEvent(field: field, value: value))
+                          ..add(const ToggleFiltersVisibilityEvent(false));
                         },
+
                       ),
                   ],
                 )
@@ -450,18 +433,5 @@ class MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-
-
 }
 
-Future<void> loadTypeColorsFromFirestore() async {
-  final querySnapshot =
-      await FirebaseFirestore.instance.collection('item').get();
-
-  for (final doc in querySnapshot.docs) {
-    final type = doc['type'];
-    final color = doc['typeColor'];
-
-    if (type != null && color != null) {}
-  }
-}
