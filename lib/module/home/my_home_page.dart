@@ -247,10 +247,12 @@ class MyHomePageState extends State<MyHomePage> {
                     if (state.showFilters)
                       GestureDetector(
                         onTap: () {
-                          _bloc.add(const ToggleFiltersVisibilityEvent(true));
+                          _bloc.add(const ToggleFiltersVisibilityEvent(false));
                         },
                         child: Container(
                           color: Colors.black.withOpacity(0.3),
+                          width: double.infinity,
+                          height: double.infinity,
                         ),
                       ),
                     if (state.showFilters)
