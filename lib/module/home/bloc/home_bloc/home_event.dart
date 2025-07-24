@@ -72,10 +72,81 @@ class DeleteItemByUidEvent extends HomeEvent {
 }
 
 class DeleteItemsByUidsEvent extends HomeEvent {
-  final List<String> uids;
 
   const DeleteItemsByUidsEvent({required this.uids});
+  final List<String> uids;
 
   @override
   List<Object?> get props => [uids];
+}
+class ToggleListModeEvent extends HomeEvent {
+  const ToggleListModeEvent(this.isListMode);
+  final bool isListMode;
+
+  @override
+  List<Object?> get props => [isListMode];
+}
+
+class ToggleSearchVisibilityEvent extends HomeEvent {
+  const ToggleSearchVisibilityEvent(this.visible);
+  final bool visible;
+
+  @override
+  List<Object?> get props => [visible];
+}
+
+class ToggleFiltersVisibilityEvent extends HomeEvent {
+  const ToggleFiltersVisibilityEvent(this.visible);
+  final bool visible;
+
+  @override
+  List<Object?> get props => [visible];
+}
+
+class ToggleCategoryListEvent extends HomeEvent {
+  const ToggleCategoryListEvent(this.visible);
+  final bool visible;
+
+  @override
+  List<Object?> get props => [visible];
+}
+
+class UpdateSelectedCategoryEvent extends HomeEvent {
+  const UpdateSelectedCategoryEvent(this.category);
+  final String? category;
+
+  @override
+  List<Object?> get props => [category];
+}
+
+class UpdateSelectedFiltersEvent extends HomeEvent {
+  const UpdateSelectedFiltersEvent(this.filters);
+  final Map<String, String> filters;
+
+  @override
+  List<Object?> get props => [filters];
+}
+
+class SetHideNavigationBarEvent extends HomeEvent {
+  const SetHideNavigationBarEvent(this.hide);
+  final bool hide;
+
+  @override
+  List<Object?> get props => [hide];
+}
+
+class SetLoadingStateEvent extends HomeEvent {
+  const SetLoadingStateEvent(this.isLoading);
+  final bool isLoading;
+
+  @override
+  List<Object?> get props => [isLoading];
+}
+
+class UpdateSelectedItemsEvent extends HomeEvent {
+  const UpdateSelectedItemsEvent(this.selectedItemIds);
+  final List<String> selectedItemIds;
+
+  @override
+  List<Object?> get props => [selectedItemIds];
 }

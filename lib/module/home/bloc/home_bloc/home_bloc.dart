@@ -40,6 +40,33 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       deleteItemByUid(event.uid);
     });
     on<DeleteItemsByUidsEvent>(_onDeleteItemsByUids);
+    on<ToggleListModeEvent>((event, emit) {
+      emit(state.copyWith(isListMode: event.isListMode));
+    });
+    on<ToggleSearchVisibilityEvent>((event, emit) {
+      emit(state.copyWith(showSearchField: event.visible));
+    });
+    on<ToggleFiltersVisibilityEvent>((event, emit) {
+      emit(state.copyWith(showFilters: event.visible));
+    });
+    on<ToggleCategoryListEvent>((event, emit) {
+      emit(state.copyWith(showCategoryList: event.visible));
+    });
+    on<UpdateSelectedCategoryEvent>((event, emit) {
+      emit(state.copyWith(selectedCategoryType: event.category));
+    });
+    on<UpdateSelectedFiltersEvent>((event, emit) {
+      emit(state.copyWith(selectedFilters: event.filters));
+    });
+    on<SetHideNavigationBarEvent>((event, emit) {
+      emit(state.copyWith(hideNavigationBar: event.hide));
+    });
+    on<SetLoadingStateEvent>((event, emit) {
+      emit(state.copyWith(isLoading: event.isLoading));
+    });
+    on<UpdateSelectedItemsEvent>((event, emit) {
+      emit(state.copyWith(selectedItemIds: event.selectedItemIds));
+    });
 
   }
 
