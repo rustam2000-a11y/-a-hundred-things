@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../core/utils/image_picker.dart';
 import '../../../model/things_model.dart';
 import '../../../repository/create_new_thing_repository.dart';
 import 'image_picker_servirs.dart';
@@ -42,7 +43,9 @@ class CreateNewThingBloc
     ChangeImageEvent event,
     Emitter<CreateNewThingState> emit,
   ) async {
-    final file = await imagePickerService.pickAndCropImage(event.context);
+    //final file = await imagePickerService.pickAndCropImage(event.context);
+    final file = await ImagePickerHelper.pickImage();
+
     if (file == null) return;
 
     emit(state.copyWith(file: file));
