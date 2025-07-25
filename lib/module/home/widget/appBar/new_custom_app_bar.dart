@@ -15,6 +15,8 @@ class NewCustomAppBar extends StatefulWidget implements PreferredSizeWidget {
     this.useTitleText = false,
     this.titleText,
     this.onLeadingOverride,
+    this.isSelectionMode = false,
+    this.onClearSelection,
   }) : super(key: key);
 
   final bool showBackButton;
@@ -26,6 +28,9 @@ class NewCustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final bool useTitleText;
   final String? titleText;
   final VoidCallback? onLeadingOverride;
+  final bool isSelectionMode;
+  final VoidCallback? onClearSelection;
+
 
   @override
   State<NewCustomAppBar> createState() => _NewCustomAppBarState();
@@ -117,18 +122,25 @@ class _NewCustomAppBarState extends State<NewCustomAppBar> {
             ],
           ),
       actions: [
-        if (widget.actionIcon != null)
+        if (widget.isSelectionMode)
+          IconButton(
+            icon: const Icon(Icons.clear, color: Colors.black),
+            onPressed: widget.onClearSelection,
+          )
+        else if (widget.actionIcon != null)
           widget.actionIcon!
         else if (widget.showSearchIcon)
-          IconButton(
-            icon: ImageIcon(
-              const AssetImage('assets/images/iconamoon_search.png'),
-              size: 22,
-              color: theme.iconTheme.color,
+            IconButton(
+              icon: ImageIcon(
+                const AssetImage('assets/images/iconamoon_search.png'),
+                size: 22,
+                color: theme.iconTheme.color,
+              ),
+              onPressed: () {},
             ),
-            onPressed: () {},
-          ),
       ],
+
+
       bottom: const PreferredSize(
         preferredSize: Size.fromHeight(1.0),
         child: Divider(height: 1, color: Colors.black),

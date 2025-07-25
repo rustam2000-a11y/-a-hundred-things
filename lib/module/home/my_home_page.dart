@@ -126,10 +126,17 @@ class MyHomePageState extends State<MyHomePage> {
             drawer: CustomDrawer(
               onToggleCategoryList: _toggleCategoryList,
             ),
-            appBar: const NewCustomAppBar(
+            appBar: NewCustomAppBar(
               showBackButton: false,
               showSearchIcon: false,
+              isSelectionMode: selectedItemsNotifier.value.isNotEmpty,
+              onClearSelection: () {
+                setState(() {
+                  selectedItemsNotifier.value = [];
+                });
+              },
             ),
+
             body: Stack(
               children: [
                 const InternetBannerOverlay(),
