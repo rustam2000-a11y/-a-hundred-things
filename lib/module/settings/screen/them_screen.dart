@@ -53,44 +53,44 @@ class _ThemeSelectionScreenState extends State<ThemeSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
-      appBar: const NewCustomAppBar(),
-      body: Column(
-        children: [
-          const InternetBannerOverlay(),
-          const Divider(color: Colors.black, height: 1, thickness: 1),
-          SizedBox(
-            height: kToolbarHeight,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.arrow_back_ios,
-                      color: isDark ? Colors.white : Colors.black,
-                    ),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ),
-                Center(
-                  child: Text(
-                    'Select Theme',
-                    style: TextStyle(
-                      color: isDark ? Colors.white : Colors.black,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+      body: SafeArea(
+        child: Column(
+          children: [
+            const InternetBannerOverlay(),
+
+            SizedBox(
+              height: kToolbarHeight,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.arrow_back_ios,
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
+                      onPressed: () => Navigator.pop(context),
                     ),
                   ),
-                ),
-              ],
+                  Center(
+                    child: Text(
+                      'Select Theme',
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          _buildThemeTile('Light', isDark),
-          _buildThemeTile('Dark', isDark),
-        ],
+            _buildThemeTile('Light', isDark),
+            _buildThemeTile('Dark', isDark),
+          ],
+        ),
       ),
     );
   }

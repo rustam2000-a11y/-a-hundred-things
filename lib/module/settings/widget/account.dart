@@ -58,7 +58,7 @@ class _AccountState extends State<Account> {
 
         return Scaffold(
           appBar: const NewCustomAppBar(
-            showBackButton: false,
+
             showSearchIcon: false,
             logo: Text('Edit Profile'),
           ),

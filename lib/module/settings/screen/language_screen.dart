@@ -59,39 +59,40 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: const NewCustomAppBar(),
-      body: Column(
-        children: [
-          const InternetBannerOverlay(),
-          SizedBox(
-            height: kToolbarHeight,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: IconButton(
-                    icon: Icon(Icons.arrow_back_ios,
-                        color: isDark ? Colors.white : Colors.black),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ),
-                Center(
-                  child: Text(
-                    S.of(context).applicationLanguage,
-                    style: TextStyle(
-                      color: isDark ? Colors.white : Colors.black,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+      body: SafeArea(
+        child: Column(
+          children: [
+            const InternetBannerOverlay(),
+            SizedBox(
+              height: kToolbarHeight,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: Icon(Icons.arrow_back_ios,
+                          color: isDark ? Colors.white : Colors.black),
+                      onPressed: () => Navigator.pop(context),
                     ),
                   ),
-                ),
-              ],
+                  Center(
+                    child: Text(
+                      S.of(context).applicationLanguage,
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          _buildLanguageTile('en', 'English', isDark),
-          _buildLanguageTile('ru', 'Русский', isDark),
-        ],
+            _buildLanguageTile('en', 'English', isDark),
+            _buildLanguageTile('ru', 'Русский', isDark),
+          ],
+        ),
       ),
     );
   }
