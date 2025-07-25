@@ -280,6 +280,18 @@ class _AddItemPageState extends State<AddTypePage> {
                             }
 
                             final type = _typeController.text.trim();
+                            final existing = await FirebaseFirestore.instance
+                                .collection('item')
+                                .where('type', arrayContains: type)
+                                .limit(1)
+                                .get();
+
+                            if (!widget.isEditing && existing.docs.isNotEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('This type already exists.')),
+                              );
+                              return;
+                            }
                             if (!typeColorsCache.containsKey(type)) {
                               typeColorsCache[type] = getRandomColor();
                             }
