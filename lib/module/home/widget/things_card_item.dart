@@ -45,11 +45,15 @@ class ThingsCardWidget extends StatelessWidget {
       valueListenable: selectedItemsNotifier ?? ValueNotifier([]),
       builder: (context, selectedItems, child) {
         final isSelected = selectedItems.contains(itemId);
+        final selectionModeActive = selectedItems.isNotEmpty;
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 4.0),
           child: GestureDetector(
-              onTap: () async {
+            onTap: () async {
+              if (selectedItemsNotifier != null && selectionModeActive) {
+                _toggleSelection(selectedItemsNotifier!, itemId);
+              } else {
                 final result = await Navigator.push(
                   context,
                   MaterialPageRoute<bool>(
@@ -74,10 +78,11 @@ class ThingsCardWidget extends StatelessWidget {
                   print('[ThingsCardWidget] Вызов onStateUpdate после Navigator.pop');
                   onStateUpdate();
                 }
-              },
+              }
+            },
+            onLongPress: () {
 
-              onLongPress: () {
-              if (selectedItemsNotifier != null) {
+              if (selectedItemsNotifier != null && !selectionModeActive) {
                 _toggleSelection(selectedItemsNotifier!, itemId);
               }
             },
@@ -98,6 +103,7 @@ class ThingsCardWidget extends StatelessWidget {
       },
     );
   }
+
 
   void _toggleSelection(ValueNotifier<List<String>> notifier, String itemId) {
     final currentItems = List<String>.from(notifier.value);
