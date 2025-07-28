@@ -10,6 +10,7 @@ import '../../../../generated/l10n.dart';
 import '../../../../presentation/colors.dart';
 import '../../../../repository/things_repository.dart';
 import '../../../login/widget/button_basic.dart';
+import '../../../things/new_things/widget/image_pager_with_indicator.dart';
 import '../appBar/dropdown_title_widget.dart';
 import '../appBar/new_custom_app_bar.dart';
 
@@ -120,49 +121,40 @@ class _AddItemPageState extends State<AddTypePage> {
             GestureDetector(
               onTap: _pickAndCropImage,
               child: Container(
-                height: screenHeight * 0.5,
+                height: screenHeight * 0.45,
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: isDarkMode ? Colors.white : Colors.white,
                 ),
-                child: Center(
-                  child: (_selectedImages.isNotEmpty || _imageUrls.isNotEmpty)
-                      ? PageView.builder(
-                          itemCount: _selectedImages.length + _imageUrls.length,
-                          itemBuilder: (context, index) {
-                            if (index < _selectedImages.length) {
-                              return Image.file(
-                                _selectedImages[index],
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: double.infinity,
-                              );
-                            } else {
-                              return Image.network(
-                                _imageUrls[index - _selectedImages.length],
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: double.infinity,
-                              );
-                            }
-                          },
-                        )
-                      : Container(
-                          width: screenWidth * 0.5,
-                          height: screenWidth * 0.5,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Icon(
-                            Icons.add_a_photo_rounded,
-                            color: AppColors.grey,
-                            size: screenWidth * 0.18,
-                          ),
-                        ),
+                child: (_selectedImages.isNotEmpty || _imageUrls.isNotEmpty)
+                    ? ImagePagerWithIndicator(
+                  files: _selectedImages,
+                  urls: _imageUrls,
+                  screenHeight: screenHeight * 0.5,
+                  onRemove: (index) {
+                    setState(() {
+                      _selectedImages.removeAt(index);
+                    });
+                  },
+                )
+                    : Center(
+                  child: Container(
+                    width: screenWidth * 0.5,
+                    height: screenWidth * 0.5,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Icon(
+                      Icons.add_a_photo_rounded,
+                      color: AppColors.grey,
+                      size: screenWidth * 0.18,
+                    ),
+                  ),
                 ),
               ),
             ),
+
             Positioned(
               top: screenHeight * 0.45,
               left: 0,
