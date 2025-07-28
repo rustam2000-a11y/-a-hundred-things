@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import '../../../../model/things_model.dart';
 import '../../../../presentation/colors.dart';
@@ -17,7 +19,7 @@ class CreateThingBottomBar extends StatelessWidget {
     required this.selectedImportance,
     required this.isFavorite,
     required this.existingDocId,
-    required this.stateFile,
+    required this.stateFiles,
     required this.stateThing,
     required this.bloc,
   });
@@ -32,8 +34,8 @@ class CreateThingBottomBar extends StatelessWidget {
   final String selectedImportance;
   final bool isFavorite;
   final String? existingDocId;
-  final dynamic stateFile;
-  final dynamic stateThing;
+  final List<File> stateFiles;
+  final ThingsModel? stateThing;
   final CreateNewThingBloc bloc;
 
   @override
@@ -64,9 +66,11 @@ class CreateThingBottomBar extends StatelessWidget {
                     type: selectedTypes,
                     typDescription: '',
                     color: '',
-                    imageUrl:
-                        stateFile != null ? [] : stateThing?.imageUrl ?? [],
-                    quantity: int.tryParse(quantityController.text.trim()) ?? 1,
+                    imageUrl: stateFiles.isNotEmpty
+                        ? []
+                        : stateThing?.imageUrl ?? [],
+                    quantity:
+                    int.tryParse(quantityController.text.trim()) ?? 1,
                     importance: selectedImportance,
                     favorites: isFavorite,
                   );

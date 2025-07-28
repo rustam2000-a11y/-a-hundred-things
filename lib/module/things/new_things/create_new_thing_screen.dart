@@ -7,7 +7,7 @@ import '../../home/widget/appBar/new_custom_app_bar.dart';
 import '../../home/widget/type_dropdown_list.dart';
 import 'create_new_thing_bloc.dart';
 import 'widget/create_thing_bottom_bar.dart';
-import 'widget/thing_image_placeholder.dart';
+import 'widget/image_pager_with_indicator.dart';
 import 'widget/type_selector_dialog.dart';
 
 class CreateNewThingScreen extends StatefulWidget {
@@ -115,15 +115,16 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                     height: MediaQuery.of(context).size.height * 0.4,
                     width: double.infinity,
                     color: Colors.white,
-                    child: state.file != null
-                        ? Image.file(state.file!, fit: BoxFit.cover)
-                        : (state.thing?.imageUrl?.isNotEmpty == true
-                            ? Image.network(state.thing!.imageUrl!.first,
-                                fit: BoxFit.cover)
-                            : ThingImagePlaceholder(
-                                screenWidth:
-                                    MediaQuery.of(context).size.width)),
+                    child: ImagePagerWithIndicator(
+                      files: state.files,
+                      urls: state.thing?.imageUrl,
+                      screenHeight: MediaQuery.of(context).size.height,
+                      onRemove: (index) {
+                        _bloc.add(RemoveImageEvent(index)); // 👈 обработка удаления
+                      },
+                    ),
                   ),
+
                 ),
                 ExpandableFormCard(
                   isExpanded: _isExpanded,
@@ -150,7 +151,8 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                   selectedImportance: _selectedImportance,
                   isFavorite: _isFavorite,
                   existingDocId: _existingDocId,
-                  stateFile: state.file,
+                  stateFiles: state.files,
+
                   stateThing: state.thing,
                   bloc: _bloc,
                 ),
@@ -175,3 +177,4 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
     });
   }
 }
+
