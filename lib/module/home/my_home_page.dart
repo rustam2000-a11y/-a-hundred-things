@@ -59,8 +59,15 @@ class MyHomePageState extends State<MyHomePage> {
 
     _scrollController.addListener(() {
       final offset = _scrollController.offset;
-
       final showSearchField = _bloc.state.showSearchField;
+
+      if (offset <= 0) {
+        if (!showSearchField) {
+          _bloc.add(const ToggleSearchVisibilityEvent(true));
+        }
+        _lastOffset = offset;
+        return;
+      }
 
       if (offset > _lastOffset && offset - _lastOffset > 5) {
         if (showSearchField) {
@@ -75,6 +82,8 @@ class MyHomePageState extends State<MyHomePage> {
 
       _lastOffset = offset;
     });
+
+
   }
 
   @override

@@ -120,7 +120,7 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                       urls: state.thing?.imageUrl,
                       screenHeight: MediaQuery.of(context).size.height,
                       onRemove: (index) {
-                        _bloc.add(RemoveImageEvent(index)); // 👈 обработка удаления
+                        _bloc.add(RemoveImageEvent(index));
                       },
                     ),
                   ),
