@@ -67,7 +67,6 @@ class _ImagePagerWithIndicatorState extends State<ImagePagerWithIndicator> {
               children: [
                 Positioned.fill(child: imageWidget),
 
-                // Показываем крестик только если это локальное изображение и есть обработчик onRemove
                 if (isFileMode && widget.onRemove != null)
                   Positioned(
                     top: 16,
@@ -75,7 +74,7 @@ class _ImagePagerWithIndicatorState extends State<ImagePagerWithIndicator> {
                     child: GestureDetector(
                       onTap: () => widget.onRemove!(_currentIndex),
                       child: Container(
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.black54,
                         ),
@@ -92,8 +91,6 @@ class _ImagePagerWithIndicatorState extends State<ImagePagerWithIndicator> {
             );
           },
         ),
-
-        // Индикаторы
         Positioned(
           bottom: widget.screenHeight * 0.015,
           child: Row(
