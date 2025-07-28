@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cropperx/cropperx.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../../core/utils/image_picker.dart';
 import '../../../../generated/l10n.dart';
 import '../../../../presentation/colors.dart';
 import '../../../../repository/things_repository.dart';
@@ -76,53 +76,15 @@ class _AddItemPageState extends State<AddTypePage> {
   }
 
   Future<void> _pickAndCropImage() async {
-    try {
-      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-      if (pickedFile != null) {
-        final cropperKey = GlobalKey(debugLabel: 'cropperKey');
-        final File imageFile = File(pickedFile.path);
+    final File? croppedImage = await ImagePickerHelper.pickImage();
 
-        await showDialog(
-          context: context,
-          builder: (context) {
-            return Dialog(
-              child: Column(
-                children: [
-                  Expanded(
-                    child: Cropper(
-                      cropperKey: cropperKey,
-                      image: Image.file(imageFile),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () async {
-                      final imageBytes =
-                          await Cropper.crop(cropperKey: cropperKey);
-                      if (imageBytes != null) {
-                        final tempDir = Directory.systemTemp;
-                        final tempFile = File(
-                            '${tempDir.path}/cropped_${DateTime.now().millisecondsSinceEpoch}.png');
-                        await tempFile.writeAsBytes(imageBytes);
-                        setState(() {
-                          _selectedImages.add(tempFile);
-                        });
-                      }
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Crop photo'),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Image cropping error: $e')),
-      );
+    if (croppedImage != null) {
+      setState(() {
+        _selectedImages.add(croppedImage);
+      });
     }
   }
+
 
   String getRandomColor() {
     final random = Random();

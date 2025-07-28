@@ -152,7 +152,6 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                   isFavorite: _isFavorite,
                   existingDocId: _existingDocId,
                   stateFiles: state.files,
-
                   stateThing: state.thing,
                   bloc: _bloc,
                 ),

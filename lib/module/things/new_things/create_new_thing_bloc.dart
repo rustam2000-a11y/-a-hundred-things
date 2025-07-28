@@ -20,7 +20,7 @@ part 'create_new_thing_state.dart';
 @Injectable()
 class CreateNewThingBloc extends Bloc<CreateNewThingEvent, CreateNewThingState> {
   CreateNewThingBloc(
-      this.imagePickerService,
+
       this.repository,
       this.imageUploadService,
       ) : super(const CreateNewThingState()) {
@@ -32,7 +32,7 @@ class CreateNewThingBloc extends Bloc<CreateNewThingEvent, CreateNewThingState> 
     on<ToggleFavoriteEvent>(_toggleFavorite);
   }
 
-  final ImagePickerService imagePickerService;
+
   final CreateThingRepositoryI repository;
   final ImageUploadService imageUploadService;
 

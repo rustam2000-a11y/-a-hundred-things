@@ -55,17 +55,16 @@ _i174.GetIt $initGetIt(
       () => _i878.ThingsRepository(baseDataApi: gh<_i323.BaseDataApiI>()));
   gh.lazySingleton<_i535.CreateThingRepositoryI>(
       () => _i535.CreateThingRepository(gh<_i841.CreateThingApiI>()));
-  gh.factory<_i1045.CreateNewThingBloc>(() => _i1045.CreateNewThingBloc(
-        gh<_i53.ImagePickerService>(),
-        gh<_i535.CreateThingRepositoryI>(),
-        gh<_i885.ImageUploadService>(),
-      ));
   gh.factory<_i429.HomeBloc>(
       () => _i429.HomeBloc(thingsRepository: gh<_i878.ThingsRepositoryI>()));
   gh.lazySingleton<_i242.AuthRepositoryI>(
       () => _i242.AuthRepository(gh<_i380.AuthDataApiI>()));
   gh.lazySingleton<_i169.SettingRepositoryI>(
       () => _i169.SettingRepository(gh<_i93.SettingDataApiI>()));
+  gh.factory<_i1045.CreateNewThingBloc>(() => _i1045.CreateNewThingBloc(
+        gh<_i535.CreateThingRepositoryI>(),
+        gh<_i885.ImageUploadService>(),
+      ));
   gh.lazySingleton<_i62.NavigatorRepositoryI>(
       () => _i62.NavigatorRepository(gh<_i565.NavigatorDataApiI>()));
   gh.factory<_i424.AccountBloc>(
