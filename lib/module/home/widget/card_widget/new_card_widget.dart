@@ -99,10 +99,10 @@ class ThingCardContainer extends StatelessWidget {
               ],
             ),
             if (selectedCategoryType != null || selectedCategoryType == type)
-              Align(
+              const Align(
                 alignment: Alignment.bottomRight,
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
+                  padding: EdgeInsets.only(top: 8.0),
 
                 ),
               ),

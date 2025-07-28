@@ -129,13 +129,12 @@ class MyHomePageState extends State<MyHomePage> {
             appBar: NewCustomAppBar(
               showBackButton: false,
               showSearchIcon: false,
-              isSelectionMode: selectedItemsNotifier.value.isNotEmpty,
+              selectedItemsNotifier: selectedItemsNotifier,
               onClearSelection: () {
-                setState(() {
-                  selectedItemsNotifier.value = [];
-                });
+                selectedItemsNotifier.value = [];
               },
             ),
+
 
             body: Stack(
               children: [

@@ -15,8 +15,8 @@ class NewCustomAppBar extends StatefulWidget implements PreferredSizeWidget {
     this.useTitleText = false,
     this.titleText,
     this.onLeadingOverride,
-    this.isSelectionMode = false,
     this.onClearSelection,
+    this.selectedItemsNotifier,
   }) : super(key: key);
 
   final bool showBackButton;
@@ -28,9 +28,8 @@ class NewCustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final bool useTitleText;
   final String? titleText;
   final VoidCallback? onLeadingOverride;
-  final bool isSelectionMode;
   final VoidCallback? onClearSelection;
-
+  final ValueNotifier<List<String>>? selectedItemsNotifier;
 
   @override
   State<NewCustomAppBar> createState() => _NewCustomAppBarState();
@@ -122,10 +121,18 @@ class _NewCustomAppBarState extends State<NewCustomAppBar> {
             ],
           ),
       actions: [
-        if (widget.isSelectionMode)
-          IconButton(
-            icon: const Icon(Icons.clear, color: Colors.black),
-            onPressed: widget.onClearSelection,
+        if (widget.selectedItemsNotifier != null)
+          ValueListenableBuilder<List<String>>(
+            valueListenable: widget.selectedItemsNotifier!,
+            builder: (context, selectedItems, _) {
+              if (selectedItems.isNotEmpty) {
+                return IconButton(
+                  icon: const Icon(Icons.clear, color: Colors.black),
+                  onPressed: widget.onClearSelection,
+                );
+              }
+              return const SizedBox.shrink();
+            },
           )
         else if (widget.actionIcon != null)
           widget.actionIcon!
@@ -139,7 +146,6 @@ class _NewCustomAppBarState extends State<NewCustomAppBar> {
               onPressed: () {},
             ),
       ],
-
 
       bottom: const PreferredSize(
         preferredSize: Size.fromHeight(1.0),
