@@ -18,17 +18,14 @@ part 'create_new_thing_event.dart';
 part 'create_new_thing_state.dart';
 
 @Injectable()
-class CreateNewThingBloc
-    extends Bloc<CreateNewThingEvent, CreateNewThingState> {
+class CreateNewThingBloc extends Bloc<CreateNewThingEvent, CreateNewThingState> {
   CreateNewThingBloc(
-    this.imagePickerService,
-    this.repository,
-    this.imageUploadService,
-  ) : super(const CreateNewThingState()) {
-    on<SetNewImageEvent>((event, emit) {
-      emit(state.copyWith(file: event.file));
-    });
-
+      this.imagePickerService,
+      this.repository,
+      this.imageUploadService,
+      ) : super(const CreateNewThingState()) {
+    on<AddImageEvent>(_addImage);
+    on<RemoveImageEvent>(_removeImage);
     on<ChangeImageEvent>(_changeImage);
     on<LoadThingEvent>(_loadThing);
     on<SaveThingEvent>(_saveThing);
@@ -39,19 +36,37 @@ class CreateNewThingBloc
   final CreateThingRepositoryI repository;
   final ImageUploadService imageUploadService;
 
-  Future<void> _changeImage(
-    ChangeImageEvent event,
-    Emitter<CreateNewThingState> emit,
-  ) async {
-    //final file = await imagePickerService.pickAndCropImage(event.context);
-    final file = await ImagePickerHelper.pickImage();
+  Future<void> _addImage(
+      AddImageEvent event,
+      Emitter<CreateNewThingState> emit,
+      ) async {
+    final updatedFiles = List<File>.from(state.files)..add(event.file);
+    emit(state.copyWith(files: updatedFiles));
+  }
 
+  Future<void> _removeImage(
+      RemoveImageEvent event,
+      Emitter<CreateNewThingState> emit,
+      ) async {
+    final updatedFiles = List<File>.from(state.files);
+    if (event.index >= 0 && event.index < updatedFiles.length) {
+      updatedFiles.removeAt(event.index);
+      emit(state.copyWith(files: updatedFiles));
+    }
+  }
+
+  Future<void> _changeImage(
+      ChangeImageEvent event,
+      Emitter<CreateNewThingState> emit,
+      ) async {
+    final file = await ImagePickerHelper.pickImage();
     if (file == null) return;
 
-    emit(state.copyWith(file: file));
+    add(AddImageEvent(file));
+
     final inputImage = InputImage.fromFile(file);
     final labeler =
-        ImageLabeler(options: ImageLabelerOptions(confidenceThreshold: 0.7));
+    ImageLabeler(options: ImageLabelerOptions(confidenceThreshold: 0.7));
     final labels = await labeler.processImage(inputImage);
     await labeler.close();
 
@@ -61,9 +76,9 @@ class CreateNewThingBloc
   }
 
   Future<void> _loadThing(
-    LoadThingEvent event,
-    Emitter<CreateNewThingState> emit,
-  ) async {
+      LoadThingEvent event,
+      Emitter<CreateNewThingState> emit,
+      ) async {
     final model = await repository.fetchThing(event.docId);
     if (model != null) {
       emit(state.copyWith(thing: model));
@@ -71,14 +86,17 @@ class CreateNewThingBloc
   }
 
   Future<void> _saveThing(
-    SaveThingEvent event,
-    Emitter<CreateNewThingState> emit,
-  ) async {
+      SaveThingEvent event,
+      Emitter<CreateNewThingState> emit,
+      ) async {
     List<String> uploadedUrls = event.model.imageUrl ?? [];
 
-    if (state.file != null) {
-      final url = await imageUploadService.uploadImage(state.file!);
-      uploadedUrls = [url];
+    if (state.files.isNotEmpty) {
+      uploadedUrls = [];
+      for (final file in state.files) {
+        final url = await imageUploadService.uploadImage(file);
+        uploadedUrls.add(url);
+      }
     }
 
     final isCreating = event.model.id.isEmpty;
@@ -108,9 +126,9 @@ class CreateNewThingBloc
   }
 
   Future<void> _toggleFavorite(
-    ToggleFavoriteEvent event,
-    Emitter<CreateNewThingState> emit,
-  ) async {
+      ToggleFavoriteEvent event,
+      Emitter<CreateNewThingState> emit,
+      ) async {
     await repository.updateFavorite(event.docId, event.isFavorite);
   }
 }

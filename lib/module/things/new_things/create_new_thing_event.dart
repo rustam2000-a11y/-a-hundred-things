@@ -7,14 +7,14 @@ abstract class CreateNewThingEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class SetNewImageEvent extends CreateNewThingEvent {
-
-  const SetNewImageEvent({required this.file});
-  final File? file;
+class AddImageEvent extends CreateNewThingEvent {
+  const AddImageEvent(this.file);
+  final File file;
 
   @override
   List<Object?> get props => [file];
 }
+
 
 class ChangeImageEvent extends CreateNewThingEvent {
 
@@ -52,4 +52,11 @@ class ToggleFavoriteEvent extends CreateNewThingEvent {
 
   @override
   List<Object?> get props => [docId, isFavorite];
+}
+class RemoveImageEvent extends CreateNewThingEvent {
+  const RemoveImageEvent(this.index);
+  final int index;
+
+  @override
+  List<Object?> get props => [index];
 }
