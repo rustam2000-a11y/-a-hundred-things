@@ -85,14 +85,29 @@ class _AddTypePageState extends State<AddTypePage> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: const NewCustomAppBar(
+        backgroundColor: Colors.white,
+        appBar: const NewCustomAppBar(
         showSearchIcon: false,
         showBackButton: false,
         logo: SizedBox.shrink(),
-      ),
-      body: SafeArea(
-        child: Stack(
+    ),
+    body: BlocListener<CreateNewThingBloc, CreateNewThingState>(
+      listenWhen: (previous, current) =>
+      previous.errorMessage != current.errorMessage ||
+          previous.files != current.files,
+      listener: (context, state) {
+        if (state.errorMessage != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.errorMessage!)),
+          );
+        } else {
+
+          final type = _typeController.text.trim();
+          Navigator.pop(context, type);
+        }
+      },
+    child: SafeArea(
+    child: Stack(
           clipBehavior: Clip.none,
           children: [
             if (_showDrawer && _typeSet.isNotEmpty)
@@ -222,7 +237,7 @@ class _AddTypePageState extends State<AddTypePage> {
                             files: _selectedImages,
                           ));
 
-                          Navigator.pop(context, type);
+
                         },
                       ),
                       CustomMainButton(
@@ -239,6 +254,7 @@ class _AddTypePageState extends State<AddTypePage> {
           ],
         ),
       ),
+    ),
     );
   }
 }

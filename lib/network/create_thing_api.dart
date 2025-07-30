@@ -14,6 +14,7 @@ abstract class CreateThingApiI {
   Future<void> addType(Map<String, dynamic> typeData);
   Future<void> updateType(String id, Map<String, dynamic> typeData);
   Future<Map<String, dynamic>?> fetchType(String id);
+  Future<bool> doesTypeExist(String type, String userId);
 }
 
 
@@ -62,6 +63,16 @@ class CreateThingApi implements CreateThingApiI {
   Future<Map<String, dynamic>?> fetchType(String id) async {
     final doc = await _collection.doc(id).get();
     return doc.data() as Map<String, dynamic>?;
+  }
+  @override
+  Future<bool> doesTypeExist(String type, String userId) async {
+    final query = await _collection
+        .where('userId', isEqualTo: userId)
+        .where('type', arrayContains: type)
+        .limit(1)
+        .get();
+
+    return query.docs.isNotEmpty;
   }
 }
 

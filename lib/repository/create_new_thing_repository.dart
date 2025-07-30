@@ -16,6 +16,7 @@ abstract class CreateThingRepositoryI {
   Future<void> updateType(String id, Map<String, dynamic> typeData);
 
   Future<Map<String, dynamic>?> fetchType(String id);
+  Future<bool> doesTypeExist(String type, String userId);
 }
 
 @LazySingleton(as: CreateThingRepositoryI)
@@ -23,7 +24,10 @@ class CreateThingRepository implements CreateThingRepositoryI {
   CreateThingRepository(this._api);
 
   final CreateThingApiI _api;
-
+  @override
+  Future<bool> doesTypeExist(String type, String userId) {
+    return _api.doesTypeExist(type, userId);
+  }
   @override
   Future<void> addThing(ThingsModel model) => _api.addThing(model);
 
