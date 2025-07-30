@@ -10,6 +10,12 @@ abstract class CreateThingRepositoryI {
   Future<ThingsModel?> fetchThing(String id);
 
   Future<void> updateFavorite(String id, bool isFavorite);
+
+  Future<void> addType(Map<String, dynamic> typeData);
+
+  Future<void> updateType(String id, Map<String, dynamic> typeData);
+
+  Future<Map<String, dynamic>?> fetchType(String id);
 }
 
 @LazySingleton(as: CreateThingRepositoryI)
@@ -30,4 +36,14 @@ class CreateThingRepository implements CreateThingRepositoryI {
   @override
   Future<void> updateFavorite(String id, bool isFavorite) =>
       _api.updateFavorite(id, isFavorite);
+
+  @override
+  Future<void> addType(Map<String, dynamic> typeData) => _api.addType(typeData);
+
+  @override
+  Future<void> updateType(String id, Map<String, dynamic> typeData) =>
+      _api.updateType(id, typeData);
+
+  @override
+  Future<Map<String, dynamic>?> fetchType(String id) => _api.fetchType(id);
 }

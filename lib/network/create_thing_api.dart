@@ -6,25 +6,26 @@ import '../model/things_model.dart';
 
 abstract class CreateThingApiI {
   Future<void> addThing(ThingsModel model);
-
   Future<void> updateThing(ThingsModel model);
-
   Future<ThingsModel?> fetchThing(String id);
-
   Future<void> updateFavorite(String id, bool isFavorite);
+
+
+  Future<void> addType(Map<String, dynamic> typeData);
+  Future<void> updateType(String id, Map<String, dynamic> typeData);
+  Future<Map<String, dynamic>?> fetchType(String id);
 }
+
 
 @LazySingleton(as: CreateThingApiI)
 class CreateThingApi implements CreateThingApiI {
   final _firestore = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
-
   CollectionReference get _collection => _firestore.collection('item');
 
   @override
   Future<void> addThing(ThingsModel model) async {
-    final data = model.toJson()
-    ..remove('id');
+    final data = model.toJson()..remove('id');
     await _collection.add(data);
   }
 
@@ -45,4 +46,22 @@ class CreateThingApi implements CreateThingApiI {
   Future<void> updateFavorite(String id, bool isFavorite) async {
     await _collection.doc(id).update({'favorites': isFavorite});
   }
+
+
+  @override
+  Future<void> addType(Map<String, dynamic> typeData) async {
+    await _collection.add(typeData);
+  }
+
+  @override
+  Future<void> updateType(String id, Map<String, dynamic> typeData) async {
+    await _collection.doc(id).update(typeData);
+  }
+
+  @override
+  Future<Map<String, dynamic>?> fetchType(String id) async {
+    final doc = await _collection.doc(id).get();
+    return doc.data() as Map<String, dynamic>?;
+  }
 }
+
