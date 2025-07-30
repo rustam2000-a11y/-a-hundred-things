@@ -1,18 +1,18 @@
 import 'dart:io';
 import 'dart:math';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../../core/utils/image_picker.dart';
 import '../../../../generated/l10n.dart';
 import '../../../../presentation/colors.dart';
-import '../../../../repository/things_repository.dart';
 import '../../../login/widget/button_basic.dart';
+import '../../../things/new_things/create_new_thing_bloc.dart';
 import '../../../things/new_things/widget/image_pager_with_indicator.dart';
 import '../appBar/dropdown_title_widget.dart';
 import '../appBar/new_custom_app_bar.dart';
+
 
 class AddTypePage extends StatefulWidget {
   const AddTypePage({
@@ -31,44 +31,32 @@ class AddTypePage extends StatefulWidget {
   final String? editingItemId;
 
   @override
-  State<AddTypePage> createState() => _AddItemPageState();
+  State<AddTypePage> createState() => _AddTypePageState();
 }
 
-class _AddItemPageState extends State<AddTypePage> {
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
+class _AddTypePageState extends State<AddTypePage> {
   final TextEditingController _typeController = TextEditingController();
-  final ImagePicker _picker = ImagePicker();
-  final ThingsRepositoryI thingsRepository = GetIt.I<ThingsRepositoryI>();
-  final List<File> _selectedImages = [];
+  final TextEditingController _descriptionController = TextEditingController();
   final Map<String, String> typeColorsCache = {};
-  List<String> _imageUrls = [];
-  String? selectedType;
+  final Set<String> _typeSet = {};
+
+  final List<String> _imageUrls = [];
+
   bool isFormFilled = false;
   final bool _showDrawer = false;
-  final Set<String> _typeSet = {};
+  final List<File> _selectedImages = [];
 
   @override
   void initState() {
     super.initState();
-
-    if (widget.initialType != null) {
-      _typeController.text = widget.initialType!;
-    }
-    if (widget.initialDescription != null) {
-      _descriptionController.text = widget.initialDescription!;
-    }
-
-    _imageUrls = widget.initialImageUrls ?? [];
-
+    _typeController.text = widget.initialType ?? '';
+    _descriptionController.text = widget.initialDescription ?? '';
     _descriptionController.addListener(_checkFormFilled);
     _typeController.addListener(_checkFormFilled);
   }
 
   void _checkFormFilled() {
-    final filled = _descriptionController.text.isNotEmpty &&
-        _typeController.text.isNotEmpty;
-
+    final filled = _descriptionController.text.isNotEmpty && _typeController.text.isNotEmpty;
     if (filled != isFormFilled) {
       setState(() {
         isFormFilled = filled;
@@ -78,14 +66,12 @@ class _AddItemPageState extends State<AddTypePage> {
 
   Future<void> _pickAndCropImage() async {
     final File? croppedImage = await ImagePickerHelper.pickImage();
-
     if (croppedImage != null) {
       setState(() {
         _selectedImages.add(croppedImage);
       });
     }
   }
-
 
   String getRandomColor() {
     final random = Random();
@@ -123,10 +109,8 @@ class _AddItemPageState extends State<AddTypePage> {
               child: Container(
                 height: screenHeight * 0.45,
                 width: double.infinity,
-                decoration: BoxDecoration(
-                  color: isDarkMode ? Colors.white : Colors.white,
-                ),
-                child: (_selectedImages.isNotEmpty || _imageUrls.isNotEmpty)
+                decoration: const BoxDecoration(color: Colors.white),
+                child: _selectedImages.isNotEmpty
                     ? ImagePagerWithIndicator(
                   files: _selectedImages,
                   urls: _imageUrls,
@@ -137,6 +121,8 @@ class _AddItemPageState extends State<AddTypePage> {
                     });
                   },
                 )
+
+
                     : Center(
                   child: Container(
                     width: screenWidth * 0.5,
@@ -154,15 +140,13 @@ class _AddItemPageState extends State<AddTypePage> {
                 ),
               ),
             ),
-
             Positioned(
               top: screenHeight * 0.45,
               left: 0,
               right: 0,
               child: Container(
                 height: screenHeight * 0.6,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   gradient: isDarkMode ? AppColors.darkBlueGradient : null,
                   color: Colors.white,
@@ -212,8 +196,7 @@ class _AddItemPageState extends State<AddTypePage> {
               child: Container(
                 height: screenHeight * 0.15,
                 decoration: BoxDecoration(
-                  color:
-                      isDarkMode ? AppColors.blackSand : AppColors.whiteColor,
+                  color: isDarkMode ? AppColors.blackSand : AppColors.whiteColor,
                   border: const Border(top: BorderSide()),
                 ),
                 child: Padding(
@@ -227,62 +210,19 @@ class _AddItemPageState extends State<AddTypePage> {
                         backgroundColor: Colors.black,
                         isEnabled: isFormFilled,
                         onPressed: () async {
-                          try {
-                            if (_selectedImages.isNotEmpty) {
-                              _imageUrls = await thingsRepository
-                                  .uploadImages(_selectedImages);
-                            }
+                          final type = _typeController.text.trim();
+                          final description = _descriptionController.text.trim();
+                          final bloc = context.read<CreateNewThingBloc>()
 
-                            final type = _typeController.text.trim();
-                            final existing = await FirebaseFirestore.instance
-                                .collection('item')
-                                .where('type', arrayContains: type)
-                                .limit(1)
-                                .get();
+                          ..add(SaveTypeEvent(
+                            type: type,
+                            description: description,
+                            isEditing: widget.isEditing,
+                            editingItemId: widget.editingItemId,
+                            files: _selectedImages,
+                          ));
 
-                            if (!widget.isEditing && existing.docs.isNotEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('This type already exists.')),
-                              );
-                              return;
-                            }
-                            if (!typeColorsCache.containsKey(type)) {
-                              typeColorsCache[type] = getRandomColor();
-                            }
-
-                            final randomColor = typeColorsCache[type]!;
-
-                            final data = {
-                              'title': _titleController.text.trim(),
-                              'typDescription':
-                                  _descriptionController.text.trim(),
-                              'type': [type],
-                              'userId': FirebaseAuth.instance.currentUser?.uid,
-                              'color': randomColor,
-                              'typeColor': randomColor,
-                              'timestamp': Timestamp.now(),
-                              'imageUrls': _imageUrls,
-                              'quantity': 1,
-                            };
-
-                            if (widget.isEditing &&
-                                widget.editingItemId != null) {
-                              await FirebaseFirestore.instance
-                                  .collection('item')
-                                  .doc(widget.editingItemId)
-                                  .update(data);
-                            } else {
-                              await FirebaseFirestore.instance
-                                  .collection('item')
-                                  .add(data);
-                            }
-
-                            Navigator.pop(context, _typeController.text);
-                          } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Error: $e')),
-                            );
-                          }
+                          Navigator.pop(context, type);
                         },
                       ),
                       CustomMainButton(
