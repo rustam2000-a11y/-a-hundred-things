@@ -1,10 +1,7 @@
-// Updated HomeBloc (home_bloc.dart)
 import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:injectable/injectable.dart';
-
 import '../../../../model/things_model.dart';
 import '../../../../repository/things_repository.dart';
 
@@ -67,7 +64,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<UpdateSelectedItemsEvent>((event, emit) {
       emit(state.copyWith(selectedItemIds: event.selectedItemIds));
     });
-
   }
 
   final ThingsRepositoryI _thingsRepository;
@@ -148,10 +144,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     add(HomeTypeThingsEvent(typesWithColors: typesWithColors));
   }
+
   Future<void> _onDeleteItemsByUids(
-      DeleteItemsByUidsEvent event,
-      Emitter<HomeState> emit,
-      ) async {
+    DeleteItemsByUidsEvent event,
+    Emitter<HomeState> emit,
+  ) async {
     emit(state.copyWith(isProgress: true));
 
     try {
@@ -167,10 +164,15 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         }
       }
       add(HomeTypeThingsEvent(typesWithColors: typesWithColors));
-    } catch (e) {
-    }
+    } catch (e) {}
 
     emit(state.copyWith(isProgress: false));
+  }
+
+  Future<void> deleteTypeAndAllThingsWithType(
+      String type, String typeUid) async {
+    await _thingsRepository.deleteThingsByType(type);
+    await _thingsRepository.deleteItemByUid(typeUid);
   }
 
   @override

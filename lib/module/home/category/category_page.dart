@@ -8,6 +8,7 @@ import '../../../core/utils/internet_banner_overlay.dart';
 import '../../../presentation/colors.dart';
 
 import '../../settings/bloc/account_bloc/account_bloc.dart';
+import '../../things/new_things/create_new_thing_bloc.dart';
 import '../bloc/home_bloc/home_bloc.dart';
 import '../widget/appBar/new_custom_app_bar.dart';
 import '../widget/drawer.dart';
@@ -30,7 +31,6 @@ class CategoriePageState extends State<CategoriePage> {
   late HomeBloc _bloc;
   ValueNotifier<List<String>> selectedItemsNotifier = ValueNotifier([]);
 
-
   @override
   void initState() {
     _bloc = GetIt.I<HomeBloc>();
@@ -39,8 +39,7 @@ class CategoriePageState extends State<CategoriePage> {
   }
 
   void _toggleCategoryList(bool show) {
-    setState(() {
-    });
+    setState(() {});
   }
 
   @override
@@ -89,7 +88,6 @@ class CategoriePageState extends State<CategoriePage> {
                     ),
                     const Padding(
                       padding: EdgeInsets.all(16),
-
                     ),
                     SizedBox(
                       height: 50,
@@ -102,7 +100,12 @@ class CategoriePageState extends State<CategoriePage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute<void>(
-                                  builder: (context) => const AddTypePage(),
+                                  builder: (context) =>
+                                      BlocProvider<CreateNewThingBloc>(
+                                    create: (_) =>
+                                        GetIt.I<CreateNewThingBloc>(),
+                                    child: const AddTypePage(),
+                                  ),
                                 ),
                               );
                             },
@@ -211,8 +214,16 @@ class CategoriePageState extends State<CategoriePage> {
                                 type: category.type.isNotEmpty
                                     ? category.type.first
                                     : '',
-                                onDeleteItem: () => _bloc.add(
-                                    DeleteItemByUidEvent(uid: category.id)),
+                                onDeleteItem: () async {
+                                  final type = category.type.isNotEmpty
+                                      ? category.type.first
+                                      : null;
+                                  if (type != null) {
+                                    await _bloc.deleteTypeAndAllThingsWithType(
+                                        type, category.id);
+                                    setState(() {});
+                                  }
+                                },
                                 selectedCategoryType: _selectedCategoryType,
                                 onStateUpdate: () => setState(() {}),
                               ),
