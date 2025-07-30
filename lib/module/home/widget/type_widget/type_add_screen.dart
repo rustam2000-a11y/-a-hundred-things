@@ -92,16 +92,14 @@ class _AddTypePageState extends State<AddTypePage> {
         logo: SizedBox.shrink(),
     ),
     body: BlocListener<CreateNewThingBloc, CreateNewThingState>(
-      listenWhen: (previous, current) =>
-      previous.errorMessage != current.errorMessage ||
-          previous.files != current.files,
       listener: (context, state) {
         if (state.errorMessage != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.errorMessage!)),
           );
-        } else {
+        }
 
+        if (state.isSuccess) {
           final type = _typeController.text.trim();
           Navigator.pop(context, type);
         }

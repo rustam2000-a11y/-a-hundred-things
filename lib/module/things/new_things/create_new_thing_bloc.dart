@@ -164,5 +164,7 @@ class CreateNewThingBloc
       final ref = await collection.add(data);
       await ref.update({'id': ref.id});
     }
+    emit(state.copyWith(isSuccess: true));
+
   }
 }
