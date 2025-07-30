@@ -28,17 +28,18 @@ class BaseDataApi implements BaseDataApiI {
   @override
   Stream<List<ThingsModel>> fetchAllThings() {
     return Stream.fromFuture(getCurrentUserUid()).asyncExpand(
-          (userUid) => databaseReference
+      (userUid) => databaseReference
           .collection('item')
           .where('userId', isEqualTo: userUid)
           .snapshots()
           .map(
             (event) => event.docs
-            .map((e) => ThingsModel.fromJson(e.data()).copyWith(id: e.id))
-            .toList(),
-      ),
+                .map((e) => ThingsModel.fromJson(e.data()).copyWith(id: e.id))
+                .toList(),
+          ),
     );
   }
+
   @override
   Stream<List<ThingsModel>> searchThingsByTitle(String searchQuery) {
     return FirebaseFirestore.instance
@@ -48,9 +49,9 @@ class BaseDataApi implements BaseDataApiI {
         .map((snapshot) {
       return snapshot.docs
           .where((item) {
-        final title = (item['title'] as String?)?.toLowerCase() ?? '';
-        return title.contains(searchQuery);
-      })
+            final title = (item['title'] as String?)?.toLowerCase() ?? '';
+            return title.contains(searchQuery);
+          })
           .map((doc) => ThingsModel.fromJson(doc.data()).copyWith(id: doc.id))
           .toList();
     });
@@ -72,8 +73,10 @@ class BaseDataApi implements BaseDataApiI {
         }
 
         final bytes = await image.readAsBytes();
-        final filename = '${DateTime.now().millisecondsSinceEpoch}_${image.path.split('/').last}';
-        final ref = FirebaseStorage.instance.ref().child('item_images/$filename');
+        final filename =
+            '${DateTime.now().millisecondsSinceEpoch}_${image.path.split('/').last}';
+        final ref =
+            FirebaseStorage.instance.ref().child('item_images/$filename');
 
         print('Uploading BYTES from file: ${image.path}');
         final taskSnapshot = await ref.putData(bytes);
@@ -82,7 +85,8 @@ class BaseDataApi implements BaseDataApiI {
 
         urls.add(downloadUrl);
       } on FirebaseException catch (e) {
-        print('🔥 Firebase Storage error: code=${e.code}, message=${e.message}');
+        print(
+            '🔥 Firebase Storage error: code=${e.code}, message=${e.message}');
         throw Exception('Ошибка Firebase: ${e.message}');
       } catch (e) {
         print('❌ Unknown error: $e');
@@ -93,24 +97,11 @@ class BaseDataApi implements BaseDataApiI {
     return urls;
   }
 
-
-
-  @override
-  Future<void> deleteThingsByType(String type) async {
-    final items = await databaseReference
-        .collection('item')
-        .where('type', isEqualTo: type)
-        .get();
-
-    for (final doc in items.docs) {
-      await doc.reference.delete();
-    }
-  }
-
   @override
   Future<void> deleteItemByUid(String uid) async {
     await databaseReference.collection('item').doc(uid).delete();
   }
+
   @override
   Future<void> deleteItemsByUids(List<String> uids) async {
     final batch = FirebaseFirestore.instance.batch();
@@ -123,9 +114,18 @@ class BaseDataApi implements BaseDataApiI {
     await batch.commit();
   }
 
+  @override
+  Future<void> deleteThingsByType(String type) async {
+    final items = await databaseReference
+        .collection('item')
+        .where('type', arrayContains: type)
+        .get();
 
+    for (final doc in items.docs) {
+      await doc.reference.delete();
+    }
+  }
 }
-
 
 abstract class BaseDataApiI {
   Future<String> getCurrentUserUid();
@@ -144,4 +144,3 @@ abstract class BaseDataApiI {
 
   Future<List<String>> uploadImages(List<File> images);
 }
-

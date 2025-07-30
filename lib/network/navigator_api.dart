@@ -42,11 +42,17 @@ class NavigatorDataApi implements NavigatorDataApiI {
       int total = 0;
 
       for (final doc in snapshot.docs) {
-        final title = doc['title'];
+        final data = doc.data();
+
+
+        if (!data.containsKey('title')) continue;
+
+        final title = data['title'];
         if (title != null && title.toString().trim().isNotEmpty) {
-          total += doc['quantity'] as int? ?? 1;
+          total += (data['quantity'] as int?) ?? 1;
         }
       }
+
 
       return total;
     });
