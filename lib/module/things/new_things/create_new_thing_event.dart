@@ -60,3 +60,21 @@ class RemoveImageEvent extends CreateNewThingEvent {
   @override
   List<Object?> get props => [index];
 }
+class SaveTypeEvent extends CreateNewThingEvent {
+
+  const SaveTypeEvent({
+    required this.type,
+    required this.description,
+    this.isEditing = false,
+    this.editingItemId,
+    this.files = const [],
+  });
+  final String type;
+  final String description;
+  final bool isEditing;
+  final String? editingItemId;
+  final List<File> files;
+
+  @override
+  List<Object?> get props => [type, description, isEditing, editingItemId, files];
+}

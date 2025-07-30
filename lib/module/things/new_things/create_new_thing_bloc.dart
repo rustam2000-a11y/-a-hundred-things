@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
@@ -6,11 +7,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:injectable/injectable.dart';
-
 import '../../../core/utils/image_picker.dart';
 import '../../../model/things_model.dart';
 import '../../../repository/create_new_thing_repository.dart';
-import 'image_picker_servirs.dart';
 import 'image_upload_service.dart';
 
 part 'create_new_thing_event.dart';
@@ -18,36 +17,36 @@ part 'create_new_thing_event.dart';
 part 'create_new_thing_state.dart';
 
 @Injectable()
-class CreateNewThingBloc extends Bloc<CreateNewThingEvent, CreateNewThingState> {
+class CreateNewThingBloc
+    extends Bloc<CreateNewThingEvent, CreateNewThingState> {
   CreateNewThingBloc(
-
-      this.repository,
-      this.imageUploadService,
-      ) : super(const CreateNewThingState()) {
+    this.repository,
+    this.imageUploadService,
+  ) : super(const CreateNewThingState()) {
     on<AddImageEvent>(_addImage);
     on<RemoveImageEvent>(_removeImage);
     on<ChangeImageEvent>(_changeImage);
     on<LoadThingEvent>(_loadThing);
     on<SaveThingEvent>(_saveThing);
     on<ToggleFavoriteEvent>(_toggleFavorite);
+    on<SaveTypeEvent>(_saveType);
   }
-
 
   final CreateThingRepositoryI repository;
   final ImageUploadService imageUploadService;
 
   Future<void> _addImage(
-      AddImageEvent event,
-      Emitter<CreateNewThingState> emit,
-      ) async {
+    AddImageEvent event,
+    Emitter<CreateNewThingState> emit,
+  ) async {
     final updatedFiles = List<File>.from(state.files)..add(event.file);
     emit(state.copyWith(files: updatedFiles));
   }
 
   Future<void> _removeImage(
-      RemoveImageEvent event,
-      Emitter<CreateNewThingState> emit,
-      ) async {
+    RemoveImageEvent event,
+    Emitter<CreateNewThingState> emit,
+  ) async {
     final updatedFiles = List<File>.from(state.files);
     if (event.index >= 0 && event.index < updatedFiles.length) {
       updatedFiles.removeAt(event.index);
@@ -56,9 +55,9 @@ class CreateNewThingBloc extends Bloc<CreateNewThingEvent, CreateNewThingState> 
   }
 
   Future<void> _changeImage(
-      ChangeImageEvent event,
-      Emitter<CreateNewThingState> emit,
-      ) async {
+    ChangeImageEvent event,
+    Emitter<CreateNewThingState> emit,
+  ) async {
     final file = await ImagePickerHelper.pickImage();
     if (file == null) return;
 
@@ -66,7 +65,7 @@ class CreateNewThingBloc extends Bloc<CreateNewThingEvent, CreateNewThingState> 
 
     final inputImage = InputImage.fromFile(file);
     final labeler =
-    ImageLabeler(options: ImageLabelerOptions(confidenceThreshold: 0.7));
+        ImageLabeler(options: ImageLabelerOptions(confidenceThreshold: 0.7));
     final labels = await labeler.processImage(inputImage);
     await labeler.close();
 
@@ -76,9 +75,9 @@ class CreateNewThingBloc extends Bloc<CreateNewThingEvent, CreateNewThingState> 
   }
 
   Future<void> _loadThing(
-      LoadThingEvent event,
-      Emitter<CreateNewThingState> emit,
-      ) async {
+    LoadThingEvent event,
+    Emitter<CreateNewThingState> emit,
+  ) async {
     final model = await repository.fetchThing(event.docId);
     if (model != null) {
       emit(state.copyWith(thing: model));
@@ -86,9 +85,9 @@ class CreateNewThingBloc extends Bloc<CreateNewThingEvent, CreateNewThingState> 
   }
 
   Future<void> _saveThing(
-      SaveThingEvent event,
-      Emitter<CreateNewThingState> emit,
-      ) async {
+    SaveThingEvent event,
+    Emitter<CreateNewThingState> emit,
+  ) async {
     List<String> uploadedUrls = event.model.imageUrl ?? [];
 
     if (state.files.isNotEmpty) {
@@ -126,9 +125,48 @@ class CreateNewThingBloc extends Bloc<CreateNewThingEvent, CreateNewThingState> 
   }
 
   Future<void> _toggleFavorite(
-      ToggleFavoriteEvent event,
-      Emitter<CreateNewThingState> emit,
-      ) async {
+    ToggleFavoriteEvent event,
+    Emitter<CreateNewThingState> emit,
+  ) async {
     await repository.updateFavorite(event.docId, event.isFavorite);
+  }
+
+  Future<void> _saveType(
+    SaveTypeEvent event,
+    Emitter<CreateNewThingState> emit,
+  ) async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return;
+
+    final List<String> uploadedUrls = [];
+
+    if (event.files.isNotEmpty) {
+      for (final file in event.files) {
+        final url = await imageUploadService.uploadImage(file);
+        uploadedUrls.add(url);
+      }
+    }
+    final randomColor =
+        '#${Random().nextInt(0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
+
+    final data = {
+      'typDescription': event.description,
+      'type': [event.type],
+      'userId': userId,
+      'color': randomColor,
+      'typeColor': randomColor,
+      'timestamp': Timestamp.now(),
+      'imageUrls': uploadedUrls,
+      'quantity': 1,
+    };
+
+    final collection = FirebaseFirestore.instance.collection('item');
+
+    if (event.isEditing && event.editingItemId != null) {
+      await collection.doc(event.editingItemId).update(data);
+    } else {
+      final ref = await collection.add(data);
+      await ref.update({'id': ref.id});
+    }
   }
 }
