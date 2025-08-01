@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import '../../../../model/things_model.dart';
 import '../../../../presentation/colors.dart';
@@ -22,6 +21,7 @@ class CreateThingBottomBar extends StatelessWidget {
     required this.stateFiles,
     required this.stateThing,
     required this.bloc,
+    required this.hashtagController,
   });
 
   final double screenHeight;
@@ -37,7 +37,7 @@ class CreateThingBottomBar extends StatelessWidget {
   final List<File> stateFiles;
   final ThingsModel? stateThing;
   final CreateNewThingBloc bloc;
-
+  final TextEditingController hashtagController;
   @override
   Widget build(BuildContext context) {
     return Align(
@@ -73,6 +73,12 @@ class CreateThingBottomBar extends StatelessWidget {
                     int.tryParse(quantityController.text.trim()) ?? 1,
                     importance: selectedImportance,
                     favorites: isFavorite,
+                    hashtags: hashtagController.text
+                        .trim()
+                        .split(RegExp(r'[,#\s]+'))
+                        .where((tag) => tag.isNotEmpty)
+                        .toList(),
+
                   );
                   bloc.add(SaveThingEvent(model));
                   Navigator.pop(context, true);

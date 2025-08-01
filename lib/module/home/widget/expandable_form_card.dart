@@ -16,6 +16,7 @@ class ExpandableFormCard extends StatefulWidget {
     required this.importanceLevel,
     required this.onImportanceChanged,
     this.quantityController,
+    this.hashtagController,
   });
 
   final bool isExpanded;
@@ -28,6 +29,8 @@ class ExpandableFormCard extends StatefulWidget {
   final String importanceLevel;
   final ValueChanged<String> onImportanceChanged;
   final TextEditingController? quantityController;
+  final TextEditingController? hashtagController;
+
 
   @override
   State<ExpandableFormCard> createState() => _ExpandableFormCardState();
@@ -115,7 +118,11 @@ class _ExpandableFormCardState extends State<ExpandableFormCard> {
                       _buildFieldRow(
                           label: 'Quantity',
                           controller: widget.quantityController),
-                      const SizedBox(height: 12),
+                      _buildFieldRow(
+                        label: 'Hashtag ',
+                        controller: widget.hashtagController,
+                      ),
+
                     ],
                     GestureDetector(
                       onTap: () {

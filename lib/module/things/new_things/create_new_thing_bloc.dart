@@ -100,7 +100,9 @@ class CreateNewThingBloc
         imageUrl: uploadedUrls,
         id: '',
         userId: userId,
+        hashtags: event.model.hashtags,
       );
+
       final ref = await FirebaseFirestore.instance
           .collection('item')
           .add(modelToSave.toJson(includeId: false));
@@ -109,7 +111,9 @@ class CreateNewThingBloc
       final modelToUpdate = event.model.copyWith(
         imageUrl: uploadedUrls,
         userId: userId,
+        hashtags: event.model.hashtags,
       );
+
       await FirebaseFirestore.instance
           .collection('item')
           .doc(modelToUpdate.id)

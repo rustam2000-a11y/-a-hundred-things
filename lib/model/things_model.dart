@@ -15,6 +15,7 @@ class ThingsModel extends Equatable {
     this.favorites = false,
     this.timestamp,
     this.userId,
+    this.hashtags = const [],
   });
 
   factory ThingsModel.fromJson(Map<String, dynamic> json) {
@@ -25,7 +26,6 @@ class ThingsModel extends Equatable {
       type: json['type'] is List
           ? List<String>.from(json['type'])
           : [json['type']?.toString() ?? ''],
-
       typDescription: json['typDescription'] as String? ?? '',
       color: json['color'] as String? ?? '',
       imageUrl: (json['imageUrls'] as List<dynamic>?)
@@ -39,6 +39,10 @@ class ThingsModel extends Equatable {
           ? (json['timestamp'] as Timestamp).toDate()
           : null,
       userId: json['userId'] as String?,
+      hashtags: (json['hashtags'] as List<dynamic>?)
+          ?.map((e) => e.toString())
+          .toList() ??
+          [],
     );
   }
 
@@ -54,6 +58,7 @@ class ThingsModel extends Equatable {
   final DateTime? timestamp;
   final bool favorites;
   final String? userId;
+  final List<String> hashtags;
 
   @override
   List<Object?> get props => [
@@ -67,6 +72,7 @@ class ThingsModel extends Equatable {
     imageUrl,
     quantity,
     importance,
+    hashtags,
   ];
 
   ThingsModel copyWith({
@@ -81,6 +87,7 @@ class ThingsModel extends Equatable {
     String? importance,
     bool? favorites,
     String? userId,
+    List<String>? hashtags,
   }) {
     return ThingsModel(
       id: id ?? this.id,
@@ -94,6 +101,7 @@ class ThingsModel extends Equatable {
       importance: importance ?? this.importance,
       favorites: favorites ?? this.favorites,
       userId: userId ?? this.userId,
+      hashtags: hashtags ?? this.hashtags,
     );
   }
 
@@ -110,6 +118,7 @@ class ThingsModel extends Equatable {
       'favorites': favorites,
       'timestamp': timestamp ?? DateTime.now(),
       'userId': userId,
+      'hashtags': hashtags,
     };
 
     if (includeId && id.isNotEmpty) {
@@ -119,3 +128,4 @@ class ThingsModel extends Equatable {
     return data;
   }
 }
+

@@ -4,7 +4,7 @@ import 'package:get_it/get_it.dart';
 import '../../../core/utils/internet_banner_overlay.dart';
 import '../../home/widget/appBar/dropdown_container.dart';
 import '../../home/widget/appBar/new_custom_app_bar.dart';
-import '../../home/widget/type_dropdown_list.dart';
+import '../../home/widget/expandable_form_card.dart';
 import 'create_new_thing_bloc.dart';
 import 'widget/create_thing_bottom_bar.dart';
 import 'widget/image_pager_with_indicator.dart';
@@ -26,6 +26,7 @@ class CreateNewThingScreen extends StatefulWidget {
 }
 
 class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
+  final _hashtagController = TextEditingController();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _quantityController = TextEditingController(text: '1');
@@ -71,6 +72,8 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
             ..clear()
             ..addAll(thing.type);
           _selectedImportance = thing.importance;
+          _hashtagController.text =
+              thing.hashtags.isNotEmpty ? thing.hashtags.first : '';
         }
       },
       builder: (context, state) {
@@ -124,13 +127,13 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                       },
                     ),
                   ),
-
                 ),
                 ExpandableFormCard(
                   isExpanded: _isExpanded,
                   titleController: _titleController,
                   descriptionController: _descriptionController,
                   quantityController: _quantityController,
+                  hashtagController: _hashtagController,
                   isDarkMode: Theme.of(context).brightness == Brightness.dark,
                   screenHeight: MediaQuery.of(context).size.height,
                   screenWidth: MediaQuery.of(context).size.width,
@@ -148,6 +151,7 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                   titleController: _titleController,
                   descriptionController: _descriptionController,
                   quantityController: _quantityController,
+                  hashtagController: _hashtagController,
                   selectedImportance: _selectedImportance,
                   isFavorite: _isFavorite,
                   existingDocId: _existingDocId,
@@ -176,4 +180,3 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
     });
   }
 }
-
