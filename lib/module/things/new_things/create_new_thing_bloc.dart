@@ -28,6 +28,10 @@ class CreateNewThingBloc
     on<SaveThingEvent>(_saveThing);
     on<ToggleFavoriteEvent>(_toggleFavorite);
     on<SaveTypeEvent>(_saveType);
+    on<InitTypeFormEvent>(_initTypeForm);
+    on<TypeChangedEvent>(_typeChanged);
+    on<DescriptionChangedEvent>(_descriptionChanged);
+
   }
 
   final CreateThingRepositoryI repository;
@@ -40,8 +44,8 @@ class CreateNewThingBloc
     emit(state.copyWith(files: updatedFiles));
   }
 
-  Future<void> _removeImage(RemoveImageEvent event,
-      Emitter<CreateNewThingState> emit,) async {
+  Future<void> _removeImage(RemoveImageEvent event, Emitter<CreateNewThingState> emit,)
+  async {
     final updatedFiles = List<File>.from(state.files);
     if (event.index >= 0 && event.index < updatedFiles.length) {
       updatedFiles.removeAt(event.index);
@@ -167,4 +171,28 @@ class CreateNewThingBloc
     emit(state.copyWith(isSuccess: true));
 
   }
+  Future<void> _initTypeForm(
+      InitTypeFormEvent event,
+      Emitter<CreateNewThingState> emit,
+      ) async {
+    emit(state.copyWith(
+      type: event.initialType ?? '',
+      description: event.initialDescription ?? '',
+    ));
+  }
+
+  Future<void> _typeChanged(
+      TypeChangedEvent event,
+      Emitter<CreateNewThingState> emit,
+      ) async {
+    emit(state.copyWith(type: event.type));
+  }
+
+  Future<void> _descriptionChanged(
+      DescriptionChangedEvent event,
+      Emitter<CreateNewThingState> emit,
+      ) async {
+    emit(state.copyWith(description: event.description));
+  }
+
 }
