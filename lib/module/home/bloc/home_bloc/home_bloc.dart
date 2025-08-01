@@ -105,13 +105,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
         final normalizedTargetValue = value.trim().toLowerCase();
 
-        if (field == 'type' && fieldValue is List) {
+        if (fieldValue is List) {
           return fieldValue
-              .map((t) => t.toString().trim().toLowerCase())
+              .map((e) => e.toString().trim().toLowerCase())
               .contains(normalizedTargetValue);
         } else {
           final normalizedFieldValue =
-              fieldValue.toString().trim().toLowerCase();
+          fieldValue.toString().trim().toLowerCase();
           return normalizedFieldValue == normalizedTargetValue;
         }
       }).toList();
@@ -119,6 +119,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       add(HomeThingsEvent(things: filteredList));
     });
   }
+
 
   Future<void> deleteThingsByType(String type) async {
     await _thingsRepository.deleteThingsByType(type);

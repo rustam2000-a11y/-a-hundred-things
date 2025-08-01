@@ -95,9 +95,10 @@ class ContainerWithFilters extends StatelessWidget {
                         const Divider(height: 1),
                         FilterOption(
                           title: title,
-                          selectedType: selectedType,
+                          selectedFilters: selectedFilters,
                           onTypeSelected: onTypeSelected,
                         ),
+
                         const Divider(height: 1),
                       ],
                     );
@@ -116,12 +117,12 @@ class FilterOption extends StatelessWidget {
   const FilterOption({
     super.key,
     required this.title,
-    this.selectedType,
+    required this.selectedFilters,
     this.onTypeSelected,
   });
 
   final String title;
-  final String? selectedType;
+  final Map<String, String> selectedFilters;
   final void Function(String field, String value)? onTypeSelected;
 
   Future<List<String>> _loadValuesFromFirestore(String field) async {
@@ -134,19 +135,22 @@ class FilterOption extends StatelessWidget {
           .where('userId', isEqualTo: user.uid)
           .get();
 
-      final values = snapshot.docs
-          .map((doc) => doc.data()[field])
-          .where((value) =>
-      value != null &&
-          value.toString().trim().isNotEmpty &&
-          value is! List &&
-          value is! Map)
-          .map((value) => value.toString().trim())
-          .toSet()
-          .toList();
+      final values = <String>{};
 
-      return values;
-    } catch (e, stackTrace) {
+      for (var doc in snapshot.docs) {
+        final data = doc.data()[field];
+
+        if (data is List) {
+          values.addAll(data.map((e) => e.toString().trim()));
+        } else if (data != null &&
+            data.toString().trim().isNotEmpty &&
+            data is! Map) {
+          values.add(data.toString().trim());
+        }
+      }
+
+      return values.toList();
+    } catch (e) {
       rethrow;
     }
   }
@@ -165,7 +169,7 @@ class FilterOption extends StatelessWidget {
       return ExpansionTile(
         title: Text(title),
         children: sortingOptions.map((option) {
-          final isSelected = option == selectedType;
+          final isSelected = option == selectedFilters['sort'];
           return ListTile(
             title: Center(
               child: Text(
@@ -185,7 +189,7 @@ class FilterOption extends StatelessWidget {
     }
 
     const firestoreFields = {
-      'Tags': 'type',
+      'Tags': 'hashtags',
       'Importance': 'importance',
     };
 
@@ -218,7 +222,7 @@ class FilterOption extends StatelessWidget {
             children: values.isEmpty
                 ? [const ListTile(title: Text('No data found'))]
                 : values.map((value) {
-              final isSelected = value == selectedType;
+              final isSelected = value == selectedFilters[field];
               return ListTile(
                 title: Text(
                   value,
@@ -237,7 +241,6 @@ class FilterOption extends StatelessWidget {
       );
     }
 
-
     return ExpansionTile(
       title: Text(title),
       children: const [
@@ -247,4 +250,5 @@ class FilterOption extends StatelessWidget {
     );
   }
 }
+
 
