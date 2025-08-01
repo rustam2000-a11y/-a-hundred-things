@@ -79,28 +79,28 @@ class SaveTypeEvent extends CreateNewThingEvent {
   List<Object?> get props => [type, description, isEditing, editingItemId, files];
 }
 class InitTypeFormEvent extends CreateNewThingEvent {
-  final String? initialType;
-  final String? initialDescription;
 
   const InitTypeFormEvent({this.initialType, this.initialDescription});
+  final String? initialType;
+  final String? initialDescription;
 
   @override
   List<Object?> get props => [initialType, initialDescription];
 }
 
 class TypeChangedEvent extends CreateNewThingEvent {
-  final String type;
 
   const TypeChangedEvent(this.type);
+  final String type;
 
   @override
   List<Object?> get props => [type];
 }
 
 class DescriptionChangedEvent extends CreateNewThingEvent {
-  final String description;
 
   const DescriptionChangedEvent(this.description);
+  final String description;
 
   @override
   List<Object?> get props => [description];

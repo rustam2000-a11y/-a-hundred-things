@@ -1,10 +1,8 @@
 import 'dart:io';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../../../../core/utils/image_picker.dart';
+import '../../../../core/utils/internet_banner_overlay.dart';
 import '../../../../generated/l10n.dart';
 import '../../../../presentation/colors.dart';
 import '../../../login/widget/button_basic.dart';
@@ -12,7 +10,6 @@ import '../../../things/new_things/create_new_thing_bloc.dart';
 import '../../../things/new_things/widget/image_pager_with_indicator.dart';
 import '../appBar/dropdown_title_widget.dart';
 import '../appBar/new_custom_app_bar.dart';
-
 
 class AddTypePage extends StatefulWidget {
   const AddTypePage({
@@ -35,47 +32,25 @@ class AddTypePage extends StatefulWidget {
 }
 
 class _AddTypePageState extends State<AddTypePage> {
-  final TextEditingController _typeController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  final Map<String, String> typeColorsCache = {};
   final Set<String> _typeSet = {};
-
-  final List<String> _imageUrls = [];
-
-  bool isFormFilled = false;
   final bool _showDrawer = false;
-  final List<File> _selectedImages = [];
 
   @override
   void initState() {
     super.initState();
-    _typeController.text = widget.initialType ?? '';
-    _descriptionController.text = widget.initialDescription ?? '';
-    _descriptionController.addListener(_checkFormFilled);
-    _typeController.addListener(_checkFormFilled);
-  }
-
-  void _checkFormFilled() {
-    final filled = _descriptionController.text.isNotEmpty && _typeController.text.isNotEmpty;
-    if (filled != isFormFilled) {
-      setState(() {
-        isFormFilled = filled;
-      });
-    }
+    context.read<CreateNewThingBloc>().add(
+          InitTypeFormEvent(
+            initialType: widget.initialType,
+            initialDescription: widget.initialDescription,
+          ),
+        );
   }
 
   Future<void> _pickAndCropImage() async {
     final File? croppedImage = await ImagePickerHelper.pickImage();
     if (croppedImage != null) {
-      setState(() {
-        _selectedImages.add(croppedImage);
-      });
+      context.read<CreateNewThingBloc>().add(AddImageEvent(croppedImage));
     }
-  }
-
-  String getRandomColor() {
-    final random = Random();
-    return '#${random.nextInt(0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
   }
 
   @override
@@ -85,174 +60,196 @@ class _AddTypePageState extends State<AddTypePage> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: const NewCustomAppBar(
+      backgroundColor: Colors.white,
+      appBar: const NewCustomAppBar(
         showSearchIcon: false,
         showBackButton: false,
         logo: SizedBox.shrink(),
-    ),
-    body: BlocListener<CreateNewThingBloc, CreateNewThingState>(
-      listener: (context, state) {
-        if (state.errorMessage != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.errorMessage!)),
-          );
-        }
-
-        if (state.isSuccess) {
-          final type = _typeController.text.trim();
-          Navigator.pop(context, type);
-        }
-      },
-    child: SafeArea(
-    child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            if (_showDrawer && _typeSet.isNotEmpty)
-              WidgetDrawer(
-                types: _typeSet.toList(),
-                onTypeSelected: (selectedType) {
-                  setState(() {
-                    _typeController.text = selectedType;
-                  });
-                },
-              ),
-            GestureDetector(
-              onTap: _pickAndCropImage,
-              child: Container(
-                height: screenHeight * 0.45,
-                width: double.infinity,
-                decoration: const BoxDecoration(color: Colors.white),
-                child: _selectedImages.isNotEmpty
-                    ? ImagePagerWithIndicator(
-                  files: _selectedImages,
-                  urls: _imageUrls,
-                  screenHeight: screenHeight * 0.5,
-                  onRemove: (index) {
-                    setState(() {
-                      _selectedImages.removeAt(index);
-                    });
-                  },
-                )
-
-
-                    : Center(
-                  child: Container(
-                    width: screenWidth * 0.5,
-                    height: screenWidth * 0.5,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Icon(
-                      Icons.add_a_photo_rounded,
-                      color: AppColors.grey,
-                      size: screenWidth * 0.18,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              top: screenHeight * 0.45,
-              left: 0,
-              right: 0,
-              child: Container(
-                height: screenHeight * 0.6,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  gradient: isDarkMode ? AppColors.darkBlueGradient : null,
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      spreadRadius: 3,
-                      blurRadius: 5,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                  border: const Border(top: BorderSide()),
-                ),
-                child: Column(
-                  children: [
-                    TextField(
-                      controller: _typeController,
-                      decoration: InputDecoration(
-                        hintText: 'CATEGORY NAME',
-                        border: InputBorder.none,
-                        suffixIcon: Icon(Icons.edit,
-                            color: isDarkMode ? Colors.white : Colors.black),
-                      ),
-                      style: TextStyle(
-                        color: isDarkMode ? Colors.white : Colors.black,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _descriptionController,
-                      decoration: InputDecoration(
-                        hintText: S.of(context).description,
-                        border: InputBorder.none,
-                      ),
-                      style: TextStyle(fontSize: screenWidth * 0.045),
-                      maxLines: 4,
-                      minLines: 1,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                height: screenHeight * 0.15,
-                decoration: BoxDecoration(
-                  color: isDarkMode ? AppColors.blackSand : AppColors.whiteColor,
-                  border: const Border(top: BorderSide()),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      CustomMainButton(
-                        text: 'SAVE',
-                        textColor: Colors.white,
-                        backgroundColor: Colors.black,
-                        isEnabled: isFormFilled,
-                        onPressed: () async {
-                          final type = _typeController.text.trim();
-                          final description = _descriptionController.text.trim();
-                          final bloc = context.read<CreateNewThingBloc>()
-
-                          ..add(SaveTypeEvent(
-                            type: type,
-                            description: description,
-                            isEditing: widget.isEditing,
-                            editingItemId: widget.editingItemId,
-                            files: _selectedImages,
-                          ));
-
-
-                        },
-                      ),
-                      CustomMainButton(
-                        text: 'DELETE',
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
-    ),
+      body: BlocConsumer<CreateNewThingBloc, CreateNewThingState>(
+        listener: (context, state) {
+          if (state.errorMessage != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.errorMessage!)),
+            );
+          }
+
+          if (state.isSuccess) {
+            Navigator.pop(context, state.type.trim());
+          }
+        },
+        builder: (context, state) {
+          return SafeArea(
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                if (_showDrawer && _typeSet.isNotEmpty)
+                  WidgetDrawer(
+                    types: _typeSet.toList(),
+                    onTypeSelected: (selectedType) {
+                      context.read<CreateNewThingBloc>().add(
+                            TypeChangedEvent(selectedType),
+                          );
+                    },
+                  ),
+                GestureDetector(
+                  onTap: _pickAndCropImage,
+                  child: Container(
+                    height: screenHeight * 0.45,
+                    width: double.infinity,
+                    decoration: const BoxDecoration(color: Colors.white),
+                    child: state.files.isNotEmpty
+                        ? ImagePagerWithIndicator(
+                            files: state.files,
+                            urls: widget.initialImageUrls ?? [],
+                            screenHeight: screenHeight * 0.5,
+                            onRemove: (index) {
+                              context
+                                  .read<CreateNewThingBloc>()
+                                  .add(RemoveImageEvent(index));
+                            },
+                          )
+                        : Center(
+                            child: Container(
+                              width: screenWidth * 0.5,
+                              height: screenWidth * 0.5,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Icon(
+                                Icons.add_a_photo_rounded,
+                                color: AppColors.grey,
+                                size: screenWidth * 0.18,
+                              ),
+                            ),
+                          ),
+                  ),
+                ),
+                Positioned(
+                  top: screenHeight * 0.45,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    height: screenHeight * 0.6,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      gradient: isDarkMode ? AppColors.darkBlueGradient : null,
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          spreadRadius: 3,
+                          blurRadius: 5,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                      border: const Border(top: BorderSide()),
+                    ),
+                    child: Column(
+                      children: [
+                        TextField(
+                          onChanged: (value) => context
+                              .read<CreateNewThingBloc>()
+                              .add(TypeChangedEvent(value)),
+                          controller: TextEditingController.fromValue(
+                            TextEditingValue(
+                              text: state.type,
+                              selection: TextSelection.collapsed(
+                                  offset: state.type.length),
+                            ),
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'CATEGORY NAME',
+                            border: InputBorder.none,
+                            suffixIcon: Icon(
+                              Icons.edit,
+                              color: isDarkMode ? Colors.white : Colors.black,
+                            ),
+                          ),
+                          style: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.black,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          onChanged: (value) => context
+                              .read<CreateNewThingBloc>()
+                              .add(DescriptionChangedEvent(value)),
+                          controller: TextEditingController.fromValue(
+                            TextEditingValue(
+                              text: state.description,
+                              selection: TextSelection.collapsed(
+                                  offset: state.description.length),
+                            ),
+                          ),
+                          decoration: InputDecoration(
+                            hintText: S.of(context).description,
+                            border: InputBorder.none,
+                          ),
+                          style: TextStyle(fontSize: screenWidth * 0.045),
+                          maxLines: 4,
+                          minLines: 1,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    height: screenHeight * 0.15,
+                    decoration: BoxDecoration(
+                      color: isDarkMode
+                          ? AppColors.blackSand
+                          : AppColors.whiteColor,
+                      border: const Border(top: BorderSide()),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          CustomMainButton(
+                            text: 'SAVE',
+                            textColor: Colors.white,
+                            backgroundColor: Colors.black,
+                            isEnabled: state.isFormFilled,
+                            onPressed: () {
+                              context.read<CreateNewThingBloc>().add(
+                                    SaveTypeEvent(
+                                      type: state.type.trim(),
+                                      description: state.description.trim(),
+                                      isEditing: widget.isEditing,
+                                      editingItemId: widget.editingItemId,
+                                      files: state.files,
+                                    ),
+                                  );
+                            },
+                          ),
+                          CustomMainButton(
+                            text: 'DELETE',
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const Align(
+                  alignment: Alignment.topCenter,
+                  child: InternetBannerOverlay(),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }
