@@ -31,19 +31,38 @@ class AddTypePage extends StatefulWidget {
   State<AddTypePage> createState() => _AddTypePageState();
 }
 
-class _AddTypePageState extends State<AddTypePage> {
+class _AddTypePageState extends State<AddTypePage> with WidgetsBindingObserver {
   final Set<String> _typeSet = {};
   final bool _showDrawer = false;
+  bool _isKeyboardVisible = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     context.read<CreateNewThingBloc>().add(
           InitTypeFormEvent(
             initialType: widget.initialType,
             initialDescription: widget.initialDescription,
           ),
         );
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
+    final isVisible = bottomInset > 0.0;
+    if (_isKeyboardVisible != isVisible) {
+      setState(() {
+        _isKeyboardVisible = isVisible;
+      });
+    }
   }
 
   Future<void> _pickAndCropImage() async {
@@ -126,8 +145,12 @@ class _AddTypePageState extends State<AddTypePage> {
                           ),
                   ),
                 ),
-                Positioned(
-                  top: screenHeight * 0.45,
+                AnimatedPositioned(
+                  duration: const Duration(milliseconds: 100),
+                  curve: Curves.easeInOut,
+                  top: _isKeyboardVisible
+                      ? screenHeight * 0.15
+                      : screenHeight * 0.45,
                   left: 0,
                   right: 0,
                   child: Container(
