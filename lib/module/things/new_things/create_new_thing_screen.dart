@@ -70,8 +70,8 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen>
 
   @override
   void didChangeMetrics() {
-    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-    final isVisible = bottomInset > 0;
+    final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
+    final isVisible = bottomInset > 0.0;
     if (_isKeyboardVisible != isVisible) {
       setState(() {
         _isKeyboardVisible = isVisible;

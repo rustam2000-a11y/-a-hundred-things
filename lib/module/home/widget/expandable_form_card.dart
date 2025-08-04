@@ -16,7 +16,8 @@ class ExpandableFormCard extends StatefulWidget {
     required this.importanceLevel,
     required this.onImportanceChanged,
     this.quantityController,
-    this.hashtagController, required this.isKeyboardVisible,
+    this.hashtagController,
+    required this.isKeyboardVisible,
   });
 
   final bool isExpanded;
@@ -32,7 +33,6 @@ class ExpandableFormCard extends StatefulWidget {
   final TextEditingController? hashtagController;
   final bool isKeyboardVisible;
 
-
   @override
   State<ExpandableFormCard> createState() => _ExpandableFormCardState();
 }
@@ -40,15 +40,15 @@ class ExpandableFormCard extends StatefulWidget {
 class _ExpandableFormCardState extends State<ExpandableFormCard> {
   @override
   Widget build(BuildContext context) {
-    
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
-      top: widget.isExpanded
-          ? (widget.isKeyboardVisible ? 20 : widget.screenHeight * 0.30)
-          : (widget.isKeyboardVisible ? 60 : widget.screenHeight * 0.45),
-
-      bottom: widget.screenHeight * 0.11,
+      top: widget.isKeyboardVisible
+          ? (widget.isExpanded ? 20 : 60)
+          : (widget.isExpanded
+              ? widget.screenHeight * 0.30
+              : widget.screenHeight * 0.45),
+      bottom: widget.screenHeight * 0.16,
       left: 0,
       right: 0,
       child: AnimatedContainer(
@@ -80,8 +80,6 @@ class _ExpandableFormCardState extends State<ExpandableFormCard> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: SingleChildScrollView(
-
-                
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -128,7 +126,6 @@ class _ExpandableFormCardState extends State<ExpandableFormCard> {
                           label: 'Hashtag ',
                           controller: widget.hashtagController,
                         ),
-                
                       ],
                       GestureDetector(
                         onTap: () {
@@ -152,8 +149,8 @@ class _ExpandableFormCardState extends State<ExpandableFormCard> {
                               AnimatedRotation(
                                 turns: widget.isExpanded ? 0.5 : 0.0,
                                 duration: const Duration(milliseconds: 300),
-                                child:
-                                    const Icon(Icons.keyboard_arrow_up, size: 24),
+                                child: const Icon(Icons.keyboard_arrow_up,
+                                    size: 24),
                               ),
                             ],
                           ),
