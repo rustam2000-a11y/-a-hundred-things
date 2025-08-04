@@ -79,6 +79,10 @@ class _NewCustomAppBarState extends State<NewCustomAppBar> {
 
     return AppBar(
       backgroundColor: Colors.white,
+      elevation: 0,
+      shadowColor: Colors.transparent,
+      surfaceTintColor: Colors.white,
+
       leading: widget.showBackButton
           ? IconButton(
               icon: const Icon(Icons.arrow_back),
