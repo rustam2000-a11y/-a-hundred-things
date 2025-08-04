@@ -204,29 +204,27 @@ class CategoriePageState extends State<CategoriePage> {
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 8.0, vertical: 6.0),
-                              child: TypeCardWidget(
-                                isSelected: selectedItemsNotifier.value
-                                    .contains(category.id),
-                                isDarkTheme: isDarkMode,
-                                typDescription: category.typDescription,
-                                imageUrl: category.imageUrl,
-                                itemId: category.id,
-                                type: category.type.isNotEmpty
-                                    ? category.type.first
-                                    : '',
-                                onDeleteItem: () async {
-                                  final type = category.type.isNotEmpty
-                                      ? category.type.first
-                                      : null;
-                                  if (type != null) {
-                                    await _bloc.deleteTypeAndAllThingsWithType(
-                                        type, category.id);
-                                    setState(() {});
-                                  }
-                                },
-                                selectedCategoryType: _selectedCategoryType,
-                                onStateUpdate: () => setState(() {}),
+                              child: BlocProvider.value(
+                                value: GetIt.I<CreateNewThingBloc>(),
+                                child: TypeCardWidget(
+                                  isSelected: selectedItemsNotifier.value.contains(category.id),
+                                  isDarkTheme: isDarkMode,
+                                  typDescription: category.typDescription,
+                                  imageUrl: category.imageUrl,
+                                  itemId: category.id,
+                                  type: category.type.isNotEmpty ? category.type.first : '',
+                                  onDeleteItem: () async {
+                                    final type = category.type.isNotEmpty ? category.type.first : null;
+                                    if (type != null) {
+                                      await _bloc.deleteTypeAndAllThingsWithType(type, category.id);
+                                      setState(() {});
+                                    }
+                                  },
+                                  selectedCategoryType: _selectedCategoryType,
+                                  onStateUpdate: () => setState(() {}),
+                                ),
                               ),
+
                             ),
                           );
                         },

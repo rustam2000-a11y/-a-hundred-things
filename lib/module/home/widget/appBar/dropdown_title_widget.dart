@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 
+import '../../../things/new_things/create_new_thing_bloc.dart';
 import '../type_widget/type_add_screen.dart';
 
 class WidgetDrawer extends StatelessWidget {
@@ -51,15 +54,20 @@ class WidgetDrawer extends StatelessWidget {
                             onTap: () async {
                               final newType = await Navigator.push<String>(
                                 context,
-                                MaterialPageRoute(builder: (context) => const AddTypePage()),
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      BlocProvider<CreateNewThingBloc>(
+                                    create: (_) =>
+                                        GetIt.I<CreateNewThingBloc>(),
+                                    child: const AddTypePage(),
+                                  ),
+                                ),
                               );
 
                               if (newType != null && !types.contains(newType)) {
                                 Navigator.pop(context, newType);
                               }
-
                             },
-
                             child: const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -76,7 +84,6 @@ class WidgetDrawer extends StatelessWidget {
                               ],
                             ),
                           ),
-
                         ],
                       ),
                       const SizedBox(height: 12),
@@ -95,7 +102,6 @@ class WidgetDrawer extends StatelessWidget {
                               onTap: () {
                                 Navigator.pop(context, types[index]);
                               },
-
                               child: Padding(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 12),

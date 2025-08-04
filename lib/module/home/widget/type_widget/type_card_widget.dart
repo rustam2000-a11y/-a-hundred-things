@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../things/new_things/create_new_thing_bloc.dart';
 import '../action_icons.dart';
 
 import '../item_image.dart';
@@ -83,12 +85,15 @@ class TypeCardWidget extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute<void>(
-                                  builder: (_) => AddTypePage(
-                                    initialType: type,
-                                    initialDescription: typDescription,
-                                    initialImageUrls: imageUrl,
-                                    isEditing: true,
-                                    editingItemId: itemId,
+                                  builder: (_) => BlocProvider.value(
+                                    value: context.read<CreateNewThingBloc>(),
+                                    child: AddTypePage(
+                                      initialType: type,
+                                      initialDescription: typDescription,
+                                      initialImageUrls: imageUrl,
+                                      isEditing: true,
+                                      editingItemId: itemId,
+                                    ),
                                   ),
                                 ),
                               );
