@@ -16,7 +16,7 @@ class ExpandableFormCard extends StatefulWidget {
     required this.importanceLevel,
     required this.onImportanceChanged,
     this.quantityController,
-    this.hashtagController,
+    this.hashtagController, required this.isKeyboardVisible,
   });
 
   final bool isExpanded;
@@ -30,6 +30,7 @@ class ExpandableFormCard extends StatefulWidget {
   final ValueChanged<String> onImportanceChanged;
   final TextEditingController? quantityController;
   final TextEditingController? hashtagController;
+  final bool isKeyboardVisible;
 
 
   @override
@@ -39,12 +40,14 @@ class ExpandableFormCard extends StatefulWidget {
 class _ExpandableFormCardState extends State<ExpandableFormCard> {
   @override
   Widget build(BuildContext context) {
+    
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
       top: widget.isExpanded
-          ? widget.screenHeight * 0.30
-          : widget.screenHeight * 0.45,
+          ? (widget.isKeyboardVisible ? 20 : widget.screenHeight * 0.30)
+          : (widget.isKeyboardVisible ? 60 : widget.screenHeight * 0.45),
+
       bottom: widget.screenHeight * 0.11,
       left: 0,
       right: 0,
@@ -74,86 +77,90 @@ class _ExpandableFormCardState extends State<ExpandableFormCard> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.zero,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: TextField(
-                        controller: widget.titleController,
-                        decoration: InputDecoration(
-                          labelText: S.of(context).enterAName,
-                          labelStyle: const TextStyle(fontSize: 24),
-                          border: InputBorder.none,
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.edit),
-                            onPressed: () {},
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: SingleChildScrollView(
+
+                
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: TextField(
+                          controller: widget.titleController,
+                          decoration: InputDecoration(
+                            labelText: S.of(context).enterAName,
+                            labelStyle: const TextStyle(fontSize: 24),
+                            border: InputBorder.none,
+                            suffixIcon: IconButton(
+                              icon: const Icon(Icons.edit),
+                              onPressed: () {},
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: widget.screenHeight * 0.02),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: TextField(
-                        controller: widget.descriptionController,
-                        decoration: InputDecoration(
-                          labelText: S.of(context).description,
-                          labelStyle: const TextStyle(fontSize: 14),
-                          border: InputBorder.none,
+                      SizedBox(height: widget.screenHeight * 0.02),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: TextField(
+                          controller: widget.descriptionController,
+                          decoration: InputDecoration(
+                            labelText: S.of(context).description,
+                            labelStyle: const TextStyle(fontSize: 14),
+                            border: InputBorder.none,
+                          ),
+                          style: const TextStyle(fontSize: 14),
+                          maxLines: 4,
+                          minLines: 1,
                         ),
-                        style: const TextStyle(fontSize: 14),
-                        maxLines: 4,
-                        minLines: 1,
                       ),
-                    ),
-                    if (widget.isExpanded) ...[
-                      const SizedBox(height: 16),
-                      buildImportanceHorizontalSelector(
-                        selectedValue: widget.importanceLevel,
-                        onChanged: widget.onImportanceChanged,
-                      ),
-                      _buildFieldRow(
-                          label: 'Quantity',
-                          controller: widget.quantityController),
-                      _buildFieldRow(
-                        label: 'Hashtag ',
-                        controller: widget.hashtagController,
-                      ),
-
-                    ],
-                    GestureDetector(
-                      onTap: () {
-                        widget.onExpandChanged(!widget.isExpanded);
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
-                        width: double.infinity,
-                        color: Colors.transparent,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'More options',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
+                      if (widget.isExpanded) ...[
+                        const SizedBox(height: 16),
+                        buildImportanceHorizontalSelector(
+                          selectedValue: widget.importanceLevel,
+                          onChanged: widget.onImportanceChanged,
+                        ),
+                        _buildFieldRow(
+                            label: 'Quantity',
+                            controller: widget.quantityController),
+                        _buildFieldRow(
+                          label: 'Hashtag ',
+                          controller: widget.hashtagController,
+                        ),
+                
+                      ],
+                      GestureDetector(
+                        onTap: () {
+                          widget.onExpandChanged(!widget.isExpanded);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                          width: double.infinity,
+                          color: Colors.transparent,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'More options',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
-                            AnimatedRotation(
-                              turns: widget.isExpanded ? 0.5 : 0.0,
-                              duration: const Duration(milliseconds: 300),
-                              child:
-                                  const Icon(Icons.keyboard_arrow_up, size: 24),
-                            ),
-                          ],
+                              AnimatedRotation(
+                                turns: widget.isExpanded ? 0.5 : 0.0,
+                                duration: const Duration(milliseconds: 300),
+                                child:
+                                    const Icon(Icons.keyboard_arrow_up, size: 24),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

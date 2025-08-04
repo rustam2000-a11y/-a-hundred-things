@@ -25,7 +25,8 @@ class CreateNewThingScreen extends StatefulWidget {
   State<CreateNewThingScreen> createState() => _CreateNewThingScreenState();
 }
 
-class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
+class _CreateNewThingScreenState extends State<CreateNewThingScreen>
+    with WidgetsBindingObserver {
   final _hashtagController = TextEditingController();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -43,17 +44,38 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
       _titleController.text.trim().isNotEmpty &&
       _descriptionController.text.trim().isNotEmpty;
 
+  bool _isKeyboardVisible = false;
+
   @override
   void initState() {
     super.initState();
     _bloc = GetIt.I<CreateNewThingBloc>();
     _typeSet.addAll(widget.allTypes);
 
+    WidgetsBinding.instance.addObserver(this);
+
     if (widget.existingThing != null) {
       _existingDocId = widget.existingThing!['id'] as String?;
       if (_existingDocId != null) {
         _bloc.add(LoadThingEvent(_existingDocId!));
       }
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final isVisible = bottomInset > 0;
+    if (_isKeyboardVisible != isVisible) {
+      setState(() {
+        _isKeyboardVisible = isVisible;
+      });
     }
   }
 
@@ -142,6 +164,7 @@ class _CreateNewThingScreenState extends State<CreateNewThingScreen> {
                       setState(() => _selectedImportance = value),
                   onExpandChanged: (value) =>
                       setState(() => _isExpanded = value),
+                  isKeyboardVisible: _isKeyboardVisible,
                 ),
                 CreateThingBottomBar(
                   screenHeight: MediaQuery.of(context).size.height,
