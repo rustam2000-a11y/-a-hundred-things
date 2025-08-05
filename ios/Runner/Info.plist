@@ -52,6 +52,11 @@
 				</array>
 			</dict>
 		</array>
+		<key>LSApplicationQueriesSchemes</key>
+        <array>
+          <string>google</string>
+          <string>com.googleusercontent.apps.563104722540-7lbaergo0pv7ocgnjrl9ora4vg9m05p2</string>
+        </array>
 		<key>NSPhotoLibraryUsageDescription</key>
             <string>We need access to your photo library to let you choose photos for upload.</string>
 
