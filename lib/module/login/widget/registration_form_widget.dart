@@ -42,6 +42,7 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: BlocListener<RegistrationBloc, RegistrationState>(
         bloc: _bloc,
@@ -72,6 +73,16 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
         child: BlocBuilder<RegistrationBloc, RegistrationState>(
           bloc: _bloc,
           builder: (context, state) {
+            String? emailError;
+            String? passwordError;
+            String? nameError;
+
+            if (state is RegistrationValidationError) {
+              emailError = state.emailError;
+              passwordError = state.passwordError;
+              nameError = state.nameError;
+            }
+
             return SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
@@ -84,7 +95,10 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
                     child: CustomText3(text: S.of(context).emailAdderss),
                   ),
                   const SizedBox(height: 4),
-                  CustomTextField(controller: _emailController),
+                  CustomTextField(
+                    controller: _emailController,
+                    errorText: emailError,
+                  ),
                   const SizedBox(height: 16),
                   Align(
                     alignment: Alignment.bottomLeft,
@@ -94,6 +108,7 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
                   CustomTextField(
                     controller: _passwordController,
                     isPasswordField: true,
+                    errorText: passwordError,
                   ),
                   const SizedBox(height: 16),
                   const Align(
@@ -101,19 +116,23 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
                     child: CustomText3(text: 'Name'),
                   ),
                   const SizedBox(height: 4),
-                  CustomTextField(controller: _nameController),
+                  CustomTextField(
+                    controller: _nameController,
+                    errorText: nameError,
+                  ),
                   const SizedBox(height: 18),
                   ReusableButton(
                     text: _isSubmitting ? 'Loading...' : S.of(context).next,
                     onPressed: _isSubmitting
                         ? null
                         : () {
-                      _bloc.add(RegisterWithEmailEvent(
+                      _bloc.add(ValidateFieldsBeforeRegisterEvent(
                         _emailController.text.trim(),
                         _passwordController.text.trim(),
                         _nameController.text.trim(),
                       ));
                     },
+
                   ),
                   const SizedBox(height: 20),
                   DividerWithText(text: S.of(context).or),

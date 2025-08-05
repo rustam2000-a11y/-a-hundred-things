@@ -13,6 +13,8 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     on<RegisterWithEmailEvent>(_onRegisterWithEmail);
     on<RegisterWithGoogleEvent>(_onRegisterWithGoogle);
     on<RegisterWithAppleEvent>(_onRegisterWithApple);
+    on<ValidateFieldsBeforeRegisterEvent>(_onValidateFieldsBeforeRegister);
+
   }
 
   Future<void> _onRegisterWithEmail(
@@ -95,4 +97,24 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
       _isHandlingRegistration = false;
     }
   }
+  void _onValidateFieldsBeforeRegister(
+      ValidateFieldsBeforeRegisterEvent event,
+      Emitter<RegistrationState> emit,
+      ) {
+    final emailError = event.email.trim().isEmpty ? 'Email is required' : null;
+    final passwordError = event.password.trim().isEmpty ? 'Password is required' : null;
+    final nameError = event.name.trim().isEmpty ? 'Name is required' : null;
+
+    if (emailError != null || passwordError != null || nameError != null) {
+      emit(RegistrationValidationError(
+        emailError: emailError,
+        passwordError: passwordError,
+        nameError: nameError,
+      ));
+      return;
+    }
+
+    add(RegisterWithEmailEvent(event.email.trim(), event.password.trim(), event.name.trim()));
+  }
+
 }

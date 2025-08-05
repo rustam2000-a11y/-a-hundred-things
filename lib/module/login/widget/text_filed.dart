@@ -8,13 +8,14 @@ class CustomTextField extends StatefulWidget {
      this.hintText,
     this.isPasswordField = false,
     this.height,
+    this.errorText,
   }) : super(key: key);
 
   final TextEditingController controller;
   final Widget? hintText;
   final bool isPasswordField;
   final double? height;
-
+  final String? errorText;
   @override
   _CustomTextFieldState createState() => _CustomTextFieldState();
 }
@@ -38,18 +39,23 @@ class _CustomTextFieldState extends State<CustomTextField> {
               contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               filled: true,
               fillColor: Colors.transparent,
+              errorText: widget.errorText,
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(4),
                 borderSide: BorderSide(
-                  color: isDarkMode ? Colors.black : Colors.black,
+                  color: widget.errorText != null
+                      ? Colors.red
+                      : (isDarkMode ? Colors.black : Colors.black),
                 ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(4),
                 borderSide: BorderSide(
-                  color: isDarkMode
+                  color: widget.errorText != null
+                      ? Colors.red
+                      : (isDarkMode
                       ? AppColors.blueGradient.colors.first
-                      : Colors.black,
+                      : Colors.black),
                 ),
               ),
               suffixIcon: widget.isPasswordField
@@ -69,6 +75,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
               )
                   : null,
             ),
+
           ),
           Positioned(
             left: 12,

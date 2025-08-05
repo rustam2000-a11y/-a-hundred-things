@@ -21,3 +21,14 @@ class RegisterWithEmailEvent extends RegistrationEvent {
 class RegisterWithGoogleEvent extends RegistrationEvent {}
 
 class RegisterWithAppleEvent extends RegistrationEvent {}
+
+class ValidateFieldsBeforeRegisterEvent extends RegistrationEvent {
+
+  const ValidateFieldsBeforeRegisterEvent(this.email, this.password, this.name);
+  final String email;
+  final String password;
+  final String name;
+
+  @override
+  List<Object> get props => [email, password, name];
+}
