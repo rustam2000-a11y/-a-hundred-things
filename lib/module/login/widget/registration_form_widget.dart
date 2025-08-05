@@ -24,7 +24,7 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
   final TextEditingController _nameController = TextEditingController();
 
   late final RegistrationBloc _bloc;
-  bool _isSubmitting = false;
+
   @override
   void initState() {
     _bloc = GetIt.I<RegistrationBloc>();
@@ -42,47 +42,28 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: BlocListener<RegistrationBloc, RegistrationState>(
         bloc: _bloc,
         listener: (context, state) {
-          if (state is RegistrationLoading) {
-            setState(() {
-              _isSubmitting = true;
-            });
-          } else if (state is RegistrationSuccess) {
-            setState(() {
-              _isSubmitting = false;
-            });
+          if (state.isSuccess) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute<void>(
                 builder: (_) => MyHomePage(toggleTheme: () {}),
               ),
             );
-          } else if (state is RegistrationFailure) {
-            setState(() {
-              _isSubmitting = false;
-            });
+          }
+
+          if (state.errorMessage != null) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
+              SnackBar(content: Text(state.errorMessage!)),
             );
           }
         },
         child: BlocBuilder<RegistrationBloc, RegistrationState>(
           bloc: _bloc,
           builder: (context, state) {
-            String? emailError;
-            String? passwordError;
-            String? nameError;
-
-            if (state is RegistrationValidationError) {
-              emailError = state.emailError;
-              passwordError = state.passwordError;
-              nameError = state.nameError;
-            }
-
             return SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
@@ -90,6 +71,7 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
                   const SizedBox(height: 64),
                   const CustomText(text: 'Create a profile'),
                   const SizedBox(height: 64),
+
                   Align(
                     alignment: Alignment.bottomLeft,
                     child: CustomText3(text: S.of(context).emailAdderss),
@@ -97,8 +79,9 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
                   const SizedBox(height: 4),
                   CustomTextField(
                     controller: _emailController,
-                    errorText: emailError,
+                    errorText: state.emailError,
                   ),
+
                   const SizedBox(height: 16),
                   Align(
                     alignment: Alignment.bottomLeft,
@@ -108,8 +91,9 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
                   CustomTextField(
                     controller: _passwordController,
                     isPasswordField: true,
-                    errorText: passwordError,
+                    errorText: state.passwordError,
                   ),
+
                   const SizedBox(height: 16),
                   const Align(
                     alignment: Alignment.bottomLeft,
@@ -118,39 +102,41 @@ class _RegistrationFormWidgetState extends State<RegistrationFormWidget> {
                   const SizedBox(height: 4),
                   CustomTextField(
                     controller: _nameController,
-                    errorText: nameError,
+                    errorText: state.nameError,
                   ),
                   const SizedBox(height: 18),
                   ReusableButton(
-                    text: _isSubmitting ? 'Loading...' : S.of(context).next,
-                    onPressed: _isSubmitting
+                    text: state.isLoading ? 'Loading...' : S.of(context).next,
+                    onPressed: state.isLoading
                         ? null
                         : () {
-                      _bloc.add(ValidateFieldsBeforeRegisterEvent(
-                        _emailController.text.trim(),
-                        _passwordController.text.trim(),
-                        _nameController.text.trim(),
-                      ));
-                    },
-
+                            _bloc.add(ValidateFieldsBeforeRegisterEvent(
+                              _emailController.text.trim(),
+                              _passwordController.text.trim(),
+                              _nameController.text.trim(),
+                            ));
+                          },
                   ),
+
                   const SizedBox(height: 20),
                   DividerWithText(text: S.of(context).or),
                   const SizedBox(height: 20),
+
                   CustomButtonRegist(
                     text: S.of(context).continueWithGoogle,
                     image: const AssetImage('assets/images/google.png'),
-                    onPressed: () {
-                      _bloc.add( RegisterWithGoogleEvent());
-                    },
+                    onPressed: state.isLoading
+                        ? null
+                        : () => _bloc.add(RegisterWithGoogleEvent()),
                   ),
+
                   const SizedBox(height: 15),
                   CustomButtonRegist(
                     text: S.of(context).continueWithApple,
                     icon: Icons.apple,
-                    onPressed: () {
-                      _bloc.add( RegisterWithAppleEvent());
-                    },
+                    onPressed: state.isLoading
+                        ? null
+                        : () => _bloc.add(RegisterWithAppleEvent()),
                   ),
                 ],
               ),

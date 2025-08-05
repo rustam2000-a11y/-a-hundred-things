@@ -6,15 +6,44 @@ import 'registration_state.dart';
 
 @injectable
 class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
-  final AuthRepositoryI _authRepository;
-  bool _isHandlingRegistration = false;
-
-  RegistrationBloc(this._authRepository) : super(RegistrationInitial()) {
+  RegistrationBloc(this._authRepository)
+      : super(const RegistrationState()) {
+    on<ValidateFieldsBeforeRegisterEvent>(_onValidateFieldsBeforeRegister);
     on<RegisterWithEmailEvent>(_onRegisterWithEmail);
     on<RegisterWithGoogleEvent>(_onRegisterWithGoogle);
     on<RegisterWithAppleEvent>(_onRegisterWithApple);
-    on<ValidateFieldsBeforeRegisterEvent>(_onValidateFieldsBeforeRegister);
+  }
 
+  final AuthRepositoryI _authRepository;
+  bool _isHandlingRegistration = false;
+
+  void _onValidateFieldsBeforeRegister(
+      ValidateFieldsBeforeRegisterEvent event,
+      Emitter<RegistrationState> emit,
+      ) {
+    final emailError =
+    event.email.trim().isEmpty ? 'Email is required' : null;
+    final passwordError =
+    event.password.trim().isEmpty ? 'Password is required' : null;
+    final nameError =
+    event.name.trim().isEmpty ? 'Name is required' : null;
+
+    if (emailError != null || passwordError != null || nameError != null) {
+      emit(state.copyWith(
+        emailError: emailError,
+        passwordError: passwordError,
+        nameError: nameError,
+        isLoading: false,
+        isSuccess: false,
+      ));
+      return;
+    }
+
+    add(RegisterWithEmailEvent(
+      event.email.trim(),
+      event.password.trim(),
+      event.name.trim(),
+    ));
   }
 
   Future<void> _onRegisterWithEmail(
@@ -24,7 +53,11 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     if (_isHandlingRegistration) return;
     _isHandlingRegistration = true;
 
-    emit(RegistrationLoading());
+    emit(state.copyWith(
+      isLoading: true,
+      isSuccess: false,
+    ));
+
     try {
       final user = await _authRepository.register(event.email, event.password);
       if (user != null) {
@@ -33,12 +66,21 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
           'name': event.name,
           'password': event.password,
         });
-        emit(RegistrationSuccess());
+        emit(state.copyWith(
+          isLoading: false,
+          isSuccess: true,
+        ));
       } else {
-        emit(const RegistrationFailure('User is null'));
+        emit(state.copyWith(
+          isLoading: false,
+          errorMessage: 'User is null',
+        ));
       }
     } catch (e) {
-      emit(RegistrationFailure(e.toString()));
+      emit(state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString(),
+      ));
     } finally {
       _isHandlingRegistration = false;
     }
@@ -51,7 +93,11 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     if (_isHandlingRegistration) return;
     _isHandlingRegistration = true;
 
-    emit(RegistrationLoading());
+    emit(state.copyWith(
+      isLoading: true,
+      isSuccess: false,
+    ));
+
     try {
       final user = await _authRepository.loginWithGoogle();
       if (user != null) {
@@ -60,12 +106,21 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
           'name': user.displayName ?? '',
           'password': '',
         });
-        emit(RegistrationSuccess());
+        emit(state.copyWith(
+          isLoading: false,
+          isSuccess: true,
+        ));
       } else {
-        emit(const RegistrationFailure('Google Sign-In failed'));
+        emit(state.copyWith(
+          isLoading: false,
+          errorMessage: 'Google Sign-In failed',
+        ));
       }
     } catch (e) {
-      emit(RegistrationFailure(e.toString()));
+      emit(state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString(),
+      ));
     } finally {
       _isHandlingRegistration = false;
     }
@@ -78,7 +133,12 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     if (_isHandlingRegistration) return;
     _isHandlingRegistration = true;
 
-    emit(RegistrationLoading());
+    emit(state.copyWith(
+      isLoading: true,
+      isSuccess: false,
+
+    ));
+
     try {
       final user = await _authRepository.loginWithApple();
       if (user != null) {
@@ -87,34 +147,23 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
           'name': user.displayName ?? '',
           'password': '',
         });
-        emit(RegistrationSuccess());
+        emit(state.copyWith(
+          isLoading: false,
+          isSuccess: true,
+        ));
       } else {
-        emit(const RegistrationFailure('Apple Sign-In failed'));
+        emit(state.copyWith(
+          isLoading: false,
+          errorMessage: 'Apple Sign-In failed',
+        ));
       }
     } catch (e) {
-      emit(RegistrationFailure(e.toString()));
+      emit(state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString(),
+      ));
     } finally {
       _isHandlingRegistration = false;
     }
   }
-  void _onValidateFieldsBeforeRegister(
-      ValidateFieldsBeforeRegisterEvent event,
-      Emitter<RegistrationState> emit,
-      ) {
-    final emailError = event.email.trim().isEmpty ? 'Email is required' : null;
-    final passwordError = event.password.trim().isEmpty ? 'Password is required' : null;
-    final nameError = event.name.trim().isEmpty ? 'Name is required' : null;
-
-    if (emailError != null || passwordError != null || nameError != null) {
-      emit(RegistrationValidationError(
-        emailError: emailError,
-        passwordError: passwordError,
-        nameError: nameError,
-      ));
-      return;
-    }
-
-    add(RegisterWithEmailEvent(event.email.trim(), event.password.trim(), event.name.trim()));
-  }
-
 }

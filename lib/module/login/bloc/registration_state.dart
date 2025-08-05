@@ -1,38 +1,47 @@
 import 'package:equatable/equatable.dart';
 
-abstract class RegistrationState extends Equatable {
-  const RegistrationState();
-
-  @override
-  List<Object?> get props => [];
-}
-
-class RegistrationInitial extends RegistrationState {}
-
-class RegistrationLoading extends RegistrationState {}
-
-class RegistrationSuccess extends RegistrationState {}
-
-class RegistrationFailure extends RegistrationState {
-
-  const RegistrationFailure(this.message);
-  final String message;
-
-  @override
-  List<Object?> get props => [message];
-}
-class RegistrationValidationError extends RegistrationState {
-
-  const RegistrationValidationError({
+class RegistrationState extends Equatable {
+  const RegistrationState({
+    this.isLoading = false,
+    this.isSuccess = false,
+    this.errorMessage,
     this.emailError,
     this.passwordError,
     this.nameError,
   });
+
+  final bool isLoading;
+  final bool isSuccess;
+  final String? errorMessage;
   final String? emailError;
   final String? passwordError;
   final String? nameError;
 
   @override
-  List<Object?> get props => [emailError, passwordError, nameError];
-}
+  List<Object?> get props => [
+        isLoading,
+        isSuccess,
+        errorMessage,
+        emailError,
+        passwordError,
+        nameError,
+      ];
 
+  RegistrationState copyWith({
+    bool? isLoading,
+    bool? isSuccess,
+    String? errorMessage,
+    String? emailError,
+    String? passwordError,
+    String? nameError,
+  }) {
+    return RegistrationState(
+      isLoading: isLoading ?? this.isLoading,
+      isSuccess: isSuccess ?? this.isSuccess,
+      errorMessage: errorMessage,
+      emailError: emailError,
+      passwordError: passwordError,
+      nameError: nameError,
+    );
+  }
+}

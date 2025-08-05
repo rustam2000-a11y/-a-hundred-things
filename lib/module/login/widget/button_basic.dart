@@ -74,7 +74,7 @@ class CustomButtonRegist extends StatelessWidget {
   const CustomButtonRegist({
     super.key,
     required this.text,
-    required this.onPressed,
+    this.onPressed,
     this.icon,
     this.image,
     this.textColor = Colors.black,
@@ -84,7 +84,7 @@ class CustomButtonRegist extends StatelessWidget {
   });
 
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final IconData? icon;
   final ImageProvider<Object>? image;
   final Color textColor;
@@ -132,6 +132,7 @@ class CustomButtonRegist extends StatelessWidget {
     );
   }
 }
+
 
 class CustomMainButton extends StatelessWidget {
   const CustomMainButton({
