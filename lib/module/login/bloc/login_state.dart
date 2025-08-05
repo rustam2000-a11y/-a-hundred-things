@@ -1,35 +1,42 @@
 import 'package:equatable/equatable.dart';
 
-abstract class LoginState extends Equatable {
-  const LoginState();
-}
+class LoginState extends Equatable {
+  const LoginState({
+    this.isLoading = false,
+    this.isSuccess = false,
+    this.errorMessage,
+    this.emailError,
+    this.passwordError,
+  });
 
-class LoginInitial extends LoginState {
-  const LoginInitial();
-
-  @override
-  List<Object?> get props => [];
-}
-
-class LoginLoading extends LoginState {
-  const LoginLoading();
-
-  @override
-  List<Object?> get props => [];
-}
-
-class LoginSuccess extends LoginState {
-  const LoginSuccess();
+  final bool isLoading;
+  final bool isSuccess;
+  final String? errorMessage;
+  final String? emailError;
+  final String? passwordError;
 
   @override
-  List<Object?> get props => [];
-}
+  List<Object?> get props => [
+    isLoading,
+    isSuccess,
+    errorMessage,
+    emailError,
+    passwordError,
+  ];
 
-class LoginFailure extends LoginState {
-  final String message;
-
-  const LoginFailure(this.message);
-
-  @override
-  List<Object?> get props => [message];
+  LoginState copyWith({
+    bool? isLoading,
+    bool? isSuccess,
+    String? errorMessage,
+    String? emailError,
+    String? passwordError,
+  }) {
+    return LoginState(
+      isLoading: isLoading ?? this.isLoading,
+      isSuccess: isSuccess ?? this.isSuccess,
+      errorMessage: errorMessage,
+      emailError: emailError,
+      passwordError: passwordError,
+    );
+  }
 }

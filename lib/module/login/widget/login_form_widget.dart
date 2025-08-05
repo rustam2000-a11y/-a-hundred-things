@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import '../../../generated/l10n.dart';
-import '../../../presentation/colors.dart';
 import '../../home/my_home_page.dart';
 import '../bloc/login_bloc.dart';
 import '../bloc/login_event.dart';
@@ -50,28 +49,23 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
       body: BlocListener<LoginBloc, LoginState>(
         bloc: _bloc,
         listener: (context, state) {
-          if (state is LoginLoading) {
-            setState(() {
-              _isSubmitting = true;
-            });
-          } else if (state is LoginSuccess) {
-            setState(() {
-              _isSubmitting = false;
-            });
 
+          setState(() {
+            _isSubmitting = state.isLoading;
+          });
+
+          if (state.isSuccess) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute<void>(
                 builder: (_) => const MyHomePage(toggleTheme: null),
               ),
             );
-          } else if (state is LoginFailure) {
-            setState(() {
-              _isSubmitting = false;
-            });
+          }
 
+          if (state.errorMessage != null) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
+              SnackBar(content: Text(state.errorMessage!)),
             );
           }
         },
@@ -92,12 +86,16 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                       const SizedBox(height: 64),
                       CustomText3(text: S.of(context).emailAdderss),
                       const SizedBox(height: 5),
-                      CustomTextField(controller: _emailController),
+                      CustomTextField(
+                        controller: _emailController,
+                        errorText: state.emailError,
+                      ),
                       const SizedBox(height: 16),
                       CustomText3(text: S.of(context).password),
                       const SizedBox(height: 5),
                       CustomTextField(
                         controller: _passwordController,
+                        errorText: state.passwordError,
                         isPasswordField: true,
                       ),
                       const SizedBox(height: 16),
