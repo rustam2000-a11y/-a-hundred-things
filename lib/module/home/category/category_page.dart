@@ -46,15 +46,8 @@ class CategoriePageState extends State<CategoriePage> {
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<HomeBloc>(
-          create: (_) => _bloc,
-        ),
-        BlocProvider<AccountBloc>(
-          create: (_) => GetIt.I<AccountBloc>(),
-        ),
-      ],
+    return BlocProvider<HomeBloc>(
+      create: (_) => _bloc,
       child: BlocBuilder<HomeBloc, HomeState>(
         bloc: _bloc,
         builder: (context, state) {

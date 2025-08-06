@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import '../../../presentation/colors.dart';
 import '../../login/screen/login_screen.dart';
 import '../../settings/bloc/account_bloc/account_bloc.dart';
@@ -161,7 +162,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute<void>(
-                      builder: (context) => const CategoriePage(),
+                      builder: (context) => MultiBlocProvider(
+                        providers: [
+                          BlocProvider(create: (_) => GetIt.I<AccountBloc>()),
+                        ],
+                        child: const CategoriePage(),
+                      ),
                     ),
                   );
                 },
