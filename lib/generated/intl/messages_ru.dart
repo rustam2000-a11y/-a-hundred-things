@@ -57,6 +57,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "login": MessageLookupByLibrary.simpleMessage("Войти"),
         "mail": MessageLookupByLibrary.simpleMessage("Почта"),
         "name": MessageLookupByLibrary.simpleMessage("Имя"),
+        "noInternetConnection":
+            MessageLookupByLibrary.simpleMessage("Нет подключения к Интернету"),
         "number": MessageLookupByLibrary.simpleMessage("Номер"),
         "openEmail": MessageLookupByLibrary.simpleMessage("Open Email"),
         "or": MessageLookupByLibrary.simpleMessage("или"),

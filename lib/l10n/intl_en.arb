@@ -45,5 +45,6 @@
   "emailAdderss": "Email Adderss",
   "next": "NEXT",
   "openEmail": "Open Email",
-  "appleSignInError": "Apple Sign In Error"
+  "appleSignInError": "Apple Sign In Error",
+  "noInternetConnection": "No internet connection"
 }

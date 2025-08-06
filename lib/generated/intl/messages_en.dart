@@ -58,6 +58,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "mail": MessageLookupByLibrary.simpleMessage("Mail"),
         "name": MessageLookupByLibrary.simpleMessage("Name"),
         "next": MessageLookupByLibrary.simpleMessage("NEXT"),
+        "noInternetConnection":
+            MessageLookupByLibrary.simpleMessage("No internet connection"),
         "number": MessageLookupByLibrary.simpleMessage("Number"),
         "openEmail": MessageLookupByLibrary.simpleMessage("Open Email"),
         "or": MessageLookupByLibrary.simpleMessage("or"),
